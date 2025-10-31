@@ -5,11 +5,11 @@ import java.util.List;
 public class CareWorkerDTO {
     private int id;
     private String name;
-    private List<Integer> residentIds;
+    private List<int> residentIds;
 
     public CareWorkerDTO() {}
 
-    public CareWorkerDTO(int id, String name, List<Integer> residentIds) {
+    public CareWorkerDTO(int id, String name, List<int> residentIds) {
         this.id = id;
         this.name = name;
         this.residentIds = residentIds;
@@ -20,6 +20,6 @@ public class CareWorkerDTO {
     public void setId(int id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public List<Integer> getResidentIds() { return residentIds; }
-    public void setResidentIds(List<Integer> residentIds) { this.residentIds = residentIds; }
+    public List<int> getResidentIds() { return residentIds; }
+    public void setResidentIds(List<int> residentIds) { this.residentIds = residentIds; }
 }

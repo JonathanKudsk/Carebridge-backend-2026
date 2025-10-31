@@ -1,25 +1,25 @@
 package dto;
-
 import java.util.List;
 
 public class GuardianDTO {
     private int id;
     private String name;
-    private List<Integer> residentIds;
+    private List<int> residentIds;
 
     public GuardianDTO() {}
 
-    public GuardianDTO(int id, String name, List<Integer> residentIds) {
+    public GuardianDTO(int id, String name, List<int> residentIds) {
         this.id = id;
         this.name = name;
         this.residentIds = residentIds;
     }
 
-    // Getters + Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public List<Integer> getResidentIds() { return residentIds; }
-    public void setResidentIds(List<Integer> residentIds) { this.residentIds = residentIds; }
+
+    public List<int> getResidentIds() { return residentIds; }
+    public void setResidentIds(List<int> residentIds) { this.residentIds = residentIds; }
 }
