@@ -14,6 +14,12 @@ public class JournalEntry {
 
     private String title;
 
+    @Enumerated(EnumType.STRING)
+    private JournalType type;
+
+    @Enumerated(EnumType.STRING)
+    private RiskLevel risk;
+
     @Column(columnDefinition = "TEXT")
     private String content;
 
@@ -31,11 +37,23 @@ public class JournalEntry {
     @OneToMany(mappedBy = "journalEntry", cascade = CascadeType.ALL)
     private List<Tag> tags;
 
+    // 1 Entry → mange ChecklistItems
+    @OneToMany(mappedBy = "journalEntry", cascade = CascadeType.ALL)
+    private List<ChecklistItem> checklistItems;
+
+    // 1 Entry → mange Attachments
+    @OneToMany(mappedBy = "journalEntry", cascade = CascadeType.ALL)
+    private List<Attachment> attachments;
+
     // Getters + Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
+    public JournalType getType() { return type; }
+    public void setType(JournalType type) { this.type = type; }
+    public RiskLevel getRisk() { return risk; }
+    public void setRisk(RiskLevel risk) { this.risk = risk; }
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
     public int getAuthorId() { return authorId; }
@@ -48,5 +66,8 @@ public class JournalEntry {
     public void setJournal(Journal journal) { this.journal = journal; }
     public List<Tag> getTags() { return tags; }
     public void setTags(List<Tag> tags) { this.tags = tags; }
-
+    public List<ChecklistItem> getChecklistItems() { return checklistItems; }
+    public void setChecklistItems(List<ChecklistItem> checklistItems) { this.checklistItems = checklistItems; }
+    public List<Attachment> getAttachments() { return attachments; }
+    public void setAttachments(List<Attachment> attachments) { this.attachments = attachments; }
 }
