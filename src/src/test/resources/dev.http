@@ -1,0 +1,25 @@
+### Get server status (test route)
+GET http://localhost:7070/
+Accept: application/json
+
+### Create new journal entry (multipart upload)
+POST http://localhost:7070/api/journalentries
+Authorization: Bearer faketoken
+Content-Type: multipart/form-data; boundary=---123
+
+---123
+Content-Disposition: form-data; name="metadata"
+
+{
+  "journalId": 1,
+  "title": "Observation of morning routine",
+  "type": "DAILY_NOTE",
+  "content": "Resident was calm and cooperative. Had breakfast at 8:30.",
+  "risk": "LOW"
+}
+---123
+Content-Disposition: form-data; name="files"; filename="observation.pdf"
+Content-Type: application/pdf
+
+< ./src/test/resources/files/observation.pdf
+---123--

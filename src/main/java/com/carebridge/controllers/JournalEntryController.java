@@ -78,7 +78,7 @@ public class JournalEntryController {
         if (dto.getType() == null)
             result.addError("type", "Journal entry type is required");
         if (dto.getRisk() == null)
-            result.addError("risk", "Risk level is required");
+            result.addError("risk", "Risk assessment is required");
 
         return result;
     }
