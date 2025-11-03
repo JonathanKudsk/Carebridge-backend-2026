@@ -1,4 +1,4 @@
-package entity;
+package com.carebridge.models;
 
 import entity.enums.ChecklistStatus;
 import jakarta.persistence.*;
@@ -8,7 +8,7 @@ public class ChecklistItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String text;
 
@@ -21,8 +21,8 @@ public class ChecklistItem {
     private JournalEntry journalEntry;
 
     // Getters + Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getText() { return text; }
     public void setText(String text) { this.text = text; }
     public ChecklistStatus getStatus() { return status; }

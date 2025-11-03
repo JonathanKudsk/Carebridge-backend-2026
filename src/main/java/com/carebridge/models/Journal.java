@@ -1,4 +1,4 @@
-package entity;
+package com.carebridge.models;
 
 import jakarta.persistence.*;
 import java.util.List;
@@ -8,7 +8,7 @@ public class Journal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     // 1 Journal ↔ 1 Resident
     @OneToOne
@@ -20,8 +20,8 @@ public class Journal {
     private List<JournalEntry> entries;
 
     // Getters + Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public Resident getResident() { return resident; }
     public void setResident(Resident resident) { this.resident = resident; }
     public List<JournalEntry> getEntries() { return entries; }

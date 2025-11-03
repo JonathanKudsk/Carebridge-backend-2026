@@ -1,4 +1,4 @@
-package entity;
+package com.carebridge.models;
 
 import entity.enums.*;
 import jakarta.persistence.*;

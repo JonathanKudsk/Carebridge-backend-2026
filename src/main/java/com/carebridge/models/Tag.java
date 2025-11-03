@@ -1,4 +1,4 @@
-package entity;
+package com.carebridge.models;
 
 import jakarta.persistence.*;
 
@@ -7,7 +7,7 @@ public class Tag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String value;
 
@@ -17,8 +17,8 @@ public class Tag {
     private JournalEntry journalEntry;
 
     // Getters + Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getValue() { return value; }
     public void setValue(String value) { this.value = value; }
     public JournalEntry getJournalEntry() { return journalEntry; }

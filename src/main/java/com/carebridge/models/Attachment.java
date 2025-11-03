@@ -1,4 +1,4 @@
-package entity;
+package com.carebridge.models;
 
 import jakarta.persistence.*;
 
@@ -7,12 +7,12 @@ public class Attachment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String storagePath;
     private String mimeType;
     private String originalName;
-    private long sizeBytes;
+    private Long sizeBytes;
 
     // Mange Attachments → 1 JournalEntry
     @ManyToOne
@@ -20,16 +20,16 @@ public class Attachment {
     private JournalEntry journalEntry;
 
     // Getters + Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getStoragePath() { return storagePath; }
     public void setStoragePath(String storagePath) { this.storagePath = storagePath; }
     public String getMimeType() { return mimeType; }
     public void setMimeType(String mimeType) { this.mimeType = mimeType; }
     public String getOriginalName() { return originalName; }
     public void setOriginalName(String originalName) { this.originalName = originalName; }
-    public long getSizeBytes() { return sizeBytes; }
-    public void setSizeBytes(long sizeBytes) { this.sizeBytes = sizeBytes; }
+    public Long getSizeBytes() { return sizeBytes; }
+    public void setSizeBytes(Long sizeBytes) { this.sizeBytes = sizeBytes; }
     public JournalEntry getJournalEntry() { return journalEntry; }
     public void setJournalEntry(JournalEntry journalEntry) { this.journalEntry = journalEntry; }
 }
