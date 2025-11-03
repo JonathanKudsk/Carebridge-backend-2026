@@ -2,12 +2,12 @@ package com.carebridge.services;
 
 
 import com.carebridge.dao.JournalEntryDAO;
-import com.carebridge.dao.ResidentDAO;
+import com.carebridge.dao.JournalDAO;
 import com.carebridge.dao.UserDAO;
 import com.carebridge.dtos.CreateJournalEntryRequestDTO;
 import com.carebridge.dtos.JournalEntryResponseDTO;
+import com.carebridge.models.Journal;
 import com.carebridge.models.JournalEntry;
-import com.carebridge.models.Resident;
 import com.carebridge.models.User;
 
 import java.time.LocalDateTime;
@@ -15,27 +15,27 @@ import java.time.LocalDateTime;
 public class JournalEntryService {
 
     private final JournalEntryDAO journalEntryDAO;
-    private final ResidentDAO residentDAO;
+    private final JournalDAO journalDAO;
     private final UserDAO userDAO;
 
     public JournalEntryService(JournalEntryDAO journalEntryDAO,
-                               ResidentDAO residentDAO,
+                               JournalDAO journalDAO,
                                UserDAO userDAO) {
         this.journalEntryDAO = journalEntryDAO;
-        this.residentDAO = residentDAO;
+        this.journalDAO = journalDAO;
         this.userDAO = userDAO;
     }
 
     /**
-     * Creates a new journal entry for a resident.
+     * Creates a new journal entry for a journal.
      * Fulfills: timestamps, author info, persistence.
      */
     public JournalEntryResponseDTO createJournalEntry(CreateJournalEntryRequestDTO requestDTO) {
 
-        // --- 1. Fetch Resident and Author ---
-        Resident resident = residentDAO.findById(requestDTO.getResidentId());
-        if (resident == null) {
-            throw new IllegalArgumentException("Resident not found with ID: " + requestDTO.getResidentId());
+        // --- 1. Fetch Journal and Author ---
+        Journal journal = journalDAO.findById(requestDTO.getJournalId());
+        if (journal == null) {
+            throw new IllegalArgumentException("Journal not found with ID: " + requestDTO.getJournalId());
         }
 
         User author = userDAO.findById(requestDTO.getAuthorUserId());
@@ -56,7 +56,7 @@ public class JournalEntryService {
 
         // --- 3. Build new JournalEntry entity ---
         JournalEntry entry = new JournalEntry();
-        entry.setResident(resident);
+        entry.setJournal(journal);
         entry.setAuthor(author);
         entry.setTitle(requestDTO.getTitle());
         entry.setContent(requestDTO.getContent());
@@ -72,7 +72,7 @@ public class JournalEntryService {
         // --- 5. Build and return Response DTO ---
         return new JournalEntryResponseDTO(
                 entry.getId(),
-                resident.getId(),
+                journal.getId(),
                 author.getId(),
                 entry.getTitle(),
                 entry.getContent(),

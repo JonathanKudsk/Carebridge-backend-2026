@@ -5,7 +5,7 @@ import com.carebridge.enums.RiskAssessment;
 
 public class CreateJournalEntryRequestDTO {
 
-    private Long residentId;
+    private Long journalId;
     private Long authorUserId;
     private String title;
     private String content;
@@ -13,10 +13,10 @@ public class CreateJournalEntryRequestDTO {
 
     public CreateJournalEntryRequestDTO() {}
 
-    public CreateJournalEntryRequestDTO(Long residentId, Long authorUserId,
+    public CreateJournalEntryRequestDTO(Long journalId, Long authorUserId,
                                         String title, String content,
                                         RiskAssessment riskAssessment) {
-        this.residentId = residentId;
+        this.journalId = journalId;
         this.authorUserId = authorUserId;
         this.title = title;
         this.content = content;
@@ -24,11 +24,9 @@ public class CreateJournalEntryRequestDTO {
     }
 
     // Getters & setters
-    public Long getResidentId() { return residentId; }
-    public void setResidentId(Long residentId) { this.residentId = residentId; }
+    public Long getJournalId() { return journalId; }
 
     public Long getAuthorUserId() { return authorUserId; }
-    public void setAuthorUserId(Long authorUserId) { this.authorUserId = authorUserId; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

@@ -1,6 +1,7 @@
 package com.carebridge.models;
 
 import com.carebridge.enums.RiskAssessment;
+import com.carebridge.enums.EntryType;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,11 +13,6 @@ public class JournalEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    // Relationship to Resident (many entries per resident)
-    @ManyToOne
-    @JoinColumn(name = "resident_id", nullable = false)
-    private Resident resident;
 
     // Relationship to User (the CareWorker or Admin who wrote it)
     @ManyToOne
@@ -33,6 +29,10 @@ public class JournalEntry {
     @Column(name = "risk_assessment", nullable = false, length = 10)
     private RiskAssessment riskAssessment;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "entry_type", nullable = false, length = 10)
+    private EntryType entryType;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -46,30 +46,18 @@ public class JournalEntry {
     // --- Constructors ---
     public JournalEntry() {}
 
-    public JournalEntry(Resident resident, User author, String title, String content, RiskAssessment riskAssessment) {
-        this.resident = resident;
+    public JournalEntry(User author, String title, String content, RiskAssessment riskAssessment, EntryType entryType) {
         this.author = author;
         this.title = title;
         this.content = content;
         this.riskAssessment = riskAssessment;
+        this.entryType = entryType;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
-    // 1 Entry → mange Tags
-    @OneToMany(mappedBy = "journalEntry", cascade = CascadeType.ALL)
-    private List<Tag> tags;
 
-    // 1 Entry → mange ChecklistItems
-    @OneToMany(mappedBy = "journalEntry", cascade = CascadeType.ALL)
-    private List<ChecklistItem> checklistItems;
     // --- Getters & Setters ---
     public Long getId() { return id; }
-
-    // 1 Entry → mange Attachments
-    @OneToMany(mappedBy = "journalEntry", cascade = CascadeType.ALL)
-    private List<Attachment> attachments;
-    public Resident getResident() { return resident; }
-    public void setResident(Resident resident) { this.resident = resident; }
 
     public User getAuthor() { return author; }
     public void setAuthor(User author) { this.author = author; }
@@ -82,16 +70,14 @@ public class JournalEntry {
     public RiskAssessment getRiskAssessment() { return riskAssessment; }
     public void setRiskAssessment(RiskAssessment riskAssessment) { this.riskAssessment = riskAssessment; }
 
+    public EntryType getEntryType() { return entryType; }
+    public void setEntryType(EntryType entryType) { this.entryType = entryType; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     public Journal getJournal() { return journal; }
     public void setJournal(Journal journal) { this.journal = journal; }
-    public List<Tag> getTags() { return tags; }
-    public void setTags(List<Tag> tags) { this.tags = tags; }
-    public List<ChecklistItem> getChecklistItems() { return checklistItems; }
-    public void setChecklistItems(List<ChecklistItem> checklistItems) { this.checklistItems = checklistItems; }
-    public List<Attachment> getAttachments() { return attachments; }
-    public void setAttachments(List<Attachment> attachments) { this.attachments = attachments; }
+
 }

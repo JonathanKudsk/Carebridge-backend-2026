@@ -1,7 +1,7 @@
 package com.carebridge.populator;
 
 import com.carebridge.models.User;
-import com.carebridge.models.Resident;
+import com.carebridge.models.Journal;
 import com.carebridge.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -16,7 +16,7 @@ public class DataPopulator {
 
             // --- Check if there's already data ---
             Long userCount = session.createQuery("select count(u) from User u", Long.class).uniqueResult();
-            Long residentCount = session.createQuery("select count(r) from Resident r", Long.class).uniqueResult();
+            Long journalCount = session.createQuery("select count(j) from Journal j", Long.class).uniqueResult();
 
             // --- Insert a test user if none exists ---
             if (userCount == 0) {
@@ -25,13 +25,13 @@ public class DataPopulator {
                 System.out.println("✅ Added test User: " + user.getName());
             }
 
-            // --- Insert a test resident if none exists ---
-            if (residentCount == 0) {
-                Resident resident = new Resident();
+            // --- Insert a test journal if none exists ---
+            if (journalCount == 0) {
+                Journal journal = new Journal();
                 // If you don't add @GeneratedValue, you MUST set an ID manually:
-                // resident.setId(1L);
-                session.persist(resident);
-                System.out.println("✅ Added test Resident with auto-generated ID");
+                // journal.setId(1L);
+                session.persist(journal);
+                System.out.println("✅ Added test Journal with auto-generated ID");
             }
 
             tx.commit();

@@ -1,7 +1,7 @@
 package com.carebridge.controllers;
 
 import com.carebridge.dao.JournalEntryDAO;
-import com.carebridge.dao.ResidentDAO;
+import com.carebridge.dao.JournalDAO;
 import com.carebridge.dao.UserDAO;
 import com.carebridge.dtos.CreateJournalEntryRequestDTO;
 import com.carebridge.dtos.JournalEntryResponseDTO;
@@ -15,7 +15,7 @@ public class JournalEntryController {
     public JournalEntryController(Javalin app) {
         this.service = new JournalEntryService(
                 new JournalEntryDAO(),
-                new ResidentDAO(),
+                new JournalDAO(),
                 new UserDAO()
         );
 

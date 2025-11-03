@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class JournalEntryResponseDTO {
 
     private Long id;
-    private Long residentId;
+    private Long journalId;
     private Long authorUserId;
     private String title;
     private String content;
@@ -17,12 +17,12 @@ public class JournalEntryResponseDTO {
 
     public JournalEntryResponseDTO() {}
 
-    public JournalEntryResponseDTO(Long id, Long residentId, Long authorUserId,
+    public JournalEntryResponseDTO(Long id, Long journalId, Long authorUserId,
                                    String title, String content,
                                    RiskAssessment riskAssessment,
                                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
-        this.residentId = residentId;
+        this.journalId = journalId;
         this.authorUserId = authorUserId;
         this.title = title;
         this.content = content;
@@ -33,7 +33,7 @@ public class JournalEntryResponseDTO {
 
     // Getters only (response objects are usually read-only)
     public Long getId() { return id; }
-    public Long getResidentId() { return residentId; }
+    public Long getJournalId() { return journalId; }
     public Long getAuthorUserId() { return authorUserId; }
     public String getTitle() { return title; }
     public String getContent() { return content; }
