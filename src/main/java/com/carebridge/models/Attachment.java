@@ -21,7 +21,6 @@ public class Attachment {
 
     // Getters + Setters
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
     public String getStoragePath() { return storagePath; }
     public void setStoragePath(String storagePath) { this.storagePath = storagePath; }
     public String getMimeType() { return mimeType; }

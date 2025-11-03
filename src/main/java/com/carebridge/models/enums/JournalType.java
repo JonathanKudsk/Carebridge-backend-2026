@@ -1,4 +1,4 @@
-package entity.enums;
+package com.carebridge.models.enums;
 
 public enum JournalType {
     DAILY,
