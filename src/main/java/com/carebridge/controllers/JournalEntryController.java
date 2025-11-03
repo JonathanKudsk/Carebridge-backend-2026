@@ -11,30 +11,38 @@ import io.javalin.Javalin;
 public class JournalEntryController {
 
     private final JournalEntryService service;
+    private final JournalEntryDAO jeDAO;
+    private final JournalDAO jDAO;
 
     public JournalEntryController(Javalin app) {
         this.service = new JournalEntryService(
-                new JournalEntryDAO(),
-                new JournalDAO(),
+                jeDAO = new JournalEntryDAO(),
+                jDAO = new JournalDAO(),
                 new UserDAO()
         );
 
-        // Register endpoint(s)
-        app.post("/residents/{residentId}/journal-entries", ctx -> {
+        createJournalEntry(app);
+    }
+
+    //Possibly move the app.post-part to routes later
+    private void createJournalEntry(Javalin app) {
+        app.post("/journals/{journalId}/journal-entries", ctx -> {
             try {
-                Long residentId = Long.parseLong(ctx.pathParam("residentId"));
+                Long journalId = Long.parseLong(ctx.pathParam("journalId"));
 
-                // Parse JSON request → DTO
                 CreateJournalEntryRequestDTO requestDTO = ctx.bodyAsClass(CreateJournalEntryRequestDTO.class);
-                requestDTO.setResidentId(residentId);
+                requestDTO.setJournalId(journalId);
+                requestDTO.setAuthorUserId(1L); // in real app, from auth
 
-                // In real app, authorUserId would come from authentication
-                requestDTO.setAuthorUserId(1L);
-
-                // Call service
                 JournalEntryResponseDTO responseDTO = service.createJournalEntry(requestDTO);
 
                 ctx.status(201).json(responseDTO);
+
+                // Add entry to journal -> But only if creation was successful
+                if (ctx.status().getCode() == 201) {
+                    jDAO.addEntryToJournal(journalId, responseDTO.getId());
+                }
+
             } catch (IllegalArgumentException e) {
                 ctx.status(400).result(e.getMessage());
             } catch (Exception e) {

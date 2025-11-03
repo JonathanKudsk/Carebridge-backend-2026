@@ -31,4 +31,30 @@ public class JournalEntryDAO {
             return session.createQuery("from JournalEntry", JournalEntry.class).list();
         }
     }
+
+    //CRUD operations
+    public void update(JournalEntry journalEntry) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            session.merge(journalEntry);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    public void create(JournalEntry journalEntry) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            session.persist(journalEntry);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        }
+    }
+
 }

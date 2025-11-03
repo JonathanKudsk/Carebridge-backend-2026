@@ -14,6 +14,14 @@ public class Journal {
     @OneToMany(mappedBy = "journal", cascade = CascadeType.ALL)
     private List<JournalEntry> entries;
 
+    // Bi-directional relationship - adding an entry to the journal
+    public void addEntry(JournalEntry entry) {
+        if(entry != null) {
+            entries.add(entry);
+            entry.setJournal(this);
+        }
+    }
+
     // Getters + Setters
     public Long getId() { return id; }
     public List<JournalEntry> getEntries() { return entries; }
