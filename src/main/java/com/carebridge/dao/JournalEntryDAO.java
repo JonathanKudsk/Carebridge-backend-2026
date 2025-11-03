@@ -1,37 +1,34 @@
 package com.carebridge.dao;
 
 import com.carebridge.models.JournalEntry;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
+import com.carebridge.util.HibernateUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import java.util.List;
 
-public class JournalEntryDAOImpl implements IJournalEntryDAO {
+public class JournalEntryDAO {
 
-    private final EntityManager em;
-
-    public JournalEntryDAOImpl(EntityManager em) {
-        this.em = em;
-    }
-
-    @Override
-    public JournalEntry save(JournalEntry entry) {
-        EntityTransaction tx = em.getTransaction();
-        try {
-            tx.begin();
-            em.persist(entry);
-            // after persist, entry.getId() should be set (because of GenerationType.IDENTITY)
+    public void save(JournalEntry journalEntry) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            session.persist(journalEntry);
             tx.commit();
-            return entry;
-        } catch (RuntimeException e) {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            throw e; // bubble up so caller knows it failed
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
         }
     }
 
-    @Override
     public JournalEntry findById(Long id) {
-        return em.find(JournalEntry.class, id);
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(JournalEntry.class, id);
+        }
+    }
+
+    public List<JournalEntry> findAll() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("from JournalEntry", JournalEntry.class).list();
+        }
     }
 }
-

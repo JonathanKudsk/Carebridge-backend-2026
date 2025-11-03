@@ -1,4 +1,8 @@
 package com.carebridge.enums;
 
-public enum RiskAssessment {
+public enum RiskAssessment
+{
+    LOW,
+    MEDIUM,
+    HIGH
 }

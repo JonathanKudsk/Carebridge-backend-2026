@@ -1,13 +1,18 @@
 package com.carebridge;
 
+import com.carebridge.populator.DataPopulator;
 import io.javalin.Javalin;
 import io.javalin.plugin.bundled.CorsPlugin;
 import io.javalin.plugin.bundled.CorsPluginConfig;
 
 import com.carebridge.controllers.UserController;
+import com.carebridge.controllers.JournalEntryController;
 
 public class App {
     public static void main(String[] args) {
+
+        // --- Initialize Hibernate + Populate Test Data ---
+        //DataPopulator.populate();
 
         Javalin app = Javalin.create(config -> {
             // Aktiver CORS for alle hosts
@@ -21,5 +26,6 @@ public class App {
 
         // Example route group
         new UserController(app);
+        new JournalEntryController(app);
     }
 }

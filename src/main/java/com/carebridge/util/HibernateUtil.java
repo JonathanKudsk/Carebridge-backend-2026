@@ -20,6 +20,8 @@ public class HibernateUtil {
             config.setProperty("hibernate.show_sql", "true");
 
             config.addAnnotatedClass(com.carebridge.models.User.class);
+            config.addAnnotatedClass(com.carebridge.models.Resident.class);
+            config.addAnnotatedClass(com.carebridge.models.JournalEntry.class);
 
             return config.buildSessionFactory();
         } catch (Exception ex) {

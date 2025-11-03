@@ -24,4 +24,11 @@ public class UserDAO {
             return session.createQuery("from User", User.class).list();
         }
     }
+
+    public User findById(Long authorUserId)
+    {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(User.class, authorUserId);
+        }
+    }
 }
