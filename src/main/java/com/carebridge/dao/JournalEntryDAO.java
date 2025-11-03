@@ -1,17 +1,18 @@
 package com.carebridge.dao;
 
-import com.carebridge.models.User;
+import com.carebridge.models.JournalEntry;
 import com.carebridge.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import java.util.List;
 
-public class UserDAO {
-    public void save(User user) {
+public class JournalEntryDAO {
+
+    public void save(JournalEntry journalEntry) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-            session.persist(user);
+            session.persist(journalEntry);
             tx.commit();
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -19,16 +20,15 @@ public class UserDAO {
         }
     }
 
-    public List<User> findAll() {
+    public JournalEntry findById(Long id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("from User", User.class).list();
+            return session.get(JournalEntry.class, id);
         }
     }
 
-    public User findById(Long authorUserId)
-    {
+    public List<JournalEntry> findAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(User.class, authorUserId);
+            return session.createQuery("from JournalEntry", JournalEntry.class).list();
         }
     }
 }
