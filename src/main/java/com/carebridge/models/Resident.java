@@ -1,6 +1,7 @@
 package com.carebridge.models;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 @Table (name = "residents")
