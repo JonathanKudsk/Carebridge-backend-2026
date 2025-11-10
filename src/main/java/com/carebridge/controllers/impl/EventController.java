@@ -259,6 +259,35 @@ public class EventController implements IController<Event, Long> {
         }
     }
 
+    public void unmarkSeen(Context ctx) {
+        try {
+            Long eventId = parseId(ctx);
+
+            var tokenUser = ctx.attribute("user");
+            String email = null;
+            if (tokenUser instanceof JwtUserDTO ju) {
+                email = ju.getUsername();
+            } else if (tokenUser instanceof com.carebridge.dtos.UserDTO du) {
+                email = du.getEmail();
+            }
+
+            if (email == null) throw new ApiRuntimeException(401, "Unauthorized");
+
+            var user = userDAO.readByEmail(email);
+            if (user == null) throw new ApiRuntimeException(401, "Unauthorized");
+
+            eventDAO.removeSeenByUser(eventId, user);
+            ctx.status(204);
+
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("unmarkSeen failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
+
+
     @Override
     public boolean validatePrimaryKey(Long id) {
         return id != null && id > 0;

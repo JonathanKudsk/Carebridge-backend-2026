@@ -121,13 +121,15 @@ public class EventDAO implements IDAO<Event, Long> {
             if (updated.getCreatedBy() != null)
                 existing.setCreatedBy(updated.getCreatedBy());
 
+            if (updated.getSeenByUsers() != null && !updated.getSeenByUsers().isEmpty()) {
+                existing.getSeenByUsers().addAll(updated.getSeenByUsers());
+            }
+
             em.getTransaction().commit();
-            logger.info("Event updated: id={}", id);
             return existing;
         } catch (ApiRuntimeException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("Error updating Event id={}", id, e);
             throw new ApiRuntimeException(500, "Error updating event: " + e.getMessage());
         }
     }
@@ -173,6 +175,32 @@ public class EventDAO implements IDAO<Event, Long> {
         } catch (Exception e) {
             logger.error("Error marking event as seen. eventId={}, userId={}", eventId, user.getId(), e);
             throw new ApiRuntimeException(500, "Error marking event as seen: " + e.getMessage());
+        }
+    }
+
+    public void removeSeenByUser(Long eventId, User user) {
+        if (eventId == null || user == null) {
+            throw new ApiRuntimeException(400, "Event id and user are required");
+        }
+
+        try (var em = em()) {
+            em.getTransaction().begin();
+
+            Event event = em.find(Event.class, eventId);
+            if (event == null) {
+                em.getTransaction().rollback();
+                throw new ApiRuntimeException(404, "Event not found");
+            }
+
+            User managedUser = em.getReference(User.class, user.getId());
+            event.getSeenByUsers().remove(managedUser);
+
+            em.getTransaction().commit();
+        } catch (ApiRuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error unmarking event as seen. eventId={}, userId={}", eventId, user.getId(), e);
+            throw new ApiRuntimeException(500, "Error unmarking event as seen: " + e.getMessage());
         }
     }
 
