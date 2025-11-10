@@ -9,18 +9,25 @@ public class HibernateUtil {
 
     private static SessionFactory buildSessionFactory() {
         try {
+            //OBS! Local file path as the dotenv couldn't find the .env file
+            /*
             Dotenv dotenv = Dotenv.load();
+            String dbUrl = dotenv.get("DATABASE_URL");*/
+            Dotenv dotenv = Dotenv.configure()
+                    .directory("C:/Users/rfwma/Documents/FjerdeSemester/Sys/CareBridge/.env")  // root folder
+                    .load();
+
             String dbUrl = dotenv.get("DATABASE_URL");
 
             Configuration config = new Configuration();
             config.setProperty("hibernate.connection.driver_class", "org.postgresql.Driver");
-            config.setProperty("hibernate.connection.url", dbUrl.replace("postgres://", "jdbc:postgresql://"));
+            config.setProperty("hibernate.connection.url", dbUrl);
             config.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
             config.setProperty("hibernate.hbm2ddl.auto", "update");
             config.setProperty("hibernate.show_sql", "true");
 
             config.addAnnotatedClass(com.carebridge.models.User.class);
-            config.addAnnotatedClass(com.carebridge.models.Resident.class);
+            config.addAnnotatedClass(com.carebridge.models.Journal.class);
             config.addAnnotatedClass(com.carebridge.models.JournalEntry.class);
 
             return config.buildSessionFactory();
