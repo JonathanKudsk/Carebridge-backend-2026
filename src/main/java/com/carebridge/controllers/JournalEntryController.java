@@ -32,7 +32,8 @@ public class JournalEntryController {
 
                 CreateJournalEntryRequestDTO requestDTO = ctx.bodyAsClass(CreateJournalEntryRequestDTO.class);
                 requestDTO.setJournalId(journalId);
-                requestDTO.setAuthorUserId(1L); // in real app, from auth
+                //TODO: Should be changed so its not hardcoded
+                requestDTO.setAuthorUserId(3L); // in real app, from auth
 
                 JournalEntryResponseDTO responseDTO = service.createJournalEntry(requestDTO);
 
