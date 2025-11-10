@@ -9,7 +9,7 @@ import org.hibernate.Transaction;
 public class DataPopulator {
 
     public static void populate() {
-        System.out.println("⚙️ Running DataPopulator...");
+        System.out.println("Running DataPopulator...");
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
@@ -22,7 +22,7 @@ public class DataPopulator {
             if (userCount == 0) {
                 User user = new User("Anna Careworker", "anna@carebridge.dk");
                 session.persist(user);
-                System.out.println("✅ Added test User: " + user.getName());
+                System.out.println("Added test User: " + user.getName());
             }
 
             // --- Insert a test journal if none exists ---
@@ -31,7 +31,7 @@ public class DataPopulator {
                 // If you don't add @GeneratedValue, you MUST set an ID manually:
                 // journal.setId(1L);
                 session.persist(journal);
-                System.out.println("✅ Added test Journal with auto-generated ID");
+                System.out.println("Added test Journal with auto-generated ID");
             }
 
             tx.commit();
@@ -39,6 +39,6 @@ public class DataPopulator {
             e.printStackTrace();
         }
 
-        System.out.println("✅ DataPopulator complete.");
+        System.out.println("DataPopulator complete.");
     }
 }
