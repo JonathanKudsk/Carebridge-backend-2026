@@ -45,8 +45,12 @@ public class EventDAO implements IDAO<Event, Long> {
     @Override
     public List<Event> readAll() {
         try (var em = em()) {
-            return em.createQuery("SELECT e FROM Event e ORDER BY e.startAt", Event.class)
-                    .getResultList();
+            return em.createQuery(
+                    "SELECT DISTINCT e FROM Event e " +
+                            "LEFT JOIN FETCH e.seenByUsers " +
+                            "ORDER BY e.startAt",
+                    Event.class
+            ).getResultList();
         } catch (Exception e) {
             logger.error("Error reading all Events", e);
             throw new ApiRuntimeException(500, "Error reading all events: " + e.getMessage());
@@ -173,15 +177,20 @@ public class EventDAO implements IDAO<Event, Long> {
     }
 
     public List<Event> readBetween(Instant from, Instant to) {
-        try (var em = emf.createEntityManager()) {
+        try (var em = em()) {
             return em.createQuery(
-                            "SELECT e FROM Event e " +
+                            "SELECT DISTINCT e FROM Event e " +
+                                    "LEFT JOIN FETCH e.seenByUsers " +
                                     "WHERE e.startAt >= :from AND e.startAt < :to " +
                                     "ORDER BY e.startAt ASC",
-                            Event.class)
+                            Event.class
+                    )
                     .setParameter("from", from)
                     .setParameter("to", to)
                     .getResultList();
+        } catch (Exception e) {
+            logger.error("Error reading events between {} and {}", from, to, e);
+            throw new ApiRuntimeException(500, "Error reading events between dates: " + e.getMessage());
         }
     }
 }
