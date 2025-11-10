@@ -16,7 +16,7 @@ public class UserRoute {
 
             post("/", controller::create, Role.ADMIN);
             put("/{id}", controller::update, Role.ADMIN);
-            delete("/{id}", controller::delete, Role.ADMIN, Role.USER);
+            delete("/{id}", controller::delete, Role.ADMIN);
         };
     }
 }

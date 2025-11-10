@@ -17,7 +17,7 @@ public class EventRoute {
             post("/", controller::create, Role.USER);
             put("/{id}", controller::update, Role.USER);
 
-            delete("/{id}", controller::delete, Role.ADMIN);
+            delete("/{id}", controller::delete, Role.ADMIN, Role.USER);
 
             get("/creator/{userId}", controller::readByCreator, Role.USER);
             get("/upcoming", controller::readUpcoming, Role.USER);
