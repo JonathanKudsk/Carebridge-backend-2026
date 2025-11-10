@@ -12,7 +12,7 @@ public class App {
     public static void main(String[] args) {
 
         // --- Initialize Hibernate + Populate Test Data ---
-        //DataPopulator.populate();
+        DataPopulator.populate();
 
         Javalin app = Javalin.create(config -> {
             // Aktiver CORS for alle hosts
