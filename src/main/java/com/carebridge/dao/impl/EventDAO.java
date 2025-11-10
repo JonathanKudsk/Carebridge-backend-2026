@@ -3,6 +3,7 @@ package com.carebridge.dao.impl;
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.IDAO;
 import com.carebridge.entities.Event;
+import com.carebridge.entities.User;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.ValidationException;
 import jakarta.persistence.EntityManager;
@@ -142,6 +143,45 @@ public class EventDAO implements IDAO<Event, Long> {
         } catch (Exception e) {
             logger.error("Error deleting Event id={}", id, e);
             throw new ApiRuntimeException(500, "Error deleting event: " + e.getMessage());
+        }
+    }
+
+    public void addSeenByUser(Long eventId, User user) {
+        if (eventId == null || user == null) {
+            throw new ApiRuntimeException(400, "Event id and user are required");
+        }
+
+        try (var em = em()) {
+            em.getTransaction().begin();
+
+            Event event = em.find(Event.class, eventId);
+            if (event == null) {
+                em.getTransaction().rollback();
+                throw new ApiRuntimeException(404, "Event not found");
+            }
+
+            User managedUser = em.getReference(User.class, user.getId());
+            event.getSeenByUsers().add(managedUser);
+
+            em.getTransaction().commit();
+        } catch (ApiRuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error marking event as seen. eventId={}, userId={}", eventId, user.getId(), e);
+            throw new ApiRuntimeException(500, "Error marking event as seen: " + e.getMessage());
+        }
+    }
+
+    public List<Event> readBetween(Instant from, Instant to) {
+        try (var em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT e FROM Event e " +
+                                    "WHERE e.startAt >= :from AND e.startAt < :to " +
+                                    "ORDER BY e.startAt ASC",
+                            Event.class)
+                    .setParameter("from", from)
+                    .setParameter("to", to)
+                    .getResultList();
         }
     }
 }

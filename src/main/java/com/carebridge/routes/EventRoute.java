@@ -21,6 +21,8 @@ public class EventRoute {
 
             get("/creator/{userId}", controller::readByCreator, Role.USER);
             get("/upcoming", controller::readUpcoming, Role.USER);
+            post("/{id}/mark-seen", controller::markSeen, Role.USER);
+
         };
     }
 }

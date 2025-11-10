@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -17,4 +20,8 @@ public class EventDTO {
     private boolean showOnBoard;
     private Long createdById;
     private Long eventTypeId;
+    private LocalDate eventDate;
+    private LocalTime eventTime;
+    private boolean seenByCurrentUser;
+    private List<Long> seenByUserIds;
 }

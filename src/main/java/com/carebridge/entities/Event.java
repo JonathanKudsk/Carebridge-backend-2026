@@ -6,8 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import java.time.Instant;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "events")
@@ -56,40 +59,60 @@ public class Event {
     @Column(nullable = false)
     private Instant updated_at;
 
+    @Column(name = "event_date")
+    private LocalDate eventDate;
+
+    @Column(name = "event_time")
+    private LocalTime eventTime;
+
+    @ManyToMany
+    @JoinTable(
+            name = "event_seen_by_users",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> seenByUsers = new HashSet<>();
+
     public Event() {
     }
 
-    public Event(String title, String description, Instant startAt, boolean showOnBoard, User createdBy, EventType eventType) {
+    public Event(String title, String description, Instant startAt,
+                 boolean showOnBoard, User createdBy, EventType eventType) {
         this.title = title;
         this.description = description;
         this.startAt = startAt;
         this.showOnBoard = showOnBoard;
         this.createdBy = createdBy;
         this.eventType = eventType;
+        syncDateTimeFromStartAt();
     }
 
     @PrePersist
     public void prePersist() {
         Instant now = Instant.now();
-        this.created_at = now;
+        if (this.created_at == null) {
+            this.created_at = now;
+        }
         this.updated_at = now;
+        syncDateTimeFromStartAt();
     }
 
     @PreUpdate
     public void preUpdate() {
         this.updated_at = Instant.now();
+        syncDateTimeFromStartAt();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Event other)) return false;
-        return id != null && id.equals(other.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
+    private void syncDateTimeFromStartAt() {
+        if (this.startAt == null) {
+            this.eventDate = null;
+            this.eventTime = null;
+            return;
+        }
+        ZoneId zone = ZoneId.of("Europe/Copenhagen");
+        ZonedDateTime zdt = this.startAt.atZone(zone);
+        this.eventDate = zdt.toLocalDate();
+        this.eventTime = zdt.toLocalTime().truncatedTo(ChronoUnit.MINUTES);
     }
 
     public Long getId() {
@@ -118,6 +141,7 @@ public class Event {
 
     public void setStartAt(Instant startAt) {
         this.startAt = startAt;
+        syncDateTimeFromStartAt();
     }
 
     public boolean isShowOnBoard() {
@@ -150,5 +174,33 @@ public class Event {
 
     public Instant getUpdated_at() {
         return updated_at;
+    }
+
+    public LocalDate getEventDate() {
+        return eventDate;
+    }
+
+    public LocalTime getEventTime() {
+        return eventTime;
+    }
+
+    public Set<User> getSeenByUsers() {
+        return seenByUsers;
+    }
+
+    public void setSeenByUsers(Set<User> seenByUsers) {
+        this.seenByUsers = seenByUsers;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Event other)) return false;
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }
