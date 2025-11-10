@@ -8,6 +8,7 @@ import java.util.List;
 
 public class JournalEntryDAO {
 
+    //TODO: Seneste fejl fundet her!
     public void save(JournalEntry journalEntry) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
