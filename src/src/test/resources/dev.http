@@ -23,3 +23,25 @@ Content-Type: application/pdf
 
 < ./src/test/resources/files/observation.pdf
 ---123--
+
+### Create journal entry with no files
+POST http://localhost:7070/journals/1/journal-entries
+Content-Type: application/json
+
+{
+  "journalId": 1,
+  "title": "Observation of morning routine",
+  "content": "Resident was calm and cooperative. Had breakfast at 8:30.",
+  "riskAssessment": "LOW",
+  "authorUserId": 3
+}
+### Remember that authorUserId should correspond to an existing user in your test database. and is hardcoded in controller
+### Create a test user
+POST http://localhost:7070/users
+Content-Type: application/json
+
+{
+  "email": "test.careworker@example.com",
+  "name": "Test CareWorker"
+}
+
