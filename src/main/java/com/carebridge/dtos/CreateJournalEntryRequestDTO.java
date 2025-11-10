@@ -27,10 +27,10 @@ public class CreateJournalEntryRequestDTO {
     //Setters are only for setting objects when parsing through the http to dto
 
     public Long getJournalId() { return journalId; }
-    public Long setJournalId(Long journalId) { return journalId; }
+    public void setJournalId(Long journalId) { this.journalId = journalId; }
 
     public Long getAuthorUserId() { return authorUserId; }
-    public Long setAuthorUserId(Long authorUserId) { return authorUserId; }
+    public void setAuthorUserId(Long authorUserId) { this.authorUserId = authorUserId; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
