@@ -39,6 +39,9 @@ public class JournalEntry {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "edit_close_time", nullable = false)
+    private LocalDateTime editCloseTime;
+
     // Mange JournalEntries → 1 Journal
     @ManyToOne
     @JoinColumn(name = "journal_id")
@@ -54,6 +57,7 @@ public class JournalEntry {
         this.entryType = entryType;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.editCloseTime = this.createdAt.plusHours(24);
     }
 
     // --- Getters & Setters ---
@@ -77,6 +81,10 @@ public class JournalEntry {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public LocalDateTime getEditCloseTime() { return editCloseTime; }
+    public void setEditCloseTime(LocalDateTime editCloseTime) { this.editCloseTime = editCloseTime; }
+
     public Journal getJournal() { return journal; }
     public void setJournal(Journal journal) { this.journal = journal; }
 

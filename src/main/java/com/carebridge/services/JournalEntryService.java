@@ -69,6 +69,7 @@ public class JournalEntryService {
         LocalDateTime now = LocalDateTime.now();
         entry.setCreatedAt(now);
         entry.setUpdatedAt(now);
+        entry.setEditCloseTime(now.plusHours(24));
 
         // --- 4. Save entry via DAO (handles transaction internally) ---
         journalEntryDAO.save(entry);
@@ -83,7 +84,8 @@ public class JournalEntryService {
                 entry.getEntryType(),
                 entry.getRiskAssessment(),
                 entry.getCreatedAt(),
-                entry.getUpdatedAt()
+                entry.getUpdatedAt(),
+                entry.getEditCloseTime()
         );
     }
 }
