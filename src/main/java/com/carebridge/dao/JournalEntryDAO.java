@@ -16,8 +16,9 @@ public class JournalEntryDAO {
             session.persist(journalEntry);
             tx.commit();
         } catch (Exception e) {
-            if (tx != null) tx.rollback();
             e.printStackTrace();
+            if (tx != null) tx.rollback();
+
         }
     }
 

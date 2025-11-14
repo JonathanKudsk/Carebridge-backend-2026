@@ -50,6 +50,9 @@ public class JournalEntryService {
         if (requestDTO.getContent() == null || requestDTO.getContent().isBlank()) {
             throw new IllegalArgumentException("Content is required.");
         }
+        if (requestDTO.getEntryType() == null) {
+            throw new IllegalArgumentException("Entry type is required.");
+        }
         if (requestDTO.getRiskAssessment() == null) {
             throw new IllegalArgumentException("Risk assessment is required.");
         }
@@ -60,6 +63,7 @@ public class JournalEntryService {
         entry.setAuthor(author);
         entry.setTitle(requestDTO.getTitle());
         entry.setContent(requestDTO.getContent());
+        entry.setEntryType(requestDTO.getEntryType());
         entry.setRiskAssessment(requestDTO.getRiskAssessment());
 
         LocalDateTime now = LocalDateTime.now();
@@ -76,6 +80,7 @@ public class JournalEntryService {
                 author.getId(),
                 entry.getTitle(),
                 entry.getContent(),
+                entry.getEntryType(),
                 entry.getRiskAssessment(),
                 entry.getCreatedAt(),
                 entry.getUpdatedAt()
