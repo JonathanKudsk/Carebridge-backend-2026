@@ -1,3 +1,4 @@
+// java
 package com.carebridge.util;
 
 import org.hibernate.SessionFactory;
@@ -5,19 +6,23 @@ import org.hibernate.cfg.Configuration;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class HibernateUtil {
-    private static final SessionFactory sessionFactory = buildSessionFactory();
+    // lazy-initialized
+    private static SessionFactory sessionFactory;
 
     private static SessionFactory buildSessionFactory() {
         try {
-            //OBS! Local file path as the dotenv couldn't find the .env file
-            /*
-            Dotenv dotenv = Dotenv.load();
-            String dbUrl = dotenv.get("DATABASE_URL");*/
             Dotenv dotenv = Dotenv.configure()
-                    .directory("C:/Users/rfwma/Documents/FjerdeSemester/Sys/CareBridge/.env")  // root folder
+                    .directory(System.getProperty("user.dir"))
+                    .ignoreIfMissing()
                     .load();
 
             String dbUrl = dotenv.get("DATABASE_URL");
+            if (dbUrl == null || dbUrl.isBlank()) {
+                dbUrl = System.getenv("DATABASE_URL");
+            }
+            if (dbUrl == null || dbUrl.isBlank()) {
+                throw new IllegalStateException("DATABASE_URL is not set in .env or system environment");
+            }
 
             Configuration config = new Configuration();
             config.setProperty("hibernate.connection.driver_class", "org.postgresql.Driver");
@@ -32,15 +37,21 @@ public class HibernateUtil {
 
             return config.buildSessionFactory();
         } catch (Exception ex) {
-            throw new ExceptionInInitializerError(ex);
+            throw new RuntimeException("Failed to build Hibernate SessionFactory", ex);
         }
     }
 
-    public static SessionFactory getSessionFactory() {
+    public static synchronized SessionFactory getSessionFactory() {
+        if (sessionFactory == null) {
+            sessionFactory = buildSessionFactory();
+        }
         return sessionFactory;
     }
 
     public static void shutdown() {
-        getSessionFactory().close();
+        if (sessionFactory != null) {
+            sessionFactory.close();
+            sessionFactory = null;
+        }
     }
 }
