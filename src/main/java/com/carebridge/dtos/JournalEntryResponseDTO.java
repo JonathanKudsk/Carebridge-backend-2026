@@ -1,5 +1,6 @@
 package com.carebridge.dtos;
 
+import com.carebridge.enums.EntryType;
 import com.carebridge.enums.RiskAssessment;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ public class JournalEntryResponseDTO {
     private Long authorUserId;
     private String title;
     private String content;
+    private EntryType entryType;
     private RiskAssessment riskAssessment;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -18,7 +20,7 @@ public class JournalEntryResponseDTO {
     public JournalEntryResponseDTO() {}
 
     public JournalEntryResponseDTO(Long id, Long journalId, Long authorUserId,
-                                   String title, String content,
+                                   String title, String content, EntryType entryType,
                                    RiskAssessment riskAssessment,
                                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -26,6 +28,7 @@ public class JournalEntryResponseDTO {
         this.authorUserId = authorUserId;
         this.title = title;
         this.content = content;
+        this.entryType = entryType;
         this.riskAssessment = riskAssessment;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -37,6 +40,7 @@ public class JournalEntryResponseDTO {
     public Long getAuthorUserId() { return authorUserId; }
     public String getTitle() { return title; }
     public String getContent() { return content; }
+    public EntryType getEntryType() { return entryType; }
     public RiskAssessment getRiskAssessment() { return riskAssessment; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

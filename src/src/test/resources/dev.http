@@ -33,7 +33,8 @@ Content-Type: application/json
   "title": "Observation of morning routine",
   "content": "Resident was calm and cooperative. Had breakfast at 8:30.",
   "riskAssessment": "LOW",
-  "authorUserId": 3
+  "authorUserId": 3,
+  "entryType": "DAILY"
 }
 ### Remember that authorUserId should correspond to an existing user in your test database. and is hardcoded in controller
 ### Create a test user

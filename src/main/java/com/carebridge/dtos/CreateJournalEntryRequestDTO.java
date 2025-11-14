@@ -1,6 +1,7 @@
 package com.carebridge.dtos;
 
 
+import com.carebridge.enums.EntryType;
 import com.carebridge.enums.RiskAssessment;
 
 public class CreateJournalEntryRequestDTO {
@@ -9,17 +10,19 @@ public class CreateJournalEntryRequestDTO {
     private Long authorUserId;
     private String title;
     private String content;
+    private EntryType entryType;
     private RiskAssessment riskAssessment;
 
     public CreateJournalEntryRequestDTO() {}
 
     public CreateJournalEntryRequestDTO(Long journalId, Long authorUserId,
-                                        String title, String content,
+                                        String title, String content, EntryType entryType,
                                         RiskAssessment riskAssessment) {
         this.journalId = journalId;
         this.authorUserId = authorUserId;
         this.title = title;
         this.content = content;
+        this.entryType = entryType;
         this.riskAssessment = riskAssessment;
     }
 
@@ -37,6 +40,9 @@ public class CreateJournalEntryRequestDTO {
 
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
+
+    public EntryType getEntryType() { return entryType; }
+    public void setEntryType(EntryType entryType) { this.entryType = entryType; }
 
     public RiskAssessment getRiskAssessment() { return riskAssessment; }
     public void setRiskAssessment(RiskAssessment riskAssessment) { this.riskAssessment = riskAssessment; }
