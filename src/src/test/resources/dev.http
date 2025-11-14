@@ -46,3 +46,11 @@ Content-Type: application/json
   "name": "Test CareWorker"
 }
 
+### Edit a journal entry
+PATCH http://localhost:7070/journals/1/journal-entries/6
+Content-Type: application/json
+
+{
+  "content": "Updated observation: resident was alert and cooperative after breakfast. No incidents observed."
+}
+
