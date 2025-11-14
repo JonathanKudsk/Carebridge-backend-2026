@@ -5,6 +5,7 @@ import com.carebridge.dao.JournalEntryDAO;
 import com.carebridge.dao.JournalDAO;
 import com.carebridge.dao.UserDAO;
 import com.carebridge.dtos.CreateJournalEntryRequestDTO;
+import com.carebridge.dtos.EditJournalEntryRequestDTO;
 import com.carebridge.dtos.JournalEntryResponseDTO;
 import com.carebridge.models.Journal;
 import com.carebridge.models.JournalEntry;
@@ -79,6 +80,50 @@ public class JournalEntryService {
                 entry.getId(),
                 journal.getId(),
                 author.getId(),
+                entry.getTitle(),
+                entry.getContent(),
+                entry.getEntryType(),
+                entry.getRiskAssessment(),
+                entry.getCreatedAt(),
+                entry.getUpdatedAt(),
+                entry.getEditCloseTime()
+        );
+    }
+
+    public JournalEntryResponseDTO editJournalEntryContent(Long journalId, Long entryId, EditJournalEntryRequestDTO requestDTO) {
+        Journal journal = journalDAO.findById(journalId);
+        if (journal == null) {
+            throw new IllegalArgumentException("Journal not found with ID: " + journalId);
+        }
+
+        JournalEntry entry = journalEntryDAO.findById(entryId);
+        if (entry == null) {
+            throw new IllegalArgumentException("Journal entry not found with ID: " + entryId);
+        }
+
+        if (entry.getJournal() == null || entry.getJournal().getId() == null ||
+                !entry.getJournal().getId().equals(journalId)) {
+            throw new IllegalArgumentException("Journal entry does not belong to the specified journal.");
+        }
+
+        if (requestDTO.getContent() == null || requestDTO.getContent().isBlank()) {
+            throw new IllegalArgumentException("Content is required.");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        if (entry.getEditCloseTime() == null || now.isAfter(entry.getEditCloseTime())) {
+            throw new IllegalArgumentException("Edit window has closed for this entry.");
+        }
+
+        entry.setContent(requestDTO.getContent());
+        entry.setUpdatedAt(now);
+
+        journalEntryDAO.update(entry);
+
+        return new JournalEntryResponseDTO(
+                entry.getId(),
+                journal.getId(),
+                entry.getAuthor() != null ? entry.getAuthor().getId() : null,
                 entry.getTitle(),
                 entry.getContent(),
                 entry.getEntryType(),

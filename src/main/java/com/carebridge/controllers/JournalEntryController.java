@@ -4,6 +4,7 @@ import com.carebridge.dao.JournalEntryDAO;
 import com.carebridge.dao.JournalDAO;
 import com.carebridge.dao.UserDAO;
 import com.carebridge.dtos.CreateJournalEntryRequestDTO;
+import com.carebridge.dtos.EditJournalEntryRequestDTO;
 import com.carebridge.dtos.JournalEntryResponseDTO;
 import com.carebridge.services.JournalEntryService;
 import io.javalin.Javalin;
@@ -22,6 +23,7 @@ public class JournalEntryController {
         );
 
         createJournalEntry(app);
+        editJournalEntry(app);
     }
 
     //Possibly move the app.post-part to routes later
@@ -43,6 +45,27 @@ public class JournalEntryController {
                 if (ctx.status().getCode() == 201) {
                     jDAO.addEntryToJournal(journalId, responseDTO.getId());
                 }
+
+            } catch (IllegalArgumentException e) {
+                ctx.status(400).result(e.getMessage());
+            } catch (Exception e) {
+                e.printStackTrace();
+                ctx.status(500).result("Internal server error");
+            }
+        });
+    }
+
+    private void editJournalEntry(Javalin app) {
+        app.patch("/journals/{journalId}/journal-entries/{entryId}", ctx -> {
+            try {
+                Long journalId = Long.parseLong(ctx.pathParam("journalId"));
+                Long entryId = Long.parseLong(ctx.pathParam("entryId"));
+
+                EditJournalEntryRequestDTO requestDTO = ctx.bodyAsClass(EditJournalEntryRequestDTO.class);
+
+                JournalEntryResponseDTO responseDTO = service.editJournalEntryContent(journalId, entryId, requestDTO);
+
+                ctx.status(200).json(responseDTO);
 
             } catch (IllegalArgumentException e) {
                 ctx.status(400).result(e.getMessage());
