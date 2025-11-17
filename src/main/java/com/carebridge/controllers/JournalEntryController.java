@@ -93,4 +93,15 @@ public class JournalEntryController {
             }
         });
     }
+
+    private void getEntryDetails(Javalin app) {
+
+        // GET /journal-entries/:entryId
+        app.get("/journals/{journalId}/journal-entries/{entryId}", ctx -> {
+            Long entryId = Long.parseLong(ctx.pathParam("entryId"));
+            JournalEntryResponseDTO dto = service.getEntryDetails(entryId);
+            ctx.json(dto);
+        });
+    }
+
 }
