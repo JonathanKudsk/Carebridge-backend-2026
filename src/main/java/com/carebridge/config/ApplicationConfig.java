@@ -16,8 +16,8 @@ public class ApplicationConfig {
     private static final AccessController accessController = new AccessController();
     private static final Logger logger = LoggerFactory.getLogger(ApplicationConfig.class);
     private static final Routes routes = new Routes();
-    private static int count = 1;
     private static final String frontEndOrigin = "http://localhost:5173";
+    private static int count = 1;
 
     public static void configuration(JavalinConfig config) {
         config.showJavalinBanner = false;
@@ -33,17 +33,13 @@ public class ApplicationConfig {
     public static Javalin startServer(int port) {
         Javalin app = Javalin.create(ApplicationConfig::configuration);
 
-        // Security gate before matching routes
         app.beforeMatched(accessController::accessHandler);
 
-        // CORS
         app.before(ApplicationConfig::corsHeaders);
         app.options("/*", ApplicationConfig::corsHeadersOptions);
 
-        // Logging after each request
         app.after(ApplicationConfig::afterRequest);
 
-        // Exceptions
         app.exception(Exception.class, ApplicationConfig::generalExceptionHandler);
         app.exception(ApiException.class, ApplicationConfig::apiExceptionHandler);
 

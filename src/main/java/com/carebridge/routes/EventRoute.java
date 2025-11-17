@@ -12,15 +12,16 @@ public class EventRoute {
     public EndpointGroup getRoutes() {
         return () -> {
             get("/", controller::readAll, Role.USER);
+            get("/upcoming", controller::readUpcoming, Role.USER);
+            get("/creator/{userId}", controller::readByCreator, Role.USER);
+
             get("/{id}", controller::read, Role.USER);
 
             post("/", controller::create, Role.USER);
             put("/{id}", controller::update, Role.USER);
 
-            delete("/{id}", controller::delete, Role.ADMIN);
+            delete("/{id}", controller::delete, Role.ADMIN, Role.USER);
 
-            get("/creator/{userId}", controller::readByCreator, Role.USER);
-            get("/upcoming", controller::readUpcoming, Role.USER);
         };
     }
 }

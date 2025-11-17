@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.stream.Collectors;
 
 public class EventController implements IController<Event, Long> {
@@ -46,13 +48,79 @@ public class EventController implements IController<Event, Long> {
     @Override
     public void readAll(Context ctx) {
         try {
-            var list = eventDAO.readAll().stream().map(EventMapper::toDTO).collect(Collectors.toList());
+            String fromParam = ctx.queryParam("from");
+            String toParam = ctx.queryParam("to");
+            String tzParam = ctx.queryParam("tz");
+
+            var tokenUser = ctx.attribute("user");
+            Long currentUserId = extractUserIdFromToken(tokenUser);
+
+            if (fromParam != null || toParam != null) {
+                ZoneId zone = resolveZone(tzParam);
+
+                var today = LocalDate.now(zone);
+                LocalDate fromDate = parseDateKeywordOrIso(fromParam, today, 0);
+                LocalDate toDate = parseDateKeywordOrIso(toParam, today, 1);
+
+                Instant fromInstant = fromDate.atStartOfDay(zone).toInstant();
+                Instant toInstant = toDate.plusDays(1).atStartOfDay(zone).toInstant();
+
+                var list = eventDAO.readBetween(fromInstant, toInstant).stream()
+                        .map(e -> EventMapper.toDTO(e, currentUserId))
+                        .toList();
+
+                ctx.json(list);
+                return;
+            }
+
+            var list = eventDAO.readAll().stream()
+                    .sorted((a, b) -> a.getStartAt().compareTo(b.getStartAt()))
+                    .map(e -> EventMapper.toDTO(e, currentUserId))
+                    .toList();
             ctx.json(list);
+
         } catch (Exception e) {
             logger.error("readAll events failed", e);
             ctx.status(500).json("{\"msg\":\"Internal error\"}");
         }
     }
+
+    private ZoneId resolveZone(String tzParam) {
+        if (tzParam == null || tzParam.isBlank()) {
+            return ZoneId.of("Europe/Copenhagen");
+        }
+        try {
+            return ZoneId.of(tzParam);
+        } catch (Exception ex) {
+            return ZoneId.of("Europe/Copenhagen");
+        }
+    }
+
+    private LocalDate parseDateKeywordOrIso(String value, LocalDate today, int defaultOffsetDays) {
+        if (value == null || value.isBlank()) {
+            return today.plusDays(defaultOffsetDays);
+        }
+        switch (value.toLowerCase()) {
+            case "today":
+                return today;
+            case "tomorrow":
+                return today.plusDays(1);
+            default:
+                return LocalDate.parse(value);
+        }
+    }
+
+    private Long extractUserIdFromToken(Object tokenUser) {
+        if (tokenUser instanceof JwtUserDTO ju) {
+            var u = userDAO.readByEmail(ju.getUsername());
+            return u != null ? u.getId() : null;
+        }
+        if (tokenUser instanceof com.carebridge.dtos.UserDTO du) {
+            return du.getId();
+        }
+        return null;
+    }
+
 
     @Override
     public void create(Context ctx) {
@@ -134,8 +202,6 @@ public class EventController implements IController<Event, Long> {
         }
     }
 
-    // inside EventController class
-
     public void readByCreator(Context ctx) {
         try {
             Long userId = Long.parseLong(ctx.pathParam("userId"));
@@ -164,6 +230,63 @@ public class EventController implements IController<Event, Long> {
             ctx.status(500).json("{\"msg\":\"Internal error\"}");
         }
     }
+
+    public void markSeen(Context ctx) {
+        try {
+            Long eventId = parseId(ctx);
+
+            var tokenUser = ctx.attribute("user");
+            String email = null;
+            if (tokenUser instanceof JwtUserDTO ju) {
+                email = ju.getUsername();
+            } else if (tokenUser instanceof com.carebridge.dtos.UserDTO du) {
+                email = du.getEmail();
+            }
+
+            if (email == null) throw new ApiRuntimeException(401, "Unauthorized");
+
+            var user = userDAO.readByEmail(email);
+            if (user == null) throw new ApiRuntimeException(401, "Unauthorized");
+
+            eventDAO.addSeenByUser(eventId, user);
+            ctx.status(204);
+
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("markSeen failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
+
+    public void unmarkSeen(Context ctx) {
+        try {
+            Long eventId = parseId(ctx);
+
+            var tokenUser = ctx.attribute("user");
+            String email = null;
+            if (tokenUser instanceof JwtUserDTO ju) {
+                email = ju.getUsername();
+            } else if (tokenUser instanceof com.carebridge.dtos.UserDTO du) {
+                email = du.getEmail();
+            }
+
+            if (email == null) throw new ApiRuntimeException(401, "Unauthorized");
+
+            var user = userDAO.readByEmail(email);
+            if (user == null) throw new ApiRuntimeException(401, "Unauthorized");
+
+            eventDAO.removeSeenByUser(eventId, user);
+            ctx.status(204);
+
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("unmarkSeen failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
+
 
     @Override
     public boolean validatePrimaryKey(Long id) {

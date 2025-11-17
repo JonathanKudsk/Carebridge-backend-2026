@@ -21,7 +21,6 @@ public class Populator {
         try {
             tx.begin();
 
-            // ---- USERS ----
             User admin = findUserByEmail(em, "admin@carebridge.io");
             if (admin == null) {
                 admin = new User("Admin", "admin@carebridge.io", "admin123", Role.ADMIN);
@@ -34,14 +33,13 @@ public class Populator {
                 em.persist(alice);
             }
 
-            // ---- EVENT TYPES ----
             List<EventType> predefinedTypes = List.of(
-                    new EventType("Meeting",  "#007bff"), // blue
-                    new EventType("Task",     "#28a745"), // green
-                    new EventType("Reminder", "#ffc107"), // yellow
-                    new EventType("Holiday",  "#dc3545"), // red
-                    new EventType("Private",  "#6f42c1"), // purple
-                    new EventType("Other",    "#adb5bd")  // gray
+                    new EventType("Meeting", "#007bff"),
+                    new EventType("Task", "#28a745"),
+                    new EventType("Reminder", "#ffc107"),
+                    new EventType("Holiday", "#dc3545"),
+                    new EventType("Private", "#6f42c1"),
+                    new EventType("Other", "#adb5bd")
             );
 
             for (EventType type : predefinedTypes) {
@@ -62,7 +60,6 @@ public class Populator {
         }
     }
 
-    // ---- HELPERS ----
     private static User findUserByEmail(EntityManager em, String email) {
         var list = em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
                 .setParameter("email", email)

@@ -3,6 +3,7 @@ package com.carebridge.dao.impl;
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.IDAO;
 import com.carebridge.entities.Event;
+import com.carebridge.entities.User;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.ValidationException;
 import jakarta.persistence.EntityManager;
@@ -44,8 +45,12 @@ public class EventDAO implements IDAO<Event, Long> {
     @Override
     public List<Event> readAll() {
         try (var em = em()) {
-            return em.createQuery("SELECT e FROM Event e ORDER BY e.startAt", Event.class)
-                    .getResultList();
+            return em.createQuery(
+                    "SELECT DISTINCT e FROM Event e " +
+                            "LEFT JOIN FETCH e.seenByUsers " +
+                            "ORDER BY e.startAt",
+                    Event.class
+            ).getResultList();
         } catch (Exception e) {
             logger.error("Error reading all Events", e);
             throw new ApiRuntimeException(500, "Error reading all events: " + e.getMessage());
@@ -116,13 +121,15 @@ public class EventDAO implements IDAO<Event, Long> {
             if (updated.getCreatedBy() != null)
                 existing.setCreatedBy(updated.getCreatedBy());
 
+            if (updated.getSeenByUsers() != null && !updated.getSeenByUsers().isEmpty()) {
+                existing.getSeenByUsers().addAll(updated.getSeenByUsers());
+            }
+
             em.getTransaction().commit();
-            logger.info("Event updated: id={}", id);
             return existing;
         } catch (ApiRuntimeException e) {
             throw e;
         } catch (Exception e) {
-            logger.error("Error updating Event id={}", id, e);
             throw new ApiRuntimeException(500, "Error updating event: " + e.getMessage());
         }
     }
@@ -142,6 +149,76 @@ public class EventDAO implements IDAO<Event, Long> {
         } catch (Exception e) {
             logger.error("Error deleting Event id={}", id, e);
             throw new ApiRuntimeException(500, "Error deleting event: " + e.getMessage());
+        }
+    }
+
+    public void addSeenByUser(Long eventId, User user) {
+        if (eventId == null || user == null) {
+            throw new ApiRuntimeException(400, "Event id and user are required");
+        }
+
+        try (var em = em()) {
+            em.getTransaction().begin();
+
+            Event event = em.find(Event.class, eventId);
+            if (event == null) {
+                em.getTransaction().rollback();
+                throw new ApiRuntimeException(404, "Event not found");
+            }
+
+            User managedUser = em.getReference(User.class, user.getId());
+            event.getSeenByUsers().add(managedUser);
+
+            em.getTransaction().commit();
+        } catch (ApiRuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error marking event as seen. eventId={}, userId={}", eventId, user.getId(), e);
+            throw new ApiRuntimeException(500, "Error marking event as seen: " + e.getMessage());
+        }
+    }
+
+    public void removeSeenByUser(Long eventId, User user) {
+        if (eventId == null || user == null) {
+            throw new ApiRuntimeException(400, "Event id and user are required");
+        }
+
+        try (var em = em()) {
+            em.getTransaction().begin();
+
+            Event event = em.find(Event.class, eventId);
+            if (event == null) {
+                em.getTransaction().rollback();
+                throw new ApiRuntimeException(404, "Event not found");
+            }
+
+            User managedUser = em.getReference(User.class, user.getId());
+            event.getSeenByUsers().remove(managedUser);
+
+            em.getTransaction().commit();
+        } catch (ApiRuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error unmarking event as seen. eventId={}, userId={}", eventId, user.getId(), e);
+            throw new ApiRuntimeException(500, "Error unmarking event as seen: " + e.getMessage());
+        }
+    }
+
+    public List<Event> readBetween(Instant from, Instant to) {
+        try (var em = em()) {
+            return em.createQuery(
+                            "SELECT DISTINCT e FROM Event e " +
+                                    "LEFT JOIN FETCH e.seenByUsers " +
+                                    "WHERE e.startAt >= :from AND e.startAt < :to " +
+                                    "ORDER BY e.startAt ASC",
+                            Event.class
+                    )
+                    .setParameter("from", from)
+                    .setParameter("to", to)
+                    .getResultList();
+        } catch (Exception e) {
+            logger.error("Error reading events between {} and {}", from, to, e);
+            throw new ApiRuntimeException(500, "Error reading events between dates: " + e.getMessage());
         }
     }
 }
