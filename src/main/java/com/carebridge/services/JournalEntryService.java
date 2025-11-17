@@ -138,4 +138,25 @@ public class JournalEntryService {
     public List<Long> getEntryIdsForJournal(Long journalId) {
         return journalEntryDAO.getEntryIdsByJournalId(journalId);
     }
+
+    public JournalEntryResponseDTO getEntryDetails(Long id) {
+        JournalEntry entry = journalEntryDAO.findById(id);
+
+        if (entry == null) {
+            throw new IllegalArgumentException("Journal entry with ID " + id + " not found");
+        }
+
+        return new JournalEntryResponseDTO(
+                entry.getId(),
+                entry.getJournal() != null ? entry.getJournal().getId() : null,
+                entry.getAuthor() != null ? entry.getAuthor().getId() : null,
+                entry.getTitle(),
+                entry.getContent(),
+                entry.getEntryType(),
+                entry.getRiskAssessment(),
+                entry.getCreatedAt(),
+                entry.getUpdatedAt(),
+                entry.getEditCloseTime()
+        );
+    }
 }
