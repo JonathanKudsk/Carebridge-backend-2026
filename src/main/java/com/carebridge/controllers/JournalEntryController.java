@@ -27,11 +27,13 @@ public class JournalEntryController {
         findAllEntriesByJournal(app);
         createJournalEntry(app);
         editJournalEntry(app);
+        getEntryDetails(app);
+
     }
 
     //Finding all entries by a journal ID
     public void findAllEntriesByJournal(Javalin app) {
-        app.get("/journals/{journalId}/entries", ctx -> {
+        app.get("/journals/{journalId}/journal-entries", ctx -> {
             try {
                 Long journalId = Long.parseLong(ctx.pathParam("journalId"));
                 ctx.json(service.getEntryIdsForJournal(journalId));
@@ -95,8 +97,6 @@ public class JournalEntryController {
     }
 
     private void getEntryDetails(Javalin app) {
-
-        // GET /journal-entries/:entryId
         app.get("/journals/{journalId}/journal-entries/{entryId}", ctx -> {
             Long entryId = Long.parseLong(ctx.pathParam("entryId"));
             JournalEntryResponseDTO dto = service.getEntryDetails(entryId);

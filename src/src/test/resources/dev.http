@@ -64,5 +64,8 @@ Content-Type: application/json
 }
 
 ### Get all journalEntry IDs for journal 1
-GET http://localhost:7070/journals/1/entries
+GET http://localhost:7070/journals/1/journal-entries
+
+### Get specific journal entry by ID
+GET http://localhost:7070/journals/1/journal-entries/8
 
