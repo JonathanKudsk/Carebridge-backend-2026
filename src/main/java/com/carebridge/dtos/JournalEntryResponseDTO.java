@@ -16,13 +16,14 @@ public class JournalEntryResponseDTO {
     private RiskAssessment riskAssessment;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime editCloseTime;
 
     public JournalEntryResponseDTO() {}
 
     public JournalEntryResponseDTO(Long id, Long journalId, Long authorUserId,
                                    String title, String content, EntryType entryType,
                                    RiskAssessment riskAssessment,
-                                   LocalDateTime createdAt, LocalDateTime updatedAt) {
+                                   LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime editCloseTime) {
         this.id = id;
         this.journalId = journalId;
         this.authorUserId = authorUserId;
@@ -32,6 +33,8 @@ public class JournalEntryResponseDTO {
         this.riskAssessment = riskAssessment;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.editCloseTime = editCloseTime;
+
     }
 
     // Getters only (response objects are usually read-only)
@@ -44,4 +47,5 @@ public class JournalEntryResponseDTO {
     public RiskAssessment getRiskAssessment() { return riskAssessment; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public LocalDateTime getEditCloseTime() { return editCloseTime; }
 }

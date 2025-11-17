@@ -46,3 +46,19 @@ Content-Type: application/json
   "name": "Test CareWorker"
 }
 
+### Edit a journal entry - where window is closed
+PATCH http://localhost:7070/journals/1/journal-entries/3
+Content-Type: application/json
+
+{
+  "content": "Updated observation: resident was alert and cooperative after breakfast. No incidents observed."
+}
+
+
+### Edit a journal entry - where window is NOT closed
+PATCH http://localhost:7070/journals/1/journal-entries/8
+Content-Type: application/json
+
+{
+  "content": "Updated observation: resident was alert and cooperative after breakfast. No incidents observed."
+}
