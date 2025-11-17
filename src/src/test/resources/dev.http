@@ -47,7 +47,7 @@ Content-Type: application/json
 }
 
 ### Edit a journal entry - where window is closed
-PATCH http://localhost:7070/journals/1/journal-entries/3
+PATCH http://localhost:7070/journals/1/journal-entries/8
 Content-Type: application/json
 
 {
@@ -56,9 +56,13 @@ Content-Type: application/json
 
 
 ### Edit a journal entry - where window is NOT closed
-PATCH http://localhost:7070/journals/1/journal-entries/8
+PATCH http://localhost:7070/journals/1/journal-entries/14
 Content-Type: application/json
 
 {
   "content": "Updated observation: resident was alert and cooperative after breakfast. No incidents observed."
 }
+
+### Get all journalEntry IDs for journal 1
+GET http://localhost:7070/journals/1/entries
+

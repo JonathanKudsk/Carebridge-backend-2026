@@ -12,6 +12,7 @@ import com.carebridge.models.JournalEntry;
 import com.carebridge.models.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class JournalEntryService {
 
@@ -132,5 +133,9 @@ public class JournalEntryService {
                 entry.getUpdatedAt(),
                 entry.getEditCloseTime()
         );
+    }
+
+    public List<Long> getEntryIdsForJournal(Long journalId) {
+        return journalEntryDAO.getEntryIdsByJournalId(journalId);
     }
 }
