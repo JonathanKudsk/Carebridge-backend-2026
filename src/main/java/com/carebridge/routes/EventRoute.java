@@ -21,7 +21,8 @@ public class EventRoute {
             put("/{id}", controller::update, Role.USER);
 
             delete("/{id}", controller::delete, Role.ADMIN, Role.USER);
-
+            post("/{id}/mark-seen", controller::markSeen, Role.USER);
+            delete("/{id}/mark-seen", controller::unmarkSeen, Role.USER);
         };
     }
 }
