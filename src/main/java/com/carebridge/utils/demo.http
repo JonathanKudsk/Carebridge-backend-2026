@@ -194,19 +194,7 @@ Content-Type: application/json
 
 ### ---- JOURNAL & JOURNAL-ENTRY API (added requests) ----
 
-### 14) Get server status (test route)
-GET {{url}}/
-Accept: application/json
-
-> {%
-    client.test("Server status (root)", function () {
-        client.assert(response.status === 200, "Server status failed");
-    });
-%}
-
-
-
-### 16) Create journal entry with no files
+### 14) Create journal entry with no files
 ### Note: authorUserId should correspond to an existing user in your test DB (hardcoded in controller)
 POST {{url}}/journals/1/journal-entries
 Content-Type: application/json
@@ -226,7 +214,7 @@ Content-Type: application/json
     });
 %}
 
-### 18) Edit a journal entry - where window is closed
+### 15) Edit a journal entry - where window is closed
 PUT {{url}}/journals/1/journal-entries/8
 Content-Type: application/json
 
@@ -240,7 +228,7 @@ Content-Type: application/json
     });
 %}
 
-### 19) Edit a journal entry - where window is NOT closed
+### 16) Edit a journal entry - where window is NOT closed
 PUT {{url}}/journals/1/journal-entries/1
 Content-Type: application/json
 
@@ -254,7 +242,7 @@ Content-Type: application/json
     });
 %}
 
-### 20) Get all journalEntry IDs for journal 1
+### 17) Get all journalEntry IDs for journal 1
 GET {{url}}/journals/1/journal-entries
 
 > {%
@@ -263,7 +251,7 @@ GET {{url}}/journals/1/journal-entries
     });
 %}
 
-### 21) Get specific journal entry by ID
+### 18) Get specific journal entry by ID
 GET {{url}}/journals/1/journal-entries/1
 
 > {%
