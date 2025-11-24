@@ -20,8 +20,8 @@ public class Routes {
             path("/users", userRoute.getRoutes());
             path("/event-types", eventTypeRoute.getRoutes());
             path("/events", eventRoute.getRoutes());
-            path("/journalentries", journalEntryRoute.getRoutes());
             path("/residents", residentRoute.getRoutes());
+            path("/journals", journalEntryRoute.getRoutes());
 
             get("/populate", controller::populate, Role.ANYONE);
             post("/populate", controller::populate, Role.ANYONE);

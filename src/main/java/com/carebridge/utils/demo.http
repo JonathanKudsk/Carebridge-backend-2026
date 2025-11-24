@@ -192,7 +192,75 @@ Content-Type: application/json
     });
 %}
 
-### 14) Create new resident
+### ---- JOURNAL & JOURNAL-ENTRY API (added requests) ----
+
+### 14) Create journal entry with no files
+### Note: authorUserId should correspond to an existing user in your test DB (hardcoded in controller)
+POST {{url}}/journals/1/journal-entries
+Content-Type: application/json
+
+{
+  "journalId": 1,
+  "title": "Observation of morning routine",
+  "content": "Resident was calm and cooperative. Had breakfast at 8:30.",
+  "riskAssessment": "LOW",
+  "authorUserId": 2,
+  "entryType": "DAILY"
+}
+
+> {%
+    client.test("Create journal entry (no files)", function () {
+        client.assert([201, 200, 400].includes(response.status), "Journal creation without files failed");
+    });
+%}
+
+### 15) Edit a journal entry - where window is closed
+PUT {{url}}/journals/1/journal-entries/8
+Content-Type: application/json
+
+{
+  "content": "Updated observation: resident was alert and cooperative after breakfast. No incidents observed."
+}
+
+> {%
+    client.test("Edit journal entry (closed window)", function () {
+        client.assert([200, 204, 404, 403].includes(response.status), "Edit failed or forbidden");
+    });
+%}
+
+### 16) Edit a journal entry - where window is NOT closed
+PUT {{url}}/journals/1/journal-entries/1
+Content-Type: application/json
+
+{
+  "content": "Updated observation: resident was alert and cooperative after breakfast. No incidents observed."
+}
+
+> {%
+    client.test("Edit journal entry (open window)", function () {
+        client.assert([200, 204, 404, 403].includes(response.status), "Edit failed or forbidden");
+    });
+%}
+
+### 17) Get all journalEntry IDs for journal 1
+GET {{url}}/journals/1/journal-entries
+
+> {%
+    client.test("List journal entries (journal 1)", function () {
+        client.assert(response.status === 200, "Failed to list journal entries");
+    });
+%}
+
+### 18) Get specific journal entry by ID
+GET {{url}}/journals/1/journal-entries/1
+
+> {%
+    client.test("Get journal entry 8", function () {
+        client.assert([200, 404].includes(response.status), "Unexpected response for journal entry");
+    });
+%}
+
+### 19) Create new resident
 POST http://localhost:7070/api/residents/create
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json

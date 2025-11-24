@@ -45,7 +45,7 @@ public class JournalEntryController implements IController<JournalEntry, Long>
             CreateJournalEntryRequestDTO requestDTO = ctx.bodyAsClass(CreateJournalEntryRequestDTO.class);
             requestDTO.setJournalId(journalId);
             // TODO: replace hardcoded author with authenticated user ID
-            requestDTO.setAuthorUserId(3L);
+            requestDTO.setAuthorUserId(2L);
 
             // --- 1. Fetch Journal and Author ---
             Journal journal = journalDAO.read(requestDTO.getJournalId());
