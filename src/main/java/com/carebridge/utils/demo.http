@@ -191,3 +191,14 @@ Content-Type: application/json
         client.assert([201, 200, 400].includes(response.status), "Event creation failed");
     });
 %}
+
+### 14) Create new resident
+POST http://localhost:7070/api/residents/create
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "Resident",
+  "cprNr": "010190-1234"
+}
