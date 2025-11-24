@@ -11,7 +11,7 @@ public class ResidentRoute {
 
     public EndpointGroup getRoutes() {
         return () -> {
-            post("/residents/create", controller::create);
+            post("/create", controller::create);
             // Define resident-related routes here
         };
     }

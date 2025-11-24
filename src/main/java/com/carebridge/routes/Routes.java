@@ -21,7 +21,7 @@ public class Routes {
             path("/event-types", eventTypeRoute.getRoutes());
             path("/events", eventRoute.getRoutes());
             path("/journalentries", journalEntryRoute.getRoutes());
-            path("/residents/create", residentRoute.getRoutes());
+            path("/residents", residentRoute.getRoutes());
 
             get("/populate", controller::populate, Role.ANYONE);
             post("/populate", controller::populate, Role.ANYONE);

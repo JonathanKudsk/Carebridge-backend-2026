@@ -44,7 +44,8 @@ public class ResidentController implements IController<Resident, Long> {
             // create single linked journal
             Journal journal = new Journal();
             resident.setJournal(journal);
-            // if Journal had a back-reference: journal.setResident(resident);
+            // Important: set the back-reference on the owning side
+            journal.setResident(resident);
 
             // --- Extract authenticated user and attach to resident/journal if desired ---
             var tokenUser = ctx.attribute("user");
@@ -56,9 +57,9 @@ public class ResidentController implements IController<Resident, Long> {
             if (email != null) {
                 User user = userDAO.readByEmail(email);
                 if (user != null) {
-                    // TODO: attach the user depending on your data model
-                    // Examples (uncomment and adapt if such setters exist):
-                    // resident.setAssignedUser(user);
+                    // attach user to resident (many-to-many)
+                    resident.addUser(user);
+                    // if you also want to mark journal creator, add a setter on Journal and set it
                     // journal.setCreatedBy(user);
                 }
             }

@@ -17,7 +17,6 @@ public class Resident
     private String cprNr;
 
     @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL)
-    @JoinColumn(name = "journal_id")
     private Journal journal;
 
     @ManyToMany(fetch = FetchType.LAZY)

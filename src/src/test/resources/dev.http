@@ -69,3 +69,13 @@ GET http://localhost:7070/api/journals/1/journal-entries
 ### Get specific journal entry by ID
 GET http://localhost:7070/api/journals/1/journal-entries/8
 
+### Create new resident
+POST http://localhost:7070/api/residents/create
+Content-Type: application/json
+Authorization: Bearer faketoken
+
+{
+  "firstName": "Test",
+  "lastName": "Resident",
+  "cprNr": "010190-1234"
+}
