@@ -1,4 +1,4 @@
-package com.carebridge.models;
+package com.carebridge.entities;
 
 import jakarta.persistence.*;
 import java.util.List;

@@ -1,10 +1,9 @@
-package com.carebridge.models;
+package com.carebridge.entities;
 
 import com.carebridge.enums.RiskAssessment;
 import com.carebridge.enums.EntryType;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "journal_entries")

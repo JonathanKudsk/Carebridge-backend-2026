@@ -1,5 +1,5 @@
 ### Get server status (test route)
-GET http://localhost:7070/
+GET http://localhost:7070/api/
 Accept: application/json
 
 ### Create new journal entry (multipart upload)
@@ -25,7 +25,7 @@ Content-Type: application/pdf
 ---123--
 
 ### Create journal entry with no files
-POST http://localhost:7070/journals/1/journal-entries
+POST http://localhost:7070/api/journals/1/journal-entries
 Content-Type: application/json
 
 {
@@ -38,7 +38,7 @@ Content-Type: application/json
 }
 ### Remember that authorUserId should correspond to an existing user in your test database. and is hardcoded in controller
 ### Create a test user
-POST http://localhost:7070/users
+POST http://localhost:7070/api/users
 Content-Type: application/json
 
 {
@@ -47,7 +47,7 @@ Content-Type: application/json
 }
 
 ### Edit a journal entry - where window is closed
-PATCH http://localhost:7070/journals/1/journal-entries/8
+PATCH http://localhost:7070/api/journals/1/journal-entries/8
 Content-Type: application/json
 
 {
@@ -56,7 +56,7 @@ Content-Type: application/json
 
 
 ### Edit a journal entry - where window is NOT closed
-PATCH http://localhost:7070/journals/1/journal-entries/14
+PATCH http://localhost:7070/api/journals/1/journal-entries/14
 Content-Type: application/json
 
 {
@@ -64,8 +64,8 @@ Content-Type: application/json
 }
 
 ### Get all journalEntry IDs for journal 1
-GET http://localhost:7070/journals/1/journal-entries
+GET http://localhost:7070/api/journals/1/journal-entries
 
 ### Get specific journal entry by ID
-GET http://localhost:7070/journals/1/journal-entries/8
+GET http://localhost:7070/api/journals/1/journal-entries/8
 
