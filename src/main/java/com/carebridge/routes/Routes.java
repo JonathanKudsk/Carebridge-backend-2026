@@ -13,6 +13,7 @@ public class Routes {
     private final EventRoute eventRoute = new EventRoute();
     private final UserController controller = new UserController();
     private final JournalEntryRoutes journalEntryRoute = new JournalEntryRoutes();
+    private final ResidentRoute residentRoute = new ResidentRoute();
 
     public EndpointGroup getRoutes() {
         return () -> {
@@ -20,6 +21,7 @@ public class Routes {
             path("/event-types", eventTypeRoute.getRoutes());
             path("/events", eventRoute.getRoutes());
             path("/journalentries", journalEntryRoute.getRoutes());
+            path("/residents/create", residentRoute.getRoutes());
 
             get("/populate", controller::populate, Role.ANYONE);
             post("/populate", controller::populate, Role.ANYONE);
