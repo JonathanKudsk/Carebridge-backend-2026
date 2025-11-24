@@ -1,9 +1,7 @@
 package com.carebridge.config;
 
 
-import com.carebridge.entities.Event;
-import com.carebridge.entities.EventType;
-import com.carebridge.entities.User;
+import com.carebridge.entities.*;
 import com.carebridge.entities.enums.Role;
 import com.carebridge.utils.Utils;
 import jakarta.persistence.EntityManagerFactory;
@@ -47,6 +45,8 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(Role.class);
         configuration.addAnnotatedClass(Event.class);
         configuration.addAnnotatedClass(EventType.class);
+        configuration.addAnnotatedClass(JournalEntry.class);
+        configuration.addAnnotatedClass(Journal.class);
     }
 
     private static EntityManagerFactory createEMF(boolean forTest) {

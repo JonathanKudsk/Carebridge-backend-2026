@@ -1,6 +1,7 @@
 package com.carebridge.config;
 
 import com.carebridge.entities.EventType;
+import com.carebridge.entities.Journal;
 import com.carebridge.entities.User;
 import com.carebridge.entities.enums.Role;
 import jakarta.persistence.EntityManager;
@@ -49,8 +50,19 @@ public class Populator {
                 }
             }
 
+            // --- Insert a test journal if none exists ---
+            long journalCount = em.createQuery("SELECT COUNT(j) FROM Journal j", Long.class)
+                    .getSingleResult();
+            if (journalCount == 0) {
+                Journal journal = new Journal();
+                // If you don't add @GeneratedValue to Journal.id, you MUST set an ID manually:
+                // journal.setId(1L);
+                em.persist(journal);
+                logger.info("Added test Journal with auto-generated ID");
+            }
+
             tx.commit();
-            logger.info("Database populated successfully (users + event types).");
+            logger.info("Database populated successfully (users + event types + journal).");
         } catch (RuntimeException ex) {
             if (tx.isActive()) tx.rollback();
             logger.error("Population failed", ex);

@@ -12,10 +12,10 @@ public class JournalEntryRoutes
     public EndpointGroup getRoutes() {
         return () ->
         {
-            get("/journals/{journalId}/journal-entries", controller::findAllEntriesByJournal);
-            post("/journals/{journalId}/journal-entries", controller::create);
-            put("/journals/{journalId}/journal-entries/{entryId}", controller::update);
-            get("/journals/{journalId}/journal-entries/{entryId}", controller::read);
+            get("/{journalId}/journal-entries", controller::findAllEntriesByJournal);
+            post("/{journalId}/journal-entries", controller::create);
+            put("/{journalId}/journal-entries/{entryId}", controller::update);
+            get("/{journalId}/journal-entries/{entryId}", controller::read);
         };
     }
 }

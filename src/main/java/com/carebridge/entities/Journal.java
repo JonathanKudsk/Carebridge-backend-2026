@@ -11,7 +11,7 @@ public class Journal {
     private Long id;
 
     // 1 Journal → mange entries
-    @OneToMany(mappedBy = "journal", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "journal",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<JournalEntry> entries;
 
     // Bi-directional relationship - adding an entry to the journal
