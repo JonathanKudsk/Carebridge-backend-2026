@@ -1,0 +1,272 @@
+@url = http://localhost:7070/api
+@admin_email = admin@carebridge.io
+@admin_password = admin123
+
+### 1) Health check (no auth)
+GET {{url}}/auth/healthcheck
+
+> {%
+    client.test("Health check works", function () {
+        client.assert(response.status === 200, "Health check failed");
+    });
+%}
+
+### 2) Populate database (POST; ANYONE)
+POST {{url}}/populate
+
+> {%
+    client.test("Populate succeeded (idempotent)", function () {
+        client.assert([200, 201, 204].includes(response.status), "Population failed");
+    });
+%}
+
+### 3) Login as seeded ADMIN (from Populator)
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{admin_email}}",
+  "password": "{{admin_password}}"
+}
+
+> {%
+    try {
+        if (response.status === 200 && response.body.token) {
+            client.global.set("jwt_token", response.body.token);
+            client.test("Admin login succeeded", () => {
+            });
+        } else {
+            console.log("Response body:", response.body);
+            client.test("Admin login failed", () => {
+                throw new Error("No token found");
+            });
+        }
+    } catch (e) {
+        console.log("Error:", e);
+        client.test("Login script error", () => {
+            throw e;
+        });
+    }
+%}
+
+### 4) List users (ADMIN only)
+GET {{url}}/users
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("List users (admin)", function () {
+        client.assert(response.status === 200, "Failed to list users");
+    });
+%}
+
+### 5) Read a user by id (ADMIN only) - try the admin (id might be 1)
+GET {{url}}/users/1
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Read user 1 (admin)", function () {
+        client.assert([200, 404].includes(response.status), "Unexpected response");
+    });
+%}
+
+### 6) Create a new user (ADMIN)
+POST {{url}}/users
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test.user@carebridge.io",
+  "password": "StrongPass!123"
+}
+
+> {%
+    client.test("Create user (admin)", function () {
+        client.assert([201, 200].includes(response.status), "User creation failed");
+        if (response.body && response.body.id) {
+            client.global.set("new_user_id", response.body.id);
+        }
+    });
+%}
+
+### 7) Update a user (ADMIN) - uses new_user_id if present, else 1
+@target_user_id = {{new_user_id}} || 1
+PUT {{url}}/users/{{target_user_id}}
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "name": "Updated Test User",
+  "email": "test.user@carebridge.io"
+}
+
+> {%
+    client.test("Update user (admin)", function () {
+        client.assert([200, 204, 404].includes(response.status), "User update failed");
+    });
+%}
+
+### 8) Delete a user (ADMIN) - uses new_user_id if present, else 99999 (harmless)
+@delete_user_id = {{new_user_id}} || 99999
+DELETE {{url}}/users/{{delete_user_id}}
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Delete user (admin)", function () {
+        client.assert([200, 204, 404].includes(response.status), "User deletion failed");
+    });
+%}
+
+### ---- EVENT-TYPE API (mixed roles) ----
+
+### 9) Get all event types (ANYONE)
+GET {{url}}/event-types/
+
+> {%
+    client.test("Get event types", function () {
+        client.assert(response.status === 200, "Failed to fetch event types");
+    });
+%}
+
+### 10) Create event type (ADMIN)
+POST {{url}}/event-types/
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "name": "Workshop",
+  "colorHex": "#00b894"
+}
+
+> {%
+    client.test("Create event type (admin)", function () {
+        client.assert([201, 200, 409].includes(response.status), "Failed to create event type");
+    });
+%}
+
+### ---- EVENT API (USER/ADMIN) ----
+
+### 11) Login as regular user (seeded by Populator)
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@carebridge.io",
+  "password": "password123"
+}
+
+> {%
+    client.test("User login", function () {
+        client.assert(response.status === 200, "User login failed");
+        client.assert(response.body.token, "No token returned");
+        client.global.set("user_jwt", response.body.token);
+    });
+%}
+
+### 12) List events (USER)
+GET {{url}}/events/
+Authorization: Bearer {{user_jwt}}
+
+> {%
+    client.test("List events (user)", function () {
+        client.assert(response.status === 200, "Failed to list events");
+    });
+%}
+
+### 13) Create event (USER) – pick a known type (e.g., Meeting)
+POST {{url}}/events/
+Authorization: Bearer {{user_jwt}}
+Content-Type: application/json
+
+{
+  "title": "User Created Event",
+  "description": "Created via HTTP client",
+  "startTime": "{{$timestamp}}",
+  "isPublic": true,
+  "eventTypeId": 1
+}
+
+> {%
+    client.test("Create event (user)", function () {
+        client.assert([201, 200, 400].includes(response.status), "Event creation failed");
+    });
+%}
+
+### ---- JOURNAL & JOURNAL-ENTRY API (added requests) ----
+
+### 14) Create journal entry with no files
+### Note: authorUserId should correspond to an existing user in your test DB (hardcoded in controller)
+POST {{url}}/journals/1/journal-entries
+Content-Type: application/json
+
+{
+  "journalId": 1,
+  "title": "Observation of morning routine",
+  "content": "Resident was calm and cooperative. Had breakfast at 8:30.",
+  "riskAssessment": "LOW",
+  "authorUserId": 2,
+  "entryType": "DAILY"
+}
+
+> {%
+    client.test("Create journal entry (no files)", function () {
+        client.assert([201, 200, 400].includes(response.status), "Journal creation without files failed");
+    });
+%}
+
+### 15) Edit a journal entry - where window is closed
+PUT {{url}}/journals/1/journal-entries/8
+Content-Type: application/json
+
+{
+  "content": "Updated observation: resident was alert and cooperative after breakfast. No incidents observed."
+}
+
+> {%
+    client.test("Edit journal entry (closed window)", function () {
+        client.assert([200, 204, 404, 403].includes(response.status), "Edit failed or forbidden");
+    });
+%}
+
+### 16) Edit a journal entry - where window is NOT closed
+PUT {{url}}/journals/1/journal-entries/1
+Content-Type: application/json
+
+{
+  "content": "Updated observation: resident was alert and cooperative after breakfast. No incidents observed."
+}
+
+> {%
+    client.test("Edit journal entry (open window)", function () {
+        client.assert([200, 204, 404, 403].includes(response.status), "Edit failed or forbidden");
+    });
+%}
+
+### 17) Get all journalEntry IDs for journal 1
+GET {{url}}/journals/1/journal-entries
+
+> {%
+    client.test("List journal entries (journal 1)", function () {
+        client.assert(response.status === 200, "Failed to list journal entries");
+    });
+%}
+
+### 18) Get specific journal entry by ID
+GET {{url}}/journals/1/journal-entries/1
+
+> {%
+    client.test("Get journal entry 8", function () {
+        client.assert([200, 404].includes(response.status), "Unexpected response for journal entry");
+    });
+%}
+
+### 19) Create new resident
+POST http://localhost:7070/api/residents/create
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "Resident",
+  "cprNr": "010190-1234"
+}
