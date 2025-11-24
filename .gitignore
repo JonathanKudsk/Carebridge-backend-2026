@@ -1,6 +1,7 @@
 # ===== Environment files =====
 .env
 .env.local
+application.properties
 
 # ===== Maven build =====
 /target/
