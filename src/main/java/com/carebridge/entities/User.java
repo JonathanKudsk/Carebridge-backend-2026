@@ -9,6 +9,8 @@ import jakarta.validation.constraints.Size;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -46,6 +48,40 @@ public class User implements ISecurityUser {
     @Column(nullable = false)
     private Instant updated_at;
 
+    @Size(max = 255)
+    private String displayName;
+
+    @Email
+    @Size(max = 255)
+    private String displayEmail;
+
+    @Size(max = 50)
+    private String displayPhone;
+
+    @Email
+    @Size(max = 255)
+    private String internalEmail;
+
+    @Size(max = 50)
+    private String internalPhone;
+
+    // ========== NYE RELATIONER ==========
+
+    // Hvis brugeren er en RESIDENT - link til deres Resident profil
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Resident residentProfile;
+
+    // Hvis brugeren er en GUARDIAN - deres tilknyttede beboere
+    @ManyToMany
+    @JoinTable(
+            name = "guardian_residents",
+            joinColumns = @JoinColumn(name = "guardian_id"),
+            inverseJoinColumns = @JoinColumn(name = "resident_id")
+    )
+    private List<Resident> residents = new ArrayList<>();
+
+    // ========== CONSTRUCTORS ==========
+
     public User() {
     }
 
@@ -55,6 +91,8 @@ public class User implements ISecurityUser {
         setPassword(rawPassword);
         this.role = role != null ? role : Role.USER;
     }
+
+    // ========== PASSWORD METHODS ==========
 
     public void setPassword(String rawPassword) {
         if (rawPassword == null || rawPassword.isBlank())
@@ -66,6 +104,8 @@ public class User implements ISecurityUser {
     public boolean verifyPassword(String pw) {
         return pw != null && BCrypt.checkpw(pw, this.passwordHash);
     }
+
+    // ========== ROLE METHODS ==========
 
     @Override
     public void addRole(Role role) {
@@ -79,6 +119,8 @@ public class User implements ISecurityUser {
         }
     }
 
+    // ========== LIFECYCLE CALLBACKS ==========
+
     @PrePersist
     public void prePersist() {
         Instant now = Instant.now();
@@ -91,6 +133,8 @@ public class User implements ISecurityUser {
         this.updated_at = Instant.now();
     }
 
+    // ========== EQUALS & HASHCODE ==========
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -102,6 +146,8 @@ public class User implements ISecurityUser {
     public int hashCode() {
         return Objects.hashCode(id);
     }
+
+    // ========== GETTERS & SETTERS ==========
 
     public Long getId() {
         return id;
@@ -141,5 +187,70 @@ public class User implements ISecurityUser {
 
     public Instant getUpdated_at() {
         return updated_at;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayEmail() {
+        return displayEmail;
+    }
+
+    public void setDisplayEmail(String displayEmail) {
+        this.displayEmail = displayEmail;
+    }
+
+    public String getDisplayPhone() {
+        return displayPhone;
+    }
+
+    public void setDisplayPhone(String displayPhone) {
+        this.displayPhone = displayPhone;
+    }
+
+    public String getInternalEmail() {
+        return internalEmail;
+    }
+
+    public void setInternalEmail(String internalEmail) {
+        this.internalEmail = internalEmail;
+    }
+
+    public String getInternalPhone() {
+        return internalPhone;
+    }
+
+    public void setInternalPhone(String internalPhone) {
+        this.internalPhone = internalPhone;
+    }
+
+    // ========== NYE GETTERS & SETTERS FOR RELATIONER ==========
+
+    public Resident getResidentProfile() {
+        return residentProfile;
+    }
+
+    public void setResidentProfile(Resident residentProfile) {
+        this.residentProfile = residentProfile;
+    }
+
+    public List<Resident> getResidents() {
+        return residents;
+    }
+
+    public void setResidents(List<Resident> residents) {
+        this.residents = residents;
+    }
+
+    // Helper metode til at tilføje en resident
+    public void addResident(Resident resident) {
+        if (resident != null && !this.residents.contains(resident)) {
+            this.residents.add(resident);
+        }
     }
 }

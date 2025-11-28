@@ -14,7 +14,7 @@ public class SecurityRoutes {
             path("/auth", () -> {
                 get("/healthcheck", security::healthCheck, Role.ANYONE);
                 post("/login", security.login(), Role.ANYONE);
-                post("/register", security.register(), Role.ANYONE);
+                post("/register", security.register(), Role.ADMIN);
                 post("/user/addrole", security.addRole(), Role.ADMIN);
             });
         };

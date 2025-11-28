@@ -14,9 +14,11 @@ public class UserRoute {
             get("/", controller::readAll, Role.ADMIN);
             get("/{id}", controller::read, Role.ADMIN);
 
+
             post("/", controller::create, Role.ADMIN);
             put("/{id}", controller::update, Role.ADMIN);
             delete("/{id}", controller::delete, Role.ADMIN);
+            post("/{id}/link-residents", controller::linkResidents, Role.ADMIN);
         };
     }
 }

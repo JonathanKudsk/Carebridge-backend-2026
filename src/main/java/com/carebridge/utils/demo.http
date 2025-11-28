@@ -70,14 +70,20 @@ Authorization: Bearer {{jwt_token}}
 %}
 
 ### 6) Create a new user (ADMIN)
-POST {{url}}/users
+POST {{url}}/auth/register
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
 {
   "name": "Test User",
   "email": "test.user@carebridge.io",
-  "password": "StrongPass!123"
+  "password": "StrongPass!123",
+  "displayName": "Test User",
+  "displayEmail": "test.user@carebridge.io",
+  "displayPhone": "123-456-7890",
+  "internalEmail": "test.internal@carebridge.io",
+  "internalPhone": "098-765-4321",
+  "role": "CAREWORKER"
 }
 
 > {%
@@ -88,6 +94,7 @@ Content-Type: application/json
         }
     });
 %}
+
 
 ### 7) Update a user (ADMIN) - uses new_user_id if present, else 1
 @target_user_id = {{new_user_id}} || 1
