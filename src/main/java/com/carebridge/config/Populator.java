@@ -37,21 +37,6 @@ public class Populator {
                 em.persist(admin);
             }
 
-            User alice = findUserByEmail(em, "alice@carebridge.io");
-            if (alice == null) {
-                alice = new User();
-                alice.setName("Alice");
-                alice.setEmail("alice@carebridge.io");
-                alice.setPassword("password123");
-                alice.setRole(Role.USER);
-                alice.setDisplayName("Alice Smith");
-                alice.setDisplayEmail("alice@carebridge.io");
-                alice.setDisplayPhone("222-2222-2222");
-                alice.setInternalEmail("alice.internal@carebridge.io");
-                alice.setInternalPhone("333-3333-3333");
-                em.persist(alice);
-            }
-
             List<EventType> predefinedTypes = List.of(
                     new EventType("Meeting", "#007bff"),
                     new EventType("Task", "#28a745"),
@@ -66,17 +51,6 @@ public class Populator {
                 if (existing == null) {
                     em.persist(type);
                 }
-            }
-
-            // --- Insert a test journal if none exists ---
-            long journalCount = em.createQuery("SELECT COUNT(j) FROM Journal j", Long.class)
-                    .getSingleResult();
-            if (journalCount == 0) {
-                Journal journal = new Journal();
-                // If you don't add @GeneratedValue to Journal.id, you MUST set an ID manually:
-                // journal.setId(1L);
-                em.persist(journal);
-                logger.info("Added test Journal with auto-generated ID");
             }
 
             tx.commit();

@@ -204,14 +204,13 @@ Content-Type: application/json
 ### 14) Create journal entry with no files
 ### Note: authorUserId should correspond to an existing user in your test DB (hardcoded in controller)
 POST {{url}}/journals/1/journal-entries
+Authorization: Bearer {{user_jwt}}
 Content-Type: application/json
 
 {
-  "journalId": 1,
   "title": "Observation of morning routine",
   "content": "Resident was calm and cooperative. Had breakfast at 8:30.",
   "riskAssessment": "LOW",
-  "authorUserId": 2,
   "entryType": "DAILY"
 }
 

@@ -5,9 +5,11 @@ import com.carebridge.dao.impl.*;
 import com.carebridge.dtos.CreateJournalEntryRequestDTO;
 import com.carebridge.dtos.EditJournalEntryRequestDTO;
 import com.carebridge.dtos.JournalEntryResponseDTO;
+import com.carebridge.dtos.JwtUserDTO;
 import com.carebridge.entities.JournalEntry;
 import com.carebridge.entities.Journal;
 import com.carebridge.entities.User;
+import com.carebridge.exceptions.ApiRuntimeException;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,21 +43,28 @@ public class JournalEntryController implements IController<JournalEntry, Long>
     public void create(Context ctx) {
         try {
             Long journalId = Long.parseLong(ctx.pathParam("journalId"));
-
             CreateJournalEntryRequestDTO requestDTO = ctx.bodyAsClass(CreateJournalEntryRequestDTO.class);
             requestDTO.setJournalId(journalId);
-            // TODO: replace hardcoded author with authenticated user ID
-            requestDTO.setAuthorUserId(2L);
+
+            //Hentning af User er taget fra EventController
+            var tokenUser = ctx.attribute("user");
+            String email = null;
+            if (tokenUser instanceof JwtUserDTO ju) email = ju.getUsername();
+            else if (tokenUser instanceof com.carebridge.dtos.UserDTO du) email = du.getEmail();
+            else if (tokenUser != null) email = tokenUser.toString();
+
+            if (email == null) throw new ApiRuntimeException(401, "Could not find user from token");
+
+            User author = userDAO.readByEmail(email);
+            if (author == null) {
+                ctx.status(401).json("{\"msg\":\"Author not found\"}");
+                return;
+            }
 
             // --- 1. Fetch Journal and Author ---
             Journal journal = journalDAO.read(requestDTO.getJournalId());
             if (journal == null) {
                 throw new IllegalArgumentException("Journal not found with ID: " + requestDTO.getJournalId());
-            }
-
-            User author = userDAO.read(requestDTO.getAuthorUserId());
-            if (author == null) {
-                throw new IllegalArgumentException("Author not found with ID: " + requestDTO.getAuthorUserId());
             }
 
             // --- 2. Validate Required Input ---
@@ -199,6 +208,7 @@ public class JournalEntryController implements IController<JournalEntry, Long>
     // Get entry details (logic moved from service)
     public void read(Context ctx) {
         try {
+
             Long entryId = Long.parseLong(ctx.pathParam("entryId"));
             JournalEntry entry = journalEntryDAO.read(entryId);
 
