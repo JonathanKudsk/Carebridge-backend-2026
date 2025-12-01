@@ -1,6 +1,7 @@
 package com.carebridge.routes;
 
 import com.carebridge.controllers.impl.ResidentController;
+import com.carebridge.entities.enums.Role;
 import io.javalin.apibuilder.EndpointGroup;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
@@ -11,7 +12,7 @@ public class ResidentRoute {
 
     public EndpointGroup getRoutes() {
         return () -> {
-            post("/create", controller::create);
+            post("/create", controller::create, Role.ADMIN);
             // Define resident-related routes here
         };
     }
