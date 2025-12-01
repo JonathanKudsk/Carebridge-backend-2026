@@ -24,13 +24,31 @@ public class Populator {
 
             User admin = findUserByEmail(em, "admin@carebridge.io");
             if (admin == null) {
-                admin = new User("Admin", "admin@carebridge.io", "admin123", Role.ADMIN);
+                admin = new User();
+                admin.setName("Admin");
+                admin.setEmail("admin@carebridge.io");
+                admin.setPassword("admin123");
+                admin.setRole(Role.ADMIN);
+                admin.setDisplayName("Admin User");
+                admin.setDisplayEmail("admin@carebridge.io");
+                admin.setDisplayPhone("000-0000-0000");
+                admin.setInternalEmail("admin.internal@carebridge.io");
+                admin.setInternalPhone("111-1111-1111");
                 em.persist(admin);
             }
 
             User alice = findUserByEmail(em, "alice@carebridge.io");
             if (alice == null) {
-                alice = new User("Alice", "alice@carebridge.io", "password123", Role.USER);
+                alice = new User();
+                alice.setName("Alice");
+                alice.setEmail("alice@carebridge.io");
+                alice.setPassword("password123");
+                alice.setRole(Role.USER);
+                alice.setDisplayName("Alice Smith");
+                alice.setDisplayEmail("alice@carebridge.io");
+                alice.setDisplayPhone("222-2222-2222");
+                alice.setInternalEmail("alice.internal@carebridge.io");
+                alice.setInternalPhone("333-3333-3333");
                 em.persist(alice);
             }
 
