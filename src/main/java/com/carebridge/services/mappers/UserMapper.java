@@ -17,6 +17,11 @@ public final class UserMapper {
                 .name(u.getName())
                 .email(u.getEmail())
                 .role(u.getRole())
+                .displayName(u.getDisplayName())
+                .displayEmail(u.getDisplayEmail())
+                .displayPhone(u.getDisplayPhone())
+                .internalEmail(u.getInternalEmail())
+                .internalPhone(u.getInternalPhone())
                 .build();
     }
 
@@ -26,6 +31,11 @@ public final class UserMapper {
         u.setName(dto.getName());
         u.setEmail(dto.getEmail());
         u.setRole(dto.getRole());
+        u.setDisplayName(dto.getDisplayName());
+        u.setDisplayEmail(dto.getDisplayEmail());
+        u.setDisplayPhone(dto.getDisplayPhone());
+        u.setInternalEmail(dto.getInternalEmail());
+        u.setInternalPhone(dto.getInternalPhone());
         return u;
     }
 

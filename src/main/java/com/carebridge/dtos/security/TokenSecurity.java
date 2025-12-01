@@ -18,10 +18,27 @@ public class TokenSecurity implements ITokenSecurity {
     @Override
     public JwtUserDTO getUserWithRolesFromToken(String token) throws ParseException {
         var jwt = SignedJWT.parse(token);
-        String rolesCsv = String.valueOf(jwt.getJWTClaimsSet().getClaim("roles"));
-        String username = String.valueOf(jwt.getJWTClaimsSet().getClaim("username"));
-        Set<String> roles = Arrays.stream(rolesCsv.split(",")).collect(Collectors.toSet());
-        return JwtUserDTO.builder().username(username).roles(roles).build();
+        var claims = jwt.getJWTClaimsSet();
+
+        String username = claims.getStringClaim("username");
+        String rolesCsv = claims.getStringClaim("roles");
+
+        // Debug logging
+        System.out.println("Extracted username: " + username);
+        System.out.println("Extracted roles CSV: " + rolesCsv);
+
+        if (rolesCsv == null || rolesCsv.isEmpty()) {
+            throw new ParseException("No roles found in token", 0);
+        }
+
+        Set<String> roles = Arrays.stream(rolesCsv.split(","))
+                .map(String::trim)
+                .collect(Collectors.toSet());
+
+        return JwtUserDTO.builder()
+                .username(username)
+                .roles(roles)
+                .build();
     }
 
     @Override

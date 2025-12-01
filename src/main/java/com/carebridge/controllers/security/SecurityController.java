@@ -5,6 +5,7 @@ import com.carebridge.dao.security.ISecurityDAO;
 import com.carebridge.dao.security.SecurityDAO;
 import com.carebridge.dtos.AuthRequest;
 import com.carebridge.dtos.JwtUserDTO;
+import com.carebridge.dtos.RegisterUserDTO;
 import com.carebridge.dtos.UserDTO;
 import com.carebridge.dtos.security.ITokenSecurity;
 import com.carebridge.dtos.security.TokenSecurity;
@@ -68,6 +69,7 @@ public class SecurityController implements ISecurityController {
             } catch (ValidationException e) {
                 ctx.status(401).json(out.put("msg", e.getMessage()));
             } catch (Exception e) {
+
                 logger.error("login failed", e);
                 ctx.status(500).json(out.put("msg", "Internal error"));
             }
@@ -79,13 +81,23 @@ public class SecurityController implements ISecurityController {
         return ctx -> {
             ObjectNode out = objectMapper.createObjectNode();
             try {
-                var node = ctx.bodyAsClass(ObjectNode.class);
-                String name = node.get("name").asText();
-                String email = node.get("email").asText();
-                String password = node.get("password").asText();
+                // Parse hele kroppen som RegisterUserDTO
+                RegisterUserDTO dto = ctx.bodyAsClass(RegisterUserDTO.class);
 
-                User created = securityDAO.createUser(name, email, password);
+                // Opret bruger i DB via SecurityDAO med alle felter
+                User created = securityDAO.createUser(
+                        dto.getName(),
+                        dto.getEmail(),
+                        dto.getPassword(),
+                        dto.getDisplayName(),
+                        dto.getDisplayEmail(),
+                        dto.getDisplayPhone(),
+                        dto.getInternalEmail(),
+                        dto.getInternalPhone(),
+                        dto.getRole()
+                );
 
+                // Lav JWT
                 JwtUserDTO jwtUser = JwtUserDTO.builder()
                         .username(created.getEmail())
                         .roles(Set.of(created.getRole().name()))
@@ -93,9 +105,17 @@ public class SecurityController implements ISecurityController {
 
                 String token = createToken(jwtUser);
 
-                ctx.status(HttpStatus.CREATED).json(out.put("token", token)
+                // Returnér token + bruger info
+                ctx.status(HttpStatus.CREATED).json(out
+                        .put("token", token)
                         .put("email", created.getEmail())
-                        .put("role", created.getRole().name()));
+                        .put("role", created.getRole().name())
+                        .put("displayName", created.getDisplayName())
+                        .put("displayEmail", created.getDisplayEmail())
+                        .put("displayPhone", created.getDisplayPhone())
+                        .put("internalEmail", created.getInternalEmail())
+                        .put("internalPhone", created.getInternalPhone())
+                );
             } catch (ApiRuntimeException e) {
                 ctx.status(e.getErrorCode()).json(out.put("msg", e.getMessage()));
             } catch (Exception e) {
@@ -104,6 +124,9 @@ public class SecurityController implements ISecurityController {
             }
         };
     }
+
+
+
 
     @Override
     public Handler authenticate() {
@@ -140,11 +163,16 @@ public class SecurityController implements ISecurityController {
             String ISSUER = DEPLOYED ? System.getenv("ISSUER") : Utils.getPropertyValue("ISSUER", "application.properties");
             String EXPIRE = DEPLOYED ? System.getenv("TOKEN_EXPIRE_TIME") : Utils.getPropertyValue("TOKEN_EXPIRE_TIME", "application.properties");
             String SECRET = DEPLOYED ? System.getenv("SECRET_KEY") : Utils.getPropertyValue("SECRET_KEY", "application.properties");
+
+            logger.info("Creating token with ISSUER={}, EXPIRE={}, SECRET={}", ISSUER, EXPIRE, SECRET != null ? "***" : "null");
+
             return tokenSecurity.createToken(user, ISSUER, EXPIRE, SECRET);
         } catch (Exception e) {
+            logger.error("Token creation failed", e);
             throw new ApiRuntimeException(500, "Could not create token");
         }
     }
+
 
     @Override
     public JwtUserDTO verifyToken(String token) {

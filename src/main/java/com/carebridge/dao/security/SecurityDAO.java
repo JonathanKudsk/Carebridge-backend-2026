@@ -32,12 +32,34 @@ public class SecurityDAO implements ISecurityDAO {
     }
 
     @Override
-    public User createUser(String name, String email, String rawPassword) {
+    public User createUser(
+            String name,
+            String email,
+            String rawPassword,
+            String displayName,
+            String displayEmail,
+            String displayPhone,
+            String internalEmail,
+            String internalPhone,
+            Role role
+    ) {
         try (var em = em()) {
             if (findByEmail(em, email) != null) {
                 throw new ApiRuntimeException(409, "Email already exists");
             }
-            var user = new User(name, email, rawPassword, Role.USER);
+
+
+            var user = new User();
+            user.setName(name);
+            user.setEmail(email);
+            user.setPassword(rawPassword);
+            user.setRole(role != null ? role : Role.USER);
+            user.setDisplayName(displayName);
+            user.setDisplayEmail(displayEmail);
+            user.setDisplayPhone(displayPhone);
+            user.setInternalEmail(internalEmail);
+            user.setInternalPhone(internalPhone);
+
             em.getTransaction().begin();
             em.persist(user);
             em.getTransaction().commit();
@@ -48,6 +70,7 @@ public class SecurityDAO implements ISecurityDAO {
             throw new ApiRuntimeException(400, ex.getMessage());
         }
     }
+
 
     @Override
     public User changeRole(Long userId, Role newRole) {
