@@ -68,8 +68,8 @@ public class User implements ISecurityUser {
     // ========== NYE RELATIONER ==========
 
     // Hvis brugeren er en RESIDENT - link til deres Resident profil
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Resident residentProfile;
+    /*@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Resident residentProfile;*/
 
     // Hvis brugeren er en GUARDIAN - deres tilknyttede beboere
     @ManyToMany
@@ -231,13 +231,13 @@ public class User implements ISecurityUser {
 
     // ========== NYE GETTERS & SETTERS FOR RELATIONER ==========
 
-    public Resident getResidentProfile() {
+    /*public Resident getResidentProfile() {
         return residentProfile;
     }
 
     public void setResidentProfile(Resident residentProfile) {
         this.residentProfile = residentProfile;
-    }
+    }*/
 
     public List<Resident> getResidents() {
         return residents;

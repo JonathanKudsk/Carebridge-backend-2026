@@ -7,7 +7,5 @@ public enum Role implements RouteRole {
     USER,
     ADMIN,
     CAREWORKER,
-    GUARDIAN,
-    MANAGER,
-    RESIDENT;
+    GUARDIAN
 }
