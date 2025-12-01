@@ -259,3 +259,14 @@ GET {{url}}/journals/1/journal-entries/1
         client.assert([200, 404].includes(response.status), "Unexpected response for journal entry");
     });
 %}
+
+### 19) Create new resident
+POST http://localhost:7070/api/residents/create
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "Resident",
+  "cprNr": "010190-1234"
+}
