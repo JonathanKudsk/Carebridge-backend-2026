@@ -1,86 +1,86 @@
 # CareBridge Backend
 
-CareBridge Backend er en Java Maven-baseret REST API bygget med Javalin, Hibernate og PostgreSQL. Projektet implementerer moderne Java-funktioner (Java 21) med fokus på sikkerhed, validering og testdækningsdækning.
+CareBridge Backend er en Java Maven-baseret REST API lavet med Javalin, Hibernate og PostgreSQL. Projektet bruger moderne Java-features (Java 21) med fokus på sikkerhed, validering og solid test-dækning.
 
-## Teknologi Stack
+## Tech Stack
 
-Projektet benytter følgende teknologier:
+Projektet benytter disse teknologier:
 
-- **Java 21**: Moderne Java med den nyeste features
-- **Javalin 6.3.0**: Lightweight REST API framework
-- **Hibernate 6.4.4**: ORM (Object-Relational Mapping) framework
+- **Java 21**: Nyeste Java-features
+- **Javalin 6.3.0**: Et lightweight framework til REST API'er
+- **Hibernate 6.4.4**: Håndterer databasekommunikationen for dig
 - **PostgreSQL 42.7.3**: Relationel database
-- **Jackson 2.15.0**: JSON serialisering og deserialisering
-- **JWT 10.5**: JSON Web Tokens til authentication
-- **BCrypt 0.4**: Sikker passwordhashing
-- **Lombok 1.18.36**: Reducer boilerplate-kode
-- **JUnit 5.10.2**: Testing framework
-- **Logback 1.5.13**: Logging framework
+- **Jackson 2.15.0**: Konverterer mellem Java-objekter og JSON
+- **JWT 10.5**: Sikkerhed via tokens
+- **BCrypt 0.4**: Sikker password-hashing
+- **Lombok 1.18.36**: Reducerer boilerplate-kode
+- **JUnit 5.10.2**: Test-framework
+- **Logback 1.5.13**: Logging
 
-## Forudsætninger
+## Det skal du have på din maskine
 
-For at køre projektet skal du have installeret:
+Du skal have disse værktøjer installeret for at arbejde med projektet:
 
 - Java Development Kit (JDK) 21 eller nyere
 - Maven 3.8.0 eller nyere
-- PostgreSQL 12 eller nyere
+- PostgreSQL 12 eller nyere (hvis du bruger lokal database)
 - Git
 
-## Opsætning
+## Kom i gang
 
-Klone repositoriet og naviger til projektets root-mappe:
+Start med at klone repositoriet:
 
 ```bash
 git clone <repository-url>
 cd carebridge-backend
 ```
 
-### Database-opsætning
+### Sæt databasen op
 
-Du har to muligheder for at sætte databasen op:
+Du kan vælge mellem to løsninger:
 
-#### Lokal PostgreSQL (udvikling)
+#### Hvis du arbejder lokalt med PostgreSQL
 
-Installér PostgreSQL lokalt og opret en database:
+Installér PostgreSQL og opret en database:
 
 ```bash
 createdb carebridge
 ```
 
-#### Cloud Database på Neon.tech (anbefalet)
+#### Hvis du bruger Neon.tech (det er gratis og anbefalet)
 
-Neon.tech tilbyder gratis PostgreSQL-hosting i cloudmiljøet, hvilket er perfekt til udvikling og test. Fordele ved at bruge Neon:
+Neon.tech giver dig en gratis PostgreSQL-database i cloudmiljøet, som er super praktisk til udvikling og test. Her er nogle fordele:
 
 - Gratis PostgreSQL-database
 - Automatiske backups
-- Nem branch-administration for forskellige teams og miljøer
-- Skalerbar infrastruktur
-- Ingen kreditkort påkrævet til gratis tier
+- Let at lave branches for forskellige teams og miljøer
+- Du får skalerbarhed uden at skulle tænke på servere
+- Du skal ikke give kreditkort-info for at bruge gratis tier
 
-**Sådan sætter du Neon op:**
+**Sådan starter du med Neon:**
 
-1. Gå til [neon.tech](https://neon.tech) og opret en gratis konto
-2. Opret et nyt projekt
-3. Neon vil automatisk oprette en standard database
-4. Under "Connection Details" finder du din forbindelses-string
+1. Hop ind på [neon.tech](https://neon.tech) og opret en gratis konto
+2. Lav et nyt projekt
+3. Neon laver automatisk en database til dig
+4. Find din forbindelses-string under "Connection Details"
 
-**Opret branches til teams:**
+**Opret branches til dine teams:**
 
-I Neon kan du oprette forskellige branches for hver team eller miljø (udvikling, staging, produktion):
+I Neon kan du lave forskellige branches til hvert team eller miljø (udvikling, staging, produktion osv.):
 
-1. I Neon-dashboard, gå til "Branches"
-2. Klik "Create branch"
-3. Navngiv den efter dit team eller miljø (fx "team-frontend", "team-backend", "staging")
+1. Åbn Neon-dashboardet og gå til "Branches"
+2. Tryk "Create branch"
+3. Navngiv den efter dit team eller miljø (f.eks. "team-frontend", "team-backend", "staging")
 4. Hver branch får sin egen database og forbindelses-detaljer
 
-**Fordele ved at bruge Neon branches:**
+**Hvorfor Neon branches er fede:**
 
-- Hvert team kan have isoleret arbejdsplads
-- Nem kopiering af data mellem branches
-- Uafhængige databaser uden påvirkning på andre teams
-- Enkel branch-administration direkte fra Neon-dashboard
+- Hvert team arbejder i sin egen isoleret database
+- Ingen risiko for at ændringer påvirker andre teams
+- Du kan nemt synkronisere data mellem branches når det skal til
+- Hele branch-administrations sker direkte i Neon-dashboardet
 
-Opret en `.env` fil i root-mappen med dine databaseoplysninger (fra Neon eller lokal setup):
+Opret en `.env` fil i rod-mappen med dine database-oplysninger. Hvis du bruger Neon, finder du værdierne i Neon-dashboardet:
 
 ```
 DB_HOST=your-project.neon.tech
@@ -91,7 +91,7 @@ DB_PASSWORD=your_password
 JWT_SECRET=din_hemmeligt_nøgle
 ```
 
-For lokal PostgreSQL:
+Eller hvis du arbejder lokalt:
 
 ```
 DB_HOST=localhost
@@ -102,28 +102,28 @@ DB_PASSWORD=din_password
 JWT_SECRET=din_hemmeligt_nøgle
 ```
 
-Installér afhængigheder og byg projektet:
+Download dependencies og byg projektet:
 
 ```bash
 mvn clean install
 ```
 
-## Kørsel
+## Start applikationen
 
-Start applikationen med Maven:
+Kør den med Maven:
 
 ```bash
 mvn clean compile exec:java
 ```
 
-Eller byg en JAR-fil og kør den:
+Eller byg den som en JAR-fil først og kør den bagefter:
 
 ```bash
 mvn clean package
 java -jar target/carebridge-backend-1.0-SNAPSHOT.jar
 ```
 
-API'en vil være tilgængelig på `http://localhost:8080` (standard Javalin-port).
+Så er API'en klar på `http://localhost:8080` (Javalin's default port).
 
 ## Projektstruktur
 
@@ -142,18 +142,18 @@ carebridge-backend/
 └── README.md                  # Denne fil
 ```
 
-## Features
+## Hvad projektet kan
 
-- RESTful API med Javalin-framework
+- RESTful API med Javalin
 - JWT-baseret authentication
-- Sikker password-hashing med BCrypt
-- Hibernate ORM for databaseadgang
-- Validering af input-data med Hibernate Validator
-- Comprehensive testing med JUnit 5 og Testcontainers
-- Logging med Logback
-- Docker-support med Testcontainers til integration tests
+- BCrypt til sikker password-hashing
+- Hibernate ORM til database-kommunikation
+- Input-validering med Hibernate Validator
+- Ordentlig test-suite med JUnit 5 og Testcontainers
+- Logging via Logback
+- Docker-support til integration tests med Testcontainers
 
-## Testing
+## Test alt
 
 Kør alle tests:
 
@@ -161,87 +161,87 @@ Kør alle tests:
 mvn test
 ```
 
-Kør specifikke testklasser:
+Eller hvis du kun vil teste en bestemt klasse:
 
 ```bash
 mvn test -Dtest=Klassenavn
 ```
 
-Projektet bruger Testcontainers til at køre PostgreSQL i isolerede Docker-containere under tests, hvilket sikrer reproducerbare testresultater.
+Projektet bruger Testcontainers til at spin up PostgreSQL i Docker under testene, så du får virkelig test-miljøer uden at påvirke din udviklings-database.
 
 ## Database-management
 
-### Neon Branch-strategi for Teams
+### Branch-strategi med Neon for dit team
 
-Hvis dit team bruger Neon.tech kan du organisere branching sådan:
+Hvis I bruger Neon kan I organisere branches sådan her:
 
 **Production branch:**
-- Branch-navn: `production`
-- Bruges til live-miljø
-- Kræver approval før ændringer
-- Daglig backup
+- Navn: `production`
+- Det der kører live
+- Skal være stabil
+- Daglige backups automatisk
 
 **Staging branch:**
-- Branch-navn: `staging`
-- Test-miljø før produktion
+- Navn: `staging`
+- Hvor du tester før den går live
 - Spejler produktions-data
-- Årlig opbygning fra produktion
+- Yearly refresh fra production
 
 **Team branches:**
-- Branch-navn: `team-frontend`, `team-backend`, `team-devops`
-- Hver team får isoleret database
-- Uafhængig udvikling uden påvirkning på andre teams
-- Mulighed for at synkronisere data fra main-branch når det er nødvendigt
+- Navn: `team-frontend`, `team-backend`, `team-devops`
+- Hver team får sin egen database
+- De kan udvikle uden at påvirke hinanden
+- Data kan synkroniseres når det skal til
 
 **Feature branches:**
-- Branch-navn: `feature/my-feature`
-- Kortvarige branches for udvikling
-- Automatisk slettet efter feature er færdig
-- Nøjtig test af nye features før merge
+- Navn: `feature/my-feature`
+- Kortvarige branches mens I udvikler
+- Slettes efter feature er færdig
+- Perfekt til at teste nye features i isolation
 
-**Sådan skifter du mellem branches i din applikation:**
+**Skift mellem branches i applikationen:**
 
-Opdater din `.env` fil eller miljø-variabler til at pege på den relevante Neon branch forbindelses-detaljer. Hver branch i Neon får sin egen host og database-navn.
+Du skifter mellem branches ved at opdatere `.env` fil eller environment variables til at pege på den branch du vil bruge. Hver Neon branch får sin egen connection-string.
 
-### Databasen under development
+### Database under udvikling
 
-Under udvikling bruger projektet automatisk Docker-containere via Testcontainers:
+Under udvikling bruges Docker-containere automatisk via Testcontainers når du kører tests:
 
 ```bash
 mvn test
 ```
 
-Dette sikrer at dine tests ikke påvirker udviklings-databasen og giver reproducerbare resultater hver gang.
+Det betyder dine tests ikke røre ved udviklings-databasen, og du får de samme resultater hver gang.
 
-### Database-migrationer
+### Hvis du skal ændre databasen
 
-For større database-skema ændringer anbefales det at:
+Når der skal ske større ændringer i database-skemaet:
 
 1. Opret en ny branch i Neon
-2. Test dine skema-ændringer på branch-databasen
-3. Verificer at applikationen fungerer som forventet
-4. Merge til main-branch i Neon når det er bekræftet
-5. Deploy til produktion med de nye skema-ændringer
+2. Test dine ændringer på den branch
+3. Verificer at applikationen virker som den skal
+4. Merge til main når alt virker
+5. Deploy til production med de nye ændringer
 
-## Maven Build
+## Build-kommandoer
 
-Byg projektet uden at køre tests:
+Byg uden at køre tests (når du er stresset for tid):
 
 ```bash
 mvn clean package -DskipTests
 ```
 
-Byg med fuld test-dækningsdækning:
+Byg med fuld test-dækning:
 
 ```bash
 mvn clean package
 ```
 
-## Dependency Management
+## Dependency-versioner
 
-Alle dependency-versioner styres centralt gennem properties i `pom.xml`. Dette gør det nemt at opdatere biblioteker globalt.
+Alle library-versionerne styres på et sted i `pom.xml` properties-sektionen. Det gør det super nemt når der kommer nye versioner - du skifter bare ét tal et sted.
 
-Vigtige afhængigheder kan opdateres ved at ændre versionsnummeret i properties-sektionen:
+For eksempel, hvis du vil opdatere Javalin:
 
 ```xml
 <javalin.version>6.3.0</javalin.version>
@@ -249,28 +249,25 @@ Vigtige afhængigheder kan opdateres ved at ændre versionsnummeret i properties
 <postgresql.version>42.7.3</postgresql.version>
 ```
 
-## Compiler-konfiguration
+## Compiler-setup
 
-Projektet er konfigureret til at generere Java 21 bytecode for maksimal kompatibilitet. Maven compiler plugin er indstillet til at bruge `<release>21</release>`, hvilket sikrer korrekt bytecode-generation uanset hvilken JDK-version der bruges til compilation.
+Projektet er indstillet til at lave Java 21 bytecode, så det virker på alle maskiner. Maven compiler plugin bruger `<release>21</release>`, hvilket betyder du får det samme output uanset hvilken JDK-version du har.
 
-Lombok-annotation-processoren er konfigureret til både main- og test-kompilering for at reducere boilerplate-kode.
+Lombok bruger annotation processors under både main- og test-compilation, så boilerplate-kode bliver genereret automatisk.
 
-## Kontribution
+## Bidrag til projektet
 
-For at bidrage til projektet:
+Hvis du vil hjælpe til:
 
 1. Fork repositoriet
-2. Opret en feature-branch (`git checkout -b feature/MinFeature`)
+2. Lav din egen branch (`git checkout -b feature/MinFeature`)
 3. Commit dine ændringer (`git commit -m 'Tilføj MinFeature'`)
-4. Push til branchen (`git push origin feature/MinFeature`)
+4. Push til din branch (`git push origin feature/MinFeature`)
 5. Åbn en Pull Request
 
-Sørg for at alle tests passerer og at ny kode følger projektets kodestandarder.
+Husk at alle tests skal passere og at ny kode skal følge projektets kodestil.
 
-## Licens
 
-Dette projekt er licenseret under MIT-licensen. Se LICENSE-filen for detaljer.
+## Hjælp og spørgsmål
 
-## Support
-
-Hvis du har spørgsmål eller støder på problemer, kan du åbne et issue på GitHub eller kontakte projektholdet.
+Hvis noget er uklart eller der er problemer, kan du åbne et issue på GitHub eller kontakte teamet direkte.
