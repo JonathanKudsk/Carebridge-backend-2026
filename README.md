@@ -55,7 +55,7 @@ Neon.tech giver dig en gratis PostgreSQL-database i cloudmiljøet, som er super 
 - Automatiske backups
 - Let at lave branches for forskellige teams og miljøer
 - Du får skalerbarhed uden at skulle tænke på servere
-- Du skal ikke give kreditkort-info for at bruge gratis tier
+- Helt gratis til den mængde data i skal gemme
 
 **Sådan starter du med Neon:**
 
