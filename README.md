@@ -92,14 +92,19 @@ JWT_SECRET=din_hemmeligt_nøgle
 ```
 
 Eller hvis du arbejder lokalt:
+Skal du oprette en application.properties fil i ressources, som skal indeholde:
 
 ```
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=carebridge
-DB_USER=postgres
-DB_PASSWORD=din_password
-JWT_SECRET=din_hemmeligt_nøgle
+DB_HOST=localhost 
+DB_PORT=5432 
+DB_NAME=carebridge 
+DB_USER=…your_DB_user
+DB_PASSWORD=your_DB_password
+JWT_SECRET=din_hemmelige_nøgle
+SECRET_KEY=samme_som_JWT
+ISSUER=carebridge 
+DB_SSLMODE=disable
+FRONTEND_ORIGIN=your_frontend_URL
 ```
 
 Download dependencies og byg projektet:

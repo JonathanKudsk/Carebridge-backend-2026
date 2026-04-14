@@ -16,7 +16,7 @@ public class ApplicationConfig {
     private static final AccessController accessController = new AccessController();
     private static final Logger logger = LoggerFactory.getLogger(ApplicationConfig.class);
     private static final Routes routes = new Routes();
-    private static final String frontEndOrigin = "http://localhost:5173";
+    private static final String frontEndOrigin = System.getenv("FRONTEND_ORIGIN");
     private static int count = 1;
 
     public static void configuration(JavalinConfig config) {
