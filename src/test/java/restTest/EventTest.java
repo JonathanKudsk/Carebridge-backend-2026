@@ -18,6 +18,8 @@ public class EventTest {
 
     private static String authToken;
     private static String adminAuthToken;
+    private static int eventTypeId;
+    private static int createdEventId;
     private Javalin app;
 
     @BeforeAll
@@ -47,6 +49,14 @@ public class EventTest {
                 .log().ifValidationFails()
                 .statusCode(200)
                 .extract().path("token");
+
+        eventTypeId = given()
+                .header("Authorization", "Bearer " + adminAuthToken)
+                .when()
+                .get("/event-types")
+                .then()
+                .statusCode(200)
+                .extract().path("[0].id");
     }
 
     @AfterAll
@@ -82,24 +92,23 @@ public class EventTest {
                 "description": "JUnit event",
                 "startAt": "%s",
                 "showOnBoard": true,
-                "createdById": 2,
-                "eventTypeId": 1
+                "eventTypeId": %d
         }
-        """, futureStartAt);
+        """, futureStartAt, eventTypeId);
 
-        int createdId =
-                given()
-                        .header("Authorization", "Bearer " + authToken)
-                        .contentType(ContentType.JSON)
-                        .body(payload)
-                        .when()
-                        .post("/events")
-                        .then()
-                        .statusCode(201)
-                        .body("title", equalTo("New Test Event"))
-                        .extract().path("id");
+        createdEventId = given()
+                .header("Authorization", "Bearer " + adminAuthToken)
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .when()
+                .post("/events")
+                .then()
+                .log().ifValidationFails()
+                .statusCode(201)
+                .body("title", equalTo("New Test Event"))
+                .extract().path("id");
 
-        Assertions.assertTrue(createdId > 0);
+        Assertions.assertTrue(createdEventId > 0);
     }
 
     // ---------------------------
@@ -109,12 +118,12 @@ public class EventTest {
     @Order(3)
     public void testReadEventById() {
         given()
-                .header("Authorization", "Bearer " + authToken)
+                .header("Authorization", "Bearer " + adminAuthToken)
                 .when()
-                .get("/events/1")
+                .get("/events/" + createdEventId)
                 .then()
                 .statusCode(200)
-                .body("id", equalTo(1));
+                .body("id", equalTo(createdEventId));
     }
 
     // ---------------------------
@@ -131,11 +140,11 @@ public class EventTest {
         """;
 
         given()
-                .header("Authorization", "Bearer " + authToken)
+                .header("Authorization", "Bearer " + adminAuthToken)
                 .contentType(ContentType.JSON)
                 .body(updateJson)
                 .when()
-                .put("/events/1")
+                .put("/events/" + createdEventId)
                 .then()
                 .statusCode(200)
                 .body("title", equalTo("Updated Event Title"));
@@ -148,9 +157,9 @@ public class EventTest {
     @Order(6)
     public void testDeleteEvent() {
         given()
-                .header("Authorization", "Bearer " + authToken)
+                .header("Authorization", "Bearer " + adminAuthToken)
                 .when()
-                .delete("/events/1")  // Only ADMIN allowed
+                .delete("/events/" + createdEventId)  // Only ADMIN allowed
                 .then()
                 .statusCode(anyOf(is(200), is(204), is(403))); // depends on your implementation
     }
@@ -162,7 +171,7 @@ public class EventTest {
     @Order(5)
     public void testUpcomingEvents() {
         given()
-                .header("Authorization", "Bearer " + authToken)
+                .header("Authorization", "Bearer " + adminAuthToken)
                 .when()
                 .get("/events/upcoming")
                 .then()
