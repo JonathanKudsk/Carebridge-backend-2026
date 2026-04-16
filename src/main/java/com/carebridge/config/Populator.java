@@ -37,6 +37,21 @@ public class Populator {
                 em.persist(admin);
             }
 
+            User alice = findUserByEmail(em, "alice@carebridge.io");
+            if (alice == null) {
+                alice = new User();
+                alice.setName("Alice");
+                alice.setEmail("alice@carebridge.io");
+                alice.setPassword("password123");
+                alice.setRole(Role.CAREWORKER);
+                alice.setDisplayName("Alice User");
+                alice.setDisplayEmail("alice@carebridge.io");
+                alice.setDisplayPhone("222-2222-2222");
+                alice.setInternalEmail("alice.internal@carebridge.io");
+                alice.setInternalPhone("333-3333-3333");
+                em.persist(alice);
+            }
+
             List<EventType> predefinedTypes = List.of(
                     new EventType("Meeting", "#007bff"),
                     new EventType("Task", "#28a745"),

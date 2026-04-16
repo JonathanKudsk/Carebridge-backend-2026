@@ -80,32 +80,33 @@ I Neon kan du lave forskellige branches til hvert team eller miljø (udvikling, 
 - Du kan nemt synkronisere data mellem branches når det skal til
 - Hele branch-administrations sker direkte i Neon-dashboardet
 
-Opret en `.env` fil i rod-mappen med dine database-oplysninger. Hvis du bruger Neon, finder du værdierne i Neon-dashboardet:
+## Konfiguration (properties + env)
+
+Projektet læser konfiguration via **environment variables** og/eller `application.properties` på classpath.
+
+### Development (kør app lokalt)
+
+Opret `src/main/resources/application.properties` med følgende (eksempel):
 
 ```
-DB_HOST=your-project.neon.tech
-DB_PORT=5432
-DB_NAME=neondb
-DB_USER=your_user
-DB_PASSWORD=your_password
-JWT_SECRET=din_hemmeligt_nøgle
-```
-
-Eller hvis du arbejder lokalt:
-Skal du oprette en application.properties fil i ressources, som skal indeholde:
-
-```
-DB_HOST=localhost 
-DB_PORT=5432 
-DB_NAME=carebridge 
-DB_USER=…your_DB_user
-DB_PASSWORD=your_DB_password
-JWT_SECRET=din_hemmelige_nøgle
-SECRET_KEY=samme_som_JWT
-ISSUER=carebridge 
+DB_HOST=localhost
+DB_NAME=carebridge
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
 DB_SSLMODE=disable
-FRONTEND_ORIGIN=your_frontend_URL
+
+# CORS (valgfri, men anbefalet i dev)
+FRONTEND_ORIGIN=where_your_frontend_run_locally
+
+# JWT
+ISSUER=carebridge
+TOKEN_EXPIRE_TIME=3600000
+SECRET_KEY=your_jwt_key (minimum 32 length)
 ```
+
+Bemærk:
+- `DB_PORT` bruges ikke i den nuværende JDBC URL-byggelogik (host+dbname bruges), så den er valgfri.
+- `FRONTEND_ORIGIN` er valgfri; hvis den ikke er sat, falder API tilbage til `*` (primært for test/CI).
 
 Download dependencies og byg projektet:
 
