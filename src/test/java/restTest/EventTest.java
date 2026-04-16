@@ -47,6 +47,10 @@ public class EventTest {
                 .extract().path("token");
     }
 
+    @AfterAll
+    public void teardown() {
+        ApplicationConfig.stopServer(app);
+    }
     // ---------------------------
     // GET /events
     // ---------------------------
