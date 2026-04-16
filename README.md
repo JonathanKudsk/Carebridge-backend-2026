@@ -96,29 +96,17 @@ DB_PASSWORD=your_db_password
 DB_SSLMODE=disable
 
 # CORS (valgfri, men anbefalet i dev)
-FRONTEND_ORIGIN=http://localhost:5173
+FRONTEND_ORIGIN=where_your_frontend_run_locally
 
 # JWT
 ISSUER=carebridge
 TOKEN_EXPIRE_TIME=3600000
-SECRET_KEY=01234567890123456789012345678901
+SECRET_KEY=your_jwt_key (minimum 32 length)
 ```
 
 Bemærk:
 - `DB_PORT` bruges ikke i den nuværende JDBC URL-byggelogik (host+dbname bruges), så den er valgfri.
 - `FRONTEND_ORIGIN` er valgfri; hvis den ikke er sat, falder API tilbage til `*` (primært for test/CI).
-
-### Tests (kør `mvn test` / CI)
-
-Opret `src/test/resources/application.properties` (denne repo indeholder en test-version) med:
-
-```
-ISSUER=carebridge-test
-TOKEN_EXPIRE_TIME=3600000
-SECRET_KEY=01234567890123456789012345678901
-```
-
-Tests bruger Testcontainers til Postgres når Docker er tilgængelig. Hvis Docker **ikke** er tilgængelig, falder test-config tilbage til en in-memory H2 database.
 
 Download dependencies og byg projektet:
 
