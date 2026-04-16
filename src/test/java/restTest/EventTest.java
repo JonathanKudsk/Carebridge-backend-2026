@@ -35,6 +35,7 @@ public class EventTest {
                 .body("{\"email\":\"alice@carebridge.io\", \"password\":\"password123\"}")
                 .post("/auth/login")
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .extract().path("token");
 
@@ -43,6 +44,7 @@ public class EventTest {
                 .body("{\"email\":\"admin@carebridge.io\", \"password\":\"admin123\"}")
                 .post("/auth/login")
                 .then()
+                .log().ifValidationFails()
                 .statusCode(200)
                 .extract().path("token");
     }
