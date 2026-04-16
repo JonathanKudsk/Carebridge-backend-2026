@@ -8,7 +8,6 @@ public class App {
 
         Javalin app = ApplicationConfig.startServer(7070);
 
-
         app.get("/", ctx -> ctx.result("Carebridge API is running"));
     }
 }

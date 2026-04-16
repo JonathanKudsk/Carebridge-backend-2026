@@ -47,6 +47,11 @@ import static org.hamcrest.Matchers.is;
                     .extract().path("token");
         }
 
+        @AfterAll
+        public void teardown() {
+            ApplicationConfig.stopServer(app);
+        }
+
     private static int createdEventTypeId;
 
     // ---------------------------
