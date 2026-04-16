@@ -32,10 +32,24 @@ public class EventDAO implements IDAO<Event, Long> {
         return emf.createEntityManager();
     }
 
+    private Event readWithFetch(EntityManager em, Long id) {
+        var list = em.createQuery(
+                        "SELECT DISTINCT e FROM Event e " +
+                                "LEFT JOIN FETCH e.seenByUsers " +
+                                "LEFT JOIN FETCH e.createdBy " +
+                                "LEFT JOIN FETCH e.eventType " +
+                                "WHERE e.id = :id",
+                        Event.class
+                )
+                .setParameter("id", id)
+                .getResultList();
+        return list.isEmpty() ? null : list.get(0);
+    }
+
     @Override
     public Event read(Long id) {
         try (var em = em()) {
-            return em.find(Event.class, id);
+            return readWithFetch(em, id);
         } catch (Exception e) {
             logger.error("Error reading Event id={}", id, e);
             throw new ApiRuntimeException(500, "Error reading event: " + e.getMessage());
@@ -93,7 +107,7 @@ public class EventDAO implements IDAO<Event, Long> {
             em.persist(e);
             em.getTransaction().commit();
             logger.info("Event created: title='{}', id={}", e.getTitle(), e.getId());
-            return e;
+            return readWithFetch(em, e.getId());
         } catch (Exception ex) {
             logger.error("Error creating Event title='{}'", e.getTitle(), ex);
             throw new ApiRuntimeException(500, "Error creating event: " + ex.getMessage());
@@ -126,7 +140,7 @@ public class EventDAO implements IDAO<Event, Long> {
             }
 
             em.getTransaction().commit();
-            return existing;
+            return readWithFetch(em, id);
         } catch (ApiRuntimeException e) {
             throw e;
         } catch (Exception e) {
