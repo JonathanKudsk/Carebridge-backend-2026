@@ -8,6 +8,7 @@ import java.time.LocalDate;
 /**
  * Medication entity representing a prescribed medication.
  */
+//
 @Entity
 @Table(name = "medications")
 public class Medication implements Serializable {
