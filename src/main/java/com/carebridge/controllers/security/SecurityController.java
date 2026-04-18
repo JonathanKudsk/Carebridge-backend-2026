@@ -3,10 +3,7 @@ package com.carebridge.controllers.security;
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.security.ISecurityDAO;
 import com.carebridge.dao.security.SecurityDAO;
-import com.carebridge.dtos.AuthRequest;
-import com.carebridge.dtos.JwtUserDTO;
-import com.carebridge.dtos.RegisterUserDTO;
-import com.carebridge.dtos.UserDTO;
+import com.carebridge.dtos.*;
 import com.carebridge.dtos.security.ITokenSecurity;
 import com.carebridge.dtos.security.TokenSecurity;
 import com.carebridge.dtos.security.TokenVerificationException;
@@ -28,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -55,21 +53,44 @@ public class SecurityController implements ISecurityController {
                 AuthRequest req = ctx.bodyAsClass(AuthRequest.class);
                 User verified = securityDAO.getVerifiedUser(req.getEmail(), req.getPassword());
 
-                JwtUserDTO jwtUser = JwtUserDTO.builder()
-                        .username(verified.getEmail())
-                        .roles(Set.of(verified.getRole().name()))
-                        .build();
+                // FLOW 1: No TOTP → setup required
+                if (!verified.isTotpEnabled()) {
+                    String tempToken = tokenSecurity.createTempToken(verified.getEmail(), "SETUP");
 
-                String token = createToken(jwtUser);
-                UserDTO safeUser = UserMapper.toDTO(verified);
+                    ctx.json(out
+                            .put("requiresTotpSetup", true)
+                            .put("tempToken", tempToken));
+                    return;
+                }
 
-                ctx.status(200).json(out.put("token", token)
-                        .put("email", safeUser.getEmail())
-                        .put("role", safeUser.getRole().name()));
+                // FLOW 2: Within grace period → full login
+                if (isWithinGracePeriod(verified)) {
+                    JwtUserDTO jwtUser = JwtUserDTO.builder()
+                            .username(verified.getEmail())
+                            .roles(Set.of(verified.getRole().name()))
+                            .build();
+
+                    String token = createToken(jwtUser);
+
+                    UserDTO safeUser = UserMapper.toDTO(verified);
+
+
+                    ctx.status(200).json(out
+                            .put("token", token)
+                            .put("email", safeUser.getEmail())
+                            .put("role", safeUser.getRole().name()));
+                    return;
+                }
+
+                // FLOW 3: Make temp token
+                String tempToken = tokenSecurity.createTempToken(verified.getEmail(), "VERIFY");
+                ctx.json(out
+                        .put("requires2FA", true)
+                        .put("tempToken", tempToken));
+
             } catch (ValidationException e) {
                 ctx.status(401).json(out.put("msg", e.getMessage()));
             } catch (Exception e) {
-
                 logger.error("login failed", e);
                 ctx.status(500).json(out.put("msg", "Internal error"));
             }
@@ -187,6 +208,114 @@ public class SecurityController implements ISecurityController {
         } catch (ParseException | NotAuthorizedException | TokenVerificationException e) {
             throw new ApiRuntimeException(401, "Unauthorized. Could not verify token");
         }
+    }
+
+
+    public Handler totpSetup() {
+        return ctx -> {
+            ObjectNode out = objectMapper.createObjectNode();
+            try {
+                // 1. Validate temp token has SETUP scope
+                String token = extractBearerToken(ctx);
+                JwtUserDTO tempUser = tokenSecurity.verifyTempToken(token, "SETUP");
+
+                // 2. Generate secret + save via DAO
+                String secret = securityDAO.generateAndSaveTotp(tempUser.getUsername());
+
+                // 3. Build otpauth URI for QR code
+                String otpauthUri = "otpauth://totp/CareBridge:" + tempUser.getUsername()
+                        + "?secret=" + secret + "&issuer=CareBridge";
+
+                ctx.json(out
+                        .put("secret", secret)
+                        .put("otpauthUri", otpauthUri));
+
+            } catch (Exception e) {
+                logger.error("totpSetup failed", e);
+                ctx.status(401).json(out.put("msg", "Unauthorized or invalid token"));
+            }
+        };
+    }
+
+
+    public Handler totpConfirm() {
+        return ctx -> {
+            ObjectNode out = objectMapper.createObjectNode();
+            try {
+                // 1. Validate temp token has SETUP scope
+                String token = extractBearerToken(ctx);
+                JwtUserDTO tempUser = tokenSecurity.verifyTempToken(token, "SETUP");
+
+                // 2. Read code from body
+                TotpCodeRequest req = ctx.bodyAsClass(TotpCodeRequest.class);
+
+                // 3. Enable TOTP + renew grace period
+                User user = securityDAO.enableTotp(tempUser.getUsername(), req.getCode());
+                securityDAO.renewGracePeriod(user);
+
+                // 4. Issue full JWT
+                JwtUserDTO jwtUser = JwtUserDTO.builder()
+                        .username(user.getEmail())
+                        .roles(Set.of(user.getRole().name()))
+                        .build();
+
+                ctx.status(200).json(out
+                        .put("token", createToken(jwtUser))
+                        .put("email", user.getEmail())
+                        .put("role", user.getRole().name()));
+
+            } catch (Exception e) {
+                logger.error("totpConfirm failed", e);
+                ctx.status(401).json(out.put("msg", "Invalid code or token"));
+            }
+        };
+    }
+
+
+    public Handler totpVerify() {
+        return ctx -> {
+            ObjectNode out = objectMapper.createObjectNode();
+            try {
+                // 1. Validate temp token has VERIFY scope
+                String token = extractBearerToken(ctx);
+                JwtUserDTO tempUser = tokenSecurity.verifyTempToken(token, "VERIFY");
+
+                // 2. Read code from body
+                TotpCodeRequest req = ctx.bodyAsClass(TotpCodeRequest.class);
+
+                // 3. Validate code + renew grace period
+                User user = securityDAO.verifyTotpCode(tempUser.getUsername(), req.getCode());
+                securityDAO.renewGracePeriod(user);
+
+                // 4. Issue full JWT
+                JwtUserDTO jwtUser = JwtUserDTO.builder()
+                        .username(user.getEmail())
+                        .roles(Set.of(user.getRole().name()))
+                        .build();
+
+                ctx.status(200).json(out
+                        .put("token", createToken(jwtUser))
+                        .put("email", user.getEmail())
+                        .put("role", user.getRole().name()));
+
+            } catch (Exception e) {
+                logger.error("totpVerify failed", e);
+                ctx.status(401).json(out.put("msg", "Invalid code or token"));
+            }
+        };
+    }
+
+    // Private helper used by all three handlers
+    private String extractBearerToken(Context ctx) {
+        String header = ctx.header("Authorization");
+        if (header == null || !header.startsWith("Bearer "))
+            throw new UnauthorizedResponse("Missing or malformed Authorization header");
+        return header.substring("Bearer ".length());
+    }
+
+    private boolean isWithinGracePeriod(User user) {
+        return user.getTotpGracePeriodEnd() != null
+                && Instant.now().isBefore(user.getTotpGracePeriodEnd());
     }
 
     public @NotNull Handler addRole() {
