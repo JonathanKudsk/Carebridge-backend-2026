@@ -21,6 +21,7 @@ public class TokenSecurity implements ITokenSecurity {
         var claims = jwt.getJWTClaimsSet();
 
         // Temp tokens must never be used for normal authenticated access
+        // So thats why this if-statement catches if we use temp tokens
         if (claims.getStringClaim("preAuthType") != null) {
             throw new TokenVerificationException("Temp tokens cannot be used for authentication", null);
         }
