@@ -108,6 +108,13 @@
             <version>0.4</version>
         </dependency>
 
+        <!-- TOTP (Time-based One-Time Password) -->
+        <dependency>
+            <groupId>dev.samstevens.totp</groupId>
+            <artifactId>totp</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
