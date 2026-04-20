@@ -8,9 +8,12 @@ import com.carebridge.dtos.ResidentResponseDTO;
 import com.carebridge.entities.Journal;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
+import com.carebridge.services.mappers.ResidentMapper;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class ResidentController implements IController<Resident, Long> {
 
@@ -89,7 +92,26 @@ public class ResidentController implements IController<Resident, Long> {
 
     // Unused interface methods kept minimal
     @Override
-    public void delete(Context ctx) { throw new UnsupportedOperationException(); }
+    public void delete(Context ctx) {
+        try {
+            Long id = Long.parseLong(ctx.pathParam("id"));
+
+            Resident resident = residentDAO.read(id);
+            if (resident == null) {
+                ctx.status(404).result("Resident not found with id: " + id);
+                return;
+            }
+            residentDAO.delete(id);
+            ctx.status(204);
+
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("Invalid ID format");
+        } catch (Exception e) {
+            logger.error("Failed to delete resident", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
+
 
     @Override
     public boolean validatePrimaryKey(Long aLong) { return false; }
@@ -98,11 +120,80 @@ public class ResidentController implements IController<Resident, Long> {
     public Resident validateEntity(Context ctx) { return null; }
 
     @Override
-    public void read(Context ctx) { throw new UnsupportedOperationException(); }
+    public void read(Context ctx) {
+        try {
+            Long id = Long.parseLong(ctx.pathParam("id"));
+
+            Resident resident = residentDAO.read(id);
+
+            if (resident == null) {
+                ctx.status(404).result("Resident not found with id: " + id);
+                return;
+            }
+
+            Long journalId = resident.getJournal() != null ? resident.getJournal().getId() : null;
+            ResidentResponseDTO resp = new ResidentResponseDTO(
+                    resident.getId(),
+                    resident.getFirstName(),
+                    resident.getLastName(),
+                    journalId
+            );
+            ctx.status(200).json(resp);
+
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("Invalid ID format");
+        } catch (Exception e) {
+            logger.error("Failed to read resident", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
 
     @Override
-    public void readAll(Context ctx) { throw new UnsupportedOperationException(); }
+    public void readAll(Context ctx) {
+        try {
+            List<Resident> residents = residentDAO.readAll();
+
+            ctx.json(ResidentMapper.toDTOList(residents));
+        } catch (Exception e) {
+            logger.error("Failed to read all residents", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
 
     @Override
-    public void update(Context ctx) { throw new UnsupportedOperationException(); }
+    public void update(Context ctx) {
+        try {
+            Long id = Long.parseLong(ctx.pathParam("id"));
+
+            CreateResidentRequestDTO req = ctx.bodyAsClass(CreateResidentRequestDTO.class);
+
+            Resident existingResident = residentDAO.read(id);
+            if (existingResident == null) {
+                ctx.status(404).result("Resident not found with id: " + id);
+                return;
+            }
+
+            if (req.getFirstName() != null) existingResident.setFirstName(req.getFirstName());
+            if (req.getLastName() != null) existingResident.setLastName(req.getLastName());
+            if (req.getCprNr() != null) existingResident.setCprNr(req.getCprNr());
+
+            Resident updated = residentDAO.update(id, existingResident);
+
+            Long journalId = updated.getJournal() != null ? updated.getJournal().getId() : null;
+            ResidentResponseDTO resp = new ResidentResponseDTO(
+                    updated.getId(),
+                    updated.getFirstName(),
+                    updated.getLastName(),
+                    journalId
+            );
+
+            ctx.status(200).json(resp);
+
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("Invalid ID format");
+        } catch (Exception e) {
+            logger.error("Failed to update resident", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
 }
