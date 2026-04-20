@@ -9,6 +9,9 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 public class SecurityDAO implements ISecurityDAO {
 
     private final EntityManagerFactory emf;
@@ -32,17 +35,7 @@ public class SecurityDAO implements ISecurityDAO {
     }
 
     @Override
-    public User createUser(
-            String name,
-            String email,
-            String rawPassword,
-            String displayName,
-            String displayEmail,
-            String displayPhone,
-            String internalEmail,
-            String internalPhone,
-            Role role
-    ) {
+    public User createUser(String name, String email, String rawPassword, String displayName, String displayEmail, String displayPhone, String internalEmail, String internalPhone, Role role) {
         try (var em = em()) {
             if (findByEmail(em, email) != null) {
                 throw new ApiRuntimeException(409, "Email already exists");
@@ -95,6 +88,46 @@ public class SecurityDAO implements ISecurityDAO {
             return q.getSingleResult();
         } catch (NoResultException ex) {
             return null;
+        }
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        try (var em = em()) {
+            User user = findByEmail(em, email);
+            if (user == null) throw new ApiRuntimeException(404, "User not found");
+            return user;
+        }
+    }
+
+    @Override
+    public void saveTotpSecret(String email, String secret) {
+        try (var em = em()) {
+            em.getTransaction().begin();
+            int updated = em.createQuery("UPDATE User u SET u.totpSecret = :secret, u.totpEnabled = false WHERE u.email = :email").setParameter("secret", secret).setParameter("email", email).executeUpdate();
+            em.getTransaction().commit();
+            if (updated == 0) throw new ApiRuntimeException(404, "User not found: " + email);
+        }
+    }
+
+    @Override
+    public void enableTotp(String email) {
+        try (var em = em()) {
+            em.getTransaction().begin();
+            int updated = em.createQuery("UPDATE User u SET u.totpEnabled = true WHERE u.email = :email").setParameter("email", email).executeUpdate();
+            em.getTransaction().commit();
+            if (updated == 0) throw new ApiRuntimeException(404, "User not found: " + email);
+        }
+    }
+
+    @Override
+    public void renewGracePeriod(String email) {
+        try (var em = em()) {
+            em.getTransaction().begin();
+            Instant deadline = Instant.now().plus(14, ChronoUnit.DAYS);
+            int updated = em.createQuery("UPDATE User u SET u.totpGracePeriodEnd = :deadline WHERE u.email = :email").setParameter("deadline", deadline).setParameter("email", email).executeUpdate();
+            em.getTransaction().commit();
+            if (updated == 0) throw new ApiRuntimeException(404, "User not found: " + email);
         }
     }
 }
