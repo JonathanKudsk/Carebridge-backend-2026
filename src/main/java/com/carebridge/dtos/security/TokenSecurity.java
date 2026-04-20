@@ -20,8 +20,8 @@ public class TokenSecurity implements ITokenSecurity {
         var jwt = SignedJWT.parse(token);
         var claims = jwt.getJWTClaimsSet();
 
-        // Temp tokens must never be used for normal authenticated access
-        // So thats why this if-statement catches if we use temp tokens
+        // Temp tokens must never be used for normal authenticated access.
+        // This check prevents temporary tokens from being used here.
         if (claims.getStringClaim("preAuthType") != null) {
             throw new TokenVerificationException("Temp tokens cannot be used for authentication", null);
         }
@@ -88,17 +88,19 @@ public class TokenSecurity implements ITokenSecurity {
     }
 
 
+    private static final long TEMP_TOKEN_EXPIRY_MILLIS = 5 * 60 * 1000L;
+
+
     @Override
     public String createTempToken(String email, String preAuthType, String issuer, String secret) {
         try {
             // Temp tokens expire in 5 minutes — just enough time to complete the 2FA step
-            long fiveMinutesMillis = 5 * 60 * 1000L;
             var claims = new JWTClaimsSet.Builder()
                     .subject(email)
                     .issuer(issuer)
                     .claim("username", email)
                     .claim("preAuthType", preAuthType)
-                    .expirationTime(new Date(new Date().getTime() + fiveMinutesMillis))
+                    .expirationTime(new Date(new Date().getTime() + TEMP_TOKEN_EXPIRY_MILLIS))
                     .build();
 
             var jws = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), new Payload(claims.toJSONObject()));

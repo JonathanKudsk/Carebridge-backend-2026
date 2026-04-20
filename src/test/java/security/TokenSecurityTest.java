@@ -62,14 +62,15 @@ public class TokenSecurityTest {
 
 
     @Test
-    void validateTempToken_withWrongSecret_throwsException() {
+    void validateTempToken_withWrongSecret_throwsTokenVerificationException() {
         // Arrange
         String token = tokenSecurity.createTempToken(TEST_EMAIL, "SETUP", TEST_ISSUER, TEST_SECRET);
         String wrongSecret = "wrong-secret-key-that-is-long-enough-for-hmac-signing";
 
         // Act + Assert
-        assertThrows(Exception.class, () ->
+        TokenVerificationException exception = assertThrows(TokenVerificationException.class, () ->
                 tokenSecurity.validateTempToken(token, "SETUP", wrongSecret));
+        assertNotNull(exception.getMessage());
     }
 
 

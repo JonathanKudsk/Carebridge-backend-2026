@@ -35,7 +35,8 @@ public class TotpService {
     }
 
 
-    // For test use only — generates the currently valid TOTP code for a given secret
+    // Generates the currently valid TOTP code for a given secret.
+    // Kept public because Task 6's Populator (main sources) needs it to seed test users with valid codes.
     public String generateCurrentCode(String secret) throws CodeGenerationException {
         var generator = new DefaultCodeGenerator(HashingAlgorithm.SHA1);
         long currentBucket = Math.floorDiv(new SystemTimeProvider().getTime(), 30);
