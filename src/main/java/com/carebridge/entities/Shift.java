@@ -9,10 +9,12 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "shift")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class Shift {
 
 	@Id
