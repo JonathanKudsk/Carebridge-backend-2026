@@ -110,4 +110,14 @@ public class ResidentDAO implements IDAO<Resident, Long> {
             throw new RuntimeException("Error deleting resident.", e);
         }
     }
+
+    public List<Resident> getAllSorted(){
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery("SELECT r FROM Resident r ORDER BY r.firstName", Resident.class)
+                    .getResultList();
+        }catch (Exception e) {
+            logger.error("Error retrieving residents sorted from db", e);
+            throw new RuntimeException("Error retrieving residents sorted from db.", e);
+        }
+    }
 }
