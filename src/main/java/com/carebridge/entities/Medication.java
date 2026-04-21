@@ -30,6 +30,10 @@ public class Medication implements Serializable {
     private String notes;
     private boolean active = true;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "medication_chart_id")
+    private MedicationChart medicationChart;
+
     // No-arg constructor required by JPA
     public Medication() {
     }
@@ -123,6 +127,14 @@ public class Medication implements Serializable {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public MedicationChart getMedicationChart() {
+        return medicationChart;
+    }
+
+    public void setMedicationChart(MedicationChart medicationChart) {
+        this.medicationChart = medicationChart;
     }
 
     // Equals/hashCode based on id (suitable for JPA entities)
