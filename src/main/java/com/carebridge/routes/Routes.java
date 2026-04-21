@@ -14,9 +14,11 @@ public class Routes {
     private final UserController controller = new UserController();
     private final JournalEntryRoutes journalEntryRoute = new JournalEntryRoutes();
     private final ResidentRoute residentRoute = new ResidentRoute();
+    private final ChatRoomRoutes chatRoomRoutes = new ChatRoomRoutes();
 
     public EndpointGroup getRoutes() {
         return () -> {
+            path("/chatRooms", chatRoomRoutes.getRoutes());
             path("/users", userRoute.getRoutes());
             path("/event-types", eventTypeRoute.getRoutes());
             path("/events", eventRoute.getRoutes());
