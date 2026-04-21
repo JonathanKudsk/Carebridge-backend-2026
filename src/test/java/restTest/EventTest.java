@@ -2,11 +2,13 @@ package restTest;
 
 import com.carebridge.config.ApplicationConfig;
 import com.carebridge.config.HibernateConfig;
-import io.javalin.http.ContentType;
-import org.junit.jupiter.api.*;
-import io.javalin.Javalin;
 import com.carebridge.config.Populator;
+import com.carebridge.services.TotpService;
+import io.javalin.Javalin;
+import io.javalin.http.ContentType;
 import io.restassured.RestAssured;
+import org.junit.jupiter.api.*;
+
 import java.time.Instant;
 
 import static io.restassured.RestAssured.given;
@@ -18,51 +20,56 @@ public class EventTest {
 
     private static String authToken;
     private static String adminAuthToken;
-    private static int eventTypeId;
     private static int createdEventId;
     private Javalin app;
 
     @BeforeAll
     public void setup() throws Exception {
         HibernateConfig.setTest(true);
-
         app = ApplicationConfig.startServer(7070);
-
         Populator.populate(HibernateConfig.getEntityManagerFactoryForTest());
-
         RestAssured.baseURI = "http://localhost:7070/api";
 
-        authToken = given()
+        TotpService totp = new TotpService();
+
+        // Alice: login → tempToken → verify med TOTP
+        String aliceTempToken = given()
                 .contentType(ContentType.JSON)
                 .body("{\"email\":\"alice@carebridge.io\", \"password\":\"password123\"}")
                 .post("/auth/login")
-                .then()
-                .log().ifValidationFails()
-                .statusCode(200)
+                .then().statusCode(200)
+                .extract().path("tempToken");
+
+        authToken = given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + aliceTempToken)
+                .body("{\"code\":\"" + totp.generateCurrentCode(Populator.ALICE_TOTP_SECRET) + "\"}")
+                .post("/auth/2fa/verify")
+                .then().statusCode(200)
                 .extract().path("token");
 
-        adminAuthToken = given()
+        // Admin: login → tempToken → verify med TOTP
+        String adminTempToken = given()
                 .contentType(ContentType.JSON)
                 .body("{\"email\":\"admin@carebridge.io\", \"password\":\"admin123\"}")
                 .post("/auth/login")
-                .then()
-                .log().ifValidationFails()
-                .statusCode(200)
-                .extract().path("token");
+                .then().statusCode(200)
+                .extract().path("tempToken");
 
-        eventTypeId = given()
-                .header("Authorization", "Bearer " + adminAuthToken)
-                .when()
-                .get("/event-types")
-                .then()
-                .statusCode(200)
-                .extract().path("[0].id");
+        adminAuthToken = given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminTempToken)
+                .body("{\"code\":\"" + totp.generateCurrentCode(Populator.ADMIN_TOTP_SECRET) + "\"}")
+                .post("/auth/2fa/verify")
+                .then().statusCode(200)
+                .extract().path("token");
     }
 
     @AfterAll
     public void teardown() {
         ApplicationConfig.stopServer(app);
     }
+
     // ---------------------------
     // GET /events
     // ---------------------------
@@ -92,21 +99,22 @@ public class EventTest {
                 "description": "JUnit event",
                 "startAt": "%s",
                 "showOnBoard": true,
-                "eventTypeId": %d
+                "createdById": 2,
+                "eventTypeId": 1
         }
-        """, futureStartAt, eventTypeId);
+        """, futureStartAt);
 
-        createdEventId = given()
-                .header("Authorization", "Bearer " + adminAuthToken)
-                .contentType(ContentType.JSON)
-                .body(payload)
-                .when()
-                .post("/events")
-                .then()
-                .log().ifValidationFails()
-                .statusCode(201)
-                .body("title", equalTo("New Test Event"))
-                .extract().path("id");
+        createdEventId =
+                given()
+                        .header("Authorization", "Bearer " + authToken)
+                        .contentType(ContentType.JSON)
+                        .body(payload)
+                        .when()
+                        .post("/events")
+                        .then()
+                        .statusCode(201)
+                        .body("title", equalTo("New Test Event"))
+                        .extract().path("id");
 
         Assertions.assertTrue(createdEventId > 0);
     }
@@ -118,7 +126,7 @@ public class EventTest {
     @Order(3)
     public void testReadEventById() {
         given()
-                .header("Authorization", "Bearer " + adminAuthToken)
+                .header("Authorization", "Bearer " + authToken)
                 .when()
                 .get("/events/" + createdEventId)
                 .then()
@@ -140,7 +148,7 @@ public class EventTest {
         """;
 
         given()
-                .header("Authorization", "Bearer " + adminAuthToken)
+                .header("Authorization", "Bearer " + authToken)
                 .contentType(ContentType.JSON)
                 .body(updateJson)
                 .when()
@@ -157,7 +165,7 @@ public class EventTest {
     @Order(6)
     public void testDeleteEvent() {
         given()
-                .header("Authorization", "Bearer " + adminAuthToken)
+                .header("Authorization", "Bearer " + authToken)
                 .when()
                 .delete("/events/" + createdEventId)  // Only ADMIN allowed
                 .then()
@@ -171,7 +179,7 @@ public class EventTest {
     @Order(5)
     public void testUpcomingEvents() {
         given()
-                .header("Authorization", "Bearer " + adminAuthToken)
+                .header("Authorization", "Bearer " + authToken)
                 .when()
                 .get("/events/upcoming")
                 .then()
