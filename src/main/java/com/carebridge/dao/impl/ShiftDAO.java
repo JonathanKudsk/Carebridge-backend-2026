@@ -58,6 +58,7 @@ public class ShiftDAO implements IDAO<Shift, Long> {
 		if (shift.getPlanPeriodId() == null) throw new ApiRuntimeException(400, "planPeriodId is required");
 		if (shift.getAssignedUserId() == null) throw new ApiRuntimeException(400, "assignedUserId is required");
 		if (shift.getCreatedBy() == null) throw new ApiRuntimeException(400, "createdBy is required");
+		if (shift.getCreatedAt() == null) shift.setCreatedAt(LocalDateTime.now());
 
 		EntityManager em = em();
 		try {
