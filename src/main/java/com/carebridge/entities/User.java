@@ -65,16 +65,7 @@ public class User implements ISecurityUser {
     @Size(max = 50)
     private String internalPhone;
 
-    @Column(name = "totp_secret")
-    private String totpSecret;
-
-    @Column(name = "totp_enabled", nullable = false)
-    private boolean totpEnabled = false;
-
-    @Column(name = "totp_grace_period_end")
-    private Instant totpGracePeriodEnd;
-
-    // ========== RELATIONS ==========
+    // ========== NYE RELATIONER ==========
 
     // Hvis brugeren er en RESIDENT - link til deres Resident profil
     /*@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -238,7 +229,7 @@ public class User implements ISecurityUser {
         this.internalPhone = internalPhone;
     }
 
-    // ========== RELATION GETTERS & SETTERS ==========
+    // ========== NYE GETTERS & SETTERS FOR RELATIONER ==========
 
     /*public Resident getResidentProfile() {
         return residentProfile;
@@ -261,29 +252,5 @@ public class User implements ISecurityUser {
         if (resident != null && !this.residents.contains(resident)) {
             this.residents.add(resident);
         }
-    }
-
-    public String getTotpSecret() {
-        return totpSecret;
-    }
-
-    public void setTotpSecret(String totpSecret) {
-        this.totpSecret = totpSecret;
-    }
-
-    public boolean isTotpEnabled() {
-        return totpEnabled;
-    }
-
-    public void setTotpEnabled(boolean totpEnabled) {
-        this.totpEnabled = totpEnabled;
-    }
-
-    public Instant getTotpGracePeriodEnd() {
-        return totpGracePeriodEnd;
-    }
-
-    public void setTotpGracePeriodEnd(Instant totpGracePeriodEnd) {
-        this.totpGracePeriodEnd = totpGracePeriodEnd;
     }
 }
