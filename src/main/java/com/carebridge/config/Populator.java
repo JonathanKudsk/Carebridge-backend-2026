@@ -17,7 +17,7 @@ import java.util.List;
 public class Populator {
     private static final Logger logger = LoggerFactory.getLogger(Populator.class);
 
-    // Kendte TOTP-secrets til brug i tests
+    // Known TOTP secrets used in tests
     public static final String ADMIN_TOTP_SECRET   = "JBSWY3DPEHPK3PXP";
     public static final String ALICE_TOTP_SECRET   = "JBSWY3DPEHPK3PXQ";
     public static final String PARTIAL_TOTP_SECRET = "JBSWY3DPEHPK3PXR";
@@ -30,7 +30,7 @@ public class Populator {
         try {
             tx.begin();
 
-            // Admin – fuld 2FA opsat
+            // Admin – fresh user, 2FA not yet configured (setup required on first login)
             User admin = findUserByEmail(em, "admin@carebridge.io");
             if (admin == null) {
                 admin = new User();
@@ -48,7 +48,7 @@ public class Populator {
                 em.persist(admin);
             }
 
-            // Alice – fuld 2FA opsat (bruges i EventTest og SecurityTest)
+            // Alice – 2FA fully enabled (used in EventTest and SecurityTest)
             User alice = findUserByEmail(em, "alice@carebridge.io");
             if (alice == null) {
                 alice = new User();
@@ -66,7 +66,7 @@ public class Populator {
                 em.persist(alice);
             }
 
-            // no2fa – aldrig sat 2FA op
+            // no2fa – never configured 2FA
             User no2fa = findUserByEmail(em, "no2fa@carebridge.io");
             if (no2fa == null) {
                 no2fa = new User();
@@ -82,7 +82,7 @@ public class Populator {
                 em.persist(no2fa);
             }
 
-            // partial – afbrudt opsætning (secret gemt, men totp_enabled=false)
+            // partial – abandoned setup: secret saved but totp_enabled=false
             User partial = findUserByEmail(em, "partial@carebridge.io");
             if (partial == null) {
                 partial = new User();
@@ -100,7 +100,7 @@ public class Populator {
                 em.persist(partial);
             }
 
-            // grace – 2FA opsat og inden for grace period (bruges i SecurityTest)
+            // grace – 2FA enabled and within the 14-day grace period (used in SecurityTest)
             User grace = findUserByEmail(em, "grace@carebridge.io");
             if (grace == null) {
                 grace = new User();
@@ -136,7 +136,7 @@ public class Populator {
             }
 
             tx.commit();
-            logger.info("Database populated successfully (users + event types + journal).");
+            logger.info("Database populated successfully (users + event types).");
         } catch (RuntimeException ex) {
             if (tx.isActive()) tx.rollback();
             logger.error("Population failed", ex);

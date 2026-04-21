@@ -24,40 +24,61 @@ public class EventTypeTest {
     @BeforeAll
     public void setup() throws Exception {
         HibernateConfig.setTest(true);
+
         app = ApplicationConfig.startServer(7070);
+
         Populator.populate(HibernateConfig.getEntityManagerFactoryForTest());
+
         RestAssured.baseURI = "http://localhost:7070/api";
 
-        TotpService totp = new TotpService();
+        TotpService totpService = new TotpService();
 
+        // Alice has totp_enabled=true — full verify flow required
         String aliceTempToken = given()
                 .contentType(ContentType.JSON)
-                .body("{\"email\":\"alice@carebridge.io\", \"password\":\"password123\"}")
+                .body("{\"email\":\"alice@carebridge.io\",\"password\":\"password123\"}")
                 .post("/auth/login")
-                .then().statusCode(200)
+                .then()
+                .log().ifValidationFails()
+                .statusCode(200)
                 .extract().path("tempToken");
 
         authToken = given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + aliceTempToken)
-                .body("{\"code\":\"" + totp.generateCurrentCode(Populator.ALICE_TOTP_SECRET) + "\"}")
+                .body("{\"code\":\"" + totpService.generateCurrentCode(Populator.ALICE_TOTP_SECRET) + "\"}")
                 .post("/auth/2fa/verify")
-                .then().statusCode(200)
+                .then()
+                .log().ifValidationFails()
+                .statusCode(200)
                 .extract().path("token");
 
+        // Admin has no TOTP configured yet — full setup flow required
         String adminTempToken = given()
                 .contentType(ContentType.JSON)
-                .body("{\"email\":\"admin@carebridge.io\", \"password\":\"admin123\"}")
+                .body("{\"email\":\"admin@carebridge.io\",\"password\":\"admin123\"}")
                 .post("/auth/login")
-                .then().statusCode(200)
+                .then()
+                .log().ifValidationFails()
+                .statusCode(200)
                 .extract().path("tempToken");
+
+        String adminSecret = given()
+                .header("Authorization", "Bearer " + adminTempToken)
+                .get("/auth/2fa/setup")
+                .then()
+                .log().ifValidationFails()
+                .statusCode(200)
+                .extract().path("secret");
 
         adminAuthToken = given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + adminTempToken)
-                .body("{\"code\":\"" + totp.generateCurrentCode(Populator.ADMIN_TOTP_SECRET) + "\"}")
-                .post("/auth/2fa/verify")
-                .then().statusCode(200)
+                .body("{\"code\":\"" + totpService.generateCurrentCode(adminSecret) + "\"}")
+                .post("/auth/2fa/confirm")
+                .then()
+                .log().ifValidationFails()
+                .statusCode(200)
                 .extract().path("token");
     }
 
