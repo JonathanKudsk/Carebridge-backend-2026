@@ -2,7 +2,7 @@ package restTest;
 
 import com.carebridge.config.ApplicationConfig;
 import com.carebridge.config.HibernateConfig;
-import com.carebridge.config.Populator;
+import com.carebridge.config.TestPopulator;
 import com.carebridge.services.TotpService;
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;
@@ -27,7 +27,7 @@ import static org.hamcrest.Matchers.is;
 
             app = ApplicationConfig.startServer(7070);
 
-            Populator.populate(HibernateConfig.getEntityManagerFactoryForTest());
+            TestPopulator.populate(HibernateConfig.getEntityManagerFactoryForTest());
 
             RestAssured.baseURI = "http://localhost:7070/api";
 
@@ -46,7 +46,7 @@ import static org.hamcrest.Matchers.is;
             authToken = given()
                     .contentType(ContentType.JSON)
                     .header("Authorization", "Bearer " + aliceTempToken)
-                    .body("{\"code\":\"" + totpService.generateCurrentCode(Populator.ALICE_TOTP_SECRET) + "\"}")
+                    .body("{\"code\":\"" + totpService.generateCurrentCode(TestPopulator.ALICE_TOTP_SECRET) + "\"}")
                     .post("/auth/2fa/verify")
                     .then()
                     .log().ifValidationFails()

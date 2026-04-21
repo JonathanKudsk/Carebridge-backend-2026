@@ -2,7 +2,7 @@ package restTest;
 
 import com.carebridge.config.ApplicationConfig;
 import com.carebridge.config.HibernateConfig;
-import com.carebridge.config.Populator;
+import com.carebridge.config.TestPopulator;
 import com.carebridge.services.TotpService;
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;
@@ -29,7 +29,7 @@ public class SecurityTest {
     void setup() {
         HibernateConfig.setTest(true);
         app = ApplicationConfig.startServer(7070);
-        Populator.populate(HibernateConfig.getEntityManagerFactoryForTest());
+        TestPopulator.populate(HibernateConfig.getEntityManagerFactoryForTest());
         RestAssured.baseURI = "http://localhost:7070/api";
     }
 
@@ -164,7 +164,7 @@ public class SecurityTest {
     @Test
     @Order(9)
     void totpVerify_withCorrectCode_returnsFullToken() throws Exception {
-        String code = totpService.generateCurrentCode(Populator.ALICE_TOTP_SECRET);
+        String code = totpService.generateCurrentCode(TestPopulator.ALICE_TOTP_SECRET);
         aliceFullToken = given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + aliceVerifyTempToken)
