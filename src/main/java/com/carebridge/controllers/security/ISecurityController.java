@@ -13,6 +13,12 @@ public interface ISecurityController {
 
     Handler authenticate();
 
+    Handler totpSetup();
+
+    Handler totpConfirm();
+
+    Handler totpVerify();
+
     boolean authorize(JwtUserDTO userDTO, Set<RouteRole> allowedRoles);
 
     String createToken(JwtUserDTO user) throws Exception;
