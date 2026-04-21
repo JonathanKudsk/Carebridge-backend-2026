@@ -17,7 +17,8 @@ public class ResidentMapper {
                 r.getId(),
                 r.getFirstName(),
                 r.getLastName(),
-                journalId
+                journalId,
+                r.getCprNr()
         );
     }
 
