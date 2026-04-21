@@ -19,5 +19,14 @@ public interface ISecurityDAO {
             String internalPhone,
             Role role
     );
+
     User changeRole(Long userId, com.carebridge.entities.enums.Role newRole);
+
+    User getUserByEmail(String email);
+
+    void saveTotpSecret(String email, String secret);
+
+    void enableTotp(String email);
+
+    void renewGracePeriod(String email);
 }
