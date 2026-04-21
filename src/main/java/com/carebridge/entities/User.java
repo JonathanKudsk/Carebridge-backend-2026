@@ -48,6 +48,15 @@ public class User implements ISecurityUser {
     @Column(nullable = false)
     private Instant updated_at;
 
+    @Column(name = "totp_secret")
+    private String totpSecret;
+
+    @Column(name = "totp_enabled", nullable = false)
+    private boolean totpEnabled = false;
+
+    @Column(name = "totp_grace_period_end")
+    private Instant totpGracePeriodEnd;
+
     @Size(max = 255)
     private String displayName;
 
@@ -220,6 +229,31 @@ public class User implements ISecurityUser {
     public void setInternalEmail(String internalEmail) {
         this.internalEmail = internalEmail;
     }
+
+    public String getTotpSecret() {
+        return totpSecret;
+    }
+
+    public void setTotpSecret(String totpSecret) {
+        this.totpSecret = totpSecret;
+    }
+
+    public boolean isTotpEnabled() {
+        return totpEnabled;
+    }
+
+    public void setTotpEnabled(boolean totpEnabled) {
+        this.totpEnabled = totpEnabled;
+    }
+
+    public Instant getTotpGracePeriodEnd() {
+        return totpGracePeriodEnd;
+    }
+
+    public void setTotpGracePeriodEnd(Instant totpGracePeriodEnd) {
+        this.totpGracePeriodEnd = totpGracePeriodEnd;
+    }
+
 
     public String getInternalPhone() {
         return internalPhone;
