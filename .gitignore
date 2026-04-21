@@ -2,6 +2,7 @@
 .env
 .env.local
 src/main/resources/application.properties
+src/main/resources/config.properties
 
 # ===== Maven build =====
 /target/

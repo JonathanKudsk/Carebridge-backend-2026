@@ -1,15 +1,12 @@
 package com.carebridge.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "shift")
+@Table(name = "shifts")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -45,6 +42,13 @@ public class Shift {
 	@Column(name = "created_by", nullable = false)
 	private Long createdBy;
 
-	@Column(name = "created_at", nullable = false)
+	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt = LocalDateTime.now();
+
+	@PrePersist
+	private void prePersist() {
+		if (createdAt == null) {
+			createdAt = LocalDateTime.now();
+		}
+	}
 }
