@@ -34,7 +34,7 @@ public class ShiftDAO implements IDAO<Shift, Long> {
 	public Shift read(Long id) {
 		EntityManager em = em();
 		try { return em.find(Shift.class, id); }
-		catch (Exception e) { logger.error("Error reading Shift id=" + id, e); throw new ApiRuntimeException(500, "Error reading shift: " + e.getMessage()); }
+		catch (Exception e) { logger.error("Error reading Shift id={}", id, e); throw new ApiRuntimeException(500, "Error reading shift: " + e.getMessage()); }
 		finally { em.close(); }
 	}
 
@@ -58,6 +58,7 @@ public class ShiftDAO implements IDAO<Shift, Long> {
 		if (shift.getPlanPeriodId() == null) throw new ApiRuntimeException(400, "planPeriodId is required");
 		if (shift.getAssignedUserId() == null) throw new ApiRuntimeException(400, "assignedUserId is required");
 		if (shift.getCreatedBy() == null) throw new ApiRuntimeException(400, "createdBy is required");
+		if (shift.getCreatedAt() == null) shift.setCreatedAt(LocalDateTime.now());
 
 		EntityManager em = em();
 		try {
@@ -117,8 +118,15 @@ public class ShiftDAO implements IDAO<Shift, Long> {
 			em.remove(shift);
 			em.getTransaction().commit();
 			logger.info("Shift deleted: id={}", id);
-		} catch (ApiRuntimeException e) { throw e; }
-		catch (Exception e) { logger.error("Error deleting shift id=" + id, e); throw new ApiRuntimeException(500, "Error deleting shift: " + e.getMessage()); }
+		} catch (ApiRuntimeException e) {
+			if (em.getTransaction().isActive()) em.getTransaction().rollback();
+			throw e;
+		}
+		catch (Exception e) {
+			if (em.getTransaction().isActive()) em.getTransaction().rollback();
+			logger.error("Error deleting shift id=" + id, e);
+			throw new ApiRuntimeException(500, "Error deleting shift: " + e.getMessage());
+		}
 		finally { em.close(); }
 	}
 }
