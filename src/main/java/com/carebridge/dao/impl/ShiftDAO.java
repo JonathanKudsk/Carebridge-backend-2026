@@ -38,11 +38,10 @@ public class ShiftDAO implements IDAO<Shift, Long> {
 		finally { em.close(); }
 	}
 
-
 	@Override
 	public List<Shift> readAll() {
 		EntityManager em = em();
-		try { return em.createQuery("SELECT s FROM Shift s ORDER BY s.startShift ASC", Shift.class).getResultList(); }
+		try { return em.createQuery("SELECT s FROM Shift s ORDER BY s.startShift", Shift.class).getResultList(); }
 		catch (Exception e) { logger.error("Error reading all shifts", e); throw new ApiRuntimeException(500, "Error reading all shifts: " + e.getMessage()); }
 		finally { em.close(); }
 	}
@@ -57,6 +56,7 @@ public class ShiftDAO implements IDAO<Shift, Long> {
 		if (shift.getLocation() == null || shift.getLocation().isBlank()) throw new ApiRuntimeException(400, "location is required");
 		if (shift.getStatus() == null || shift.getStatus().isBlank()) throw new ApiRuntimeException(400, "status is required");
 		if (shift.getPlanPeriodId() == null) throw new ApiRuntimeException(400, "planPeriodId is required");
+		if (shift.getAssignedUserId() == null) throw new ApiRuntimeException(400, "assignedUserId is required");
 		if (shift.getCreatedBy() == null) throw new ApiRuntimeException(400, "createdBy is required");
 
 		EntityManager em = em();
@@ -111,9 +111,9 @@ public class ShiftDAO implements IDAO<Shift, Long> {
 	public void delete(Long id) {
 		EntityManager em = em();
 		try {
-			em.getTransaction().begin();
 			Shift shift = em.find(Shift.class, id);
 			if (shift == null) throw new ApiRuntimeException(404, "Shift not found");
+			em.getTransaction().begin();
 			em.remove(shift);
 			em.getTransaction().commit();
 			logger.info("Shift deleted: id={}", id);
