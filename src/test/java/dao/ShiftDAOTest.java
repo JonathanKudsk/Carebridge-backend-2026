@@ -43,7 +43,11 @@ public class ShiftDAOTest {
         if (testShift != null) {
             try {
                 shiftDAO.delete(testShift.getId());
-            } catch (Exception ignored) {}
+            } catch (ApiRuntimeException e) {
+                if (e.getStatusCode() != 404) {
+                    throw e;
+                }
+            }
         }
     }
 
