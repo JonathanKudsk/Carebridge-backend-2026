@@ -1,6 +1,7 @@
 package com.carebridge;
 
 import com.carebridge.config.ApplicationConfig;
+import com.carebridge.entities.User;
 import io.javalin.Javalin;
 
 public class App {
