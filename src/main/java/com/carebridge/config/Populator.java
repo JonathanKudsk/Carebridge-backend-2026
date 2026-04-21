@@ -2,6 +2,7 @@ package com.carebridge.config;
 
 import com.carebridge.entities.EventType;
 import com.carebridge.entities.Journal;
+import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 import com.carebridge.entities.enums.Role;
 import jakarta.persistence.EntityManager;
@@ -68,8 +69,52 @@ public class Populator {
                 }
             }
 
+            // --- RESIDENT DUMMY DATA ---
+            Resident resident1 = findResidentByCprNr(em, "010150-1111");
+            if (resident1 == null) {
+                resident1 = new Resident();
+                resident1.setFirstName("Anna");
+                resident1.setLastName("Hansen");
+                resident1.setCprNr("010150-1111");
+                
+                Journal journal1 = new Journal();
+                journal1.setResident(resident1);
+                resident1.setJournal(journal1);
+                
+                em.persist(resident1);
+            }
+
+            Resident resident2 = findResidentByCprNr(em, "050560-2222");
+            if (resident2 == null) {
+                resident2 = new Resident();
+                resident2.setFirstName("Bent");
+                resident2.setLastName("Olsen");
+                resident2.setCprNr("050560-2222");
+                
+                Journal journal2 = new Journal();
+                journal2.setResident(resident2);
+                resident2.setJournal(journal2);
+                
+                em.persist(resident2);
+            }
+
+            Resident resident3 = findResidentByCprNr(em, "101070-3333");
+            if (resident3 == null) {
+                resident3 = new Resident();
+                resident3.setFirstName("Cecilie");
+                resident3.setLastName("Nielsen");
+                resident3.setCprNr("101070-3333");
+                
+                Journal journal3 = new Journal();
+                journal3.setResident(resident3);
+                resident3.setJournal(journal3);
+                
+                em.persist(resident3);
+            }
+            // -------------------------------
+
             tx.commit();
-            logger.info("Database populated successfully (users + event types + journal).");
+            logger.info("Database populated successfully (users + event types + journal + residents).");
         } catch (RuntimeException ex) {
             if (tx.isActive()) tx.rollback();
             logger.error("Population failed", ex);
@@ -89,6 +134,14 @@ public class Populator {
     private static EventType findEventTypeByName(EntityManager em, String name) {
         var list = em.createQuery("SELECT et FROM EventType et WHERE et.name = :name", EventType.class)
                 .setParameter("name", name)
+                .getResultList();
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    // --- NEW HELPER METHOD ---
+    private static Resident findResidentByCprNr(EntityManager em, String cprNr) {
+        var list = em.createQuery("SELECT r FROM Resident r WHERE r.cprNr = :cprNr", Resident.class)
+                .setParameter("cprNr", cprNr)
                 .getResultList();
         return list.isEmpty() ? null : list.get(0);
     }

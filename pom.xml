@@ -2,7 +2,7 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion> 
 
     <groupId>com.carebridge</groupId>
     <artifactId>carebridge-backend</artifactId>
@@ -13,6 +13,7 @@
         <!-- You can keep these; compiler plugin will use <release> below -->
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Dependency versions -->
@@ -137,26 +138,6 @@
             <version>1.20.1</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.36</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Jackson dependency for objectmapper -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.16.1</version>
-        </dependency>
-
-        <!-- Local date time module -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.16.1</version>
-        </dependency>
 
     </dependencies>
 
@@ -168,8 +149,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <!-- Generate Java 21 bytecode even if javac is 22 -->
-                    <release>21</release>
+                    <!-- Generate Java 21 bytecode using the workspace Java version -->
+                    <release>${maven.compiler.release}</release>
                 </configuration>
                 <executions>
                     <!-- Main compilation with Lombok as annotation processor -->

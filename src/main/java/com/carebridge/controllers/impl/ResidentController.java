@@ -101,7 +101,28 @@ public class ResidentController implements IController<Resident, Long> {
     public void read(Context ctx) { throw new UnsupportedOperationException(); }
 
     @Override
-    public void readAll(Context ctx) { throw new UnsupportedOperationException(); }
+    public void readAll(Context ctx) {
+        try {
+            // Fetch entities from DAO
+            var residents = residentDAO.readAll();
+            
+            // Map entities to DTOs for the frontend
+            var dtos = residents.stream().map(r -> {
+                Long journalId = r.getJournal() != null ? r.getJournal().getId() : null;
+                return new ResidentResponseDTO(
+                        r.getId(),
+                        r.getFirstName(),
+                        r.getLastName(),
+                        journalId
+                );
+            }).toList();
+
+            ctx.status(200).json(dtos);
+        } catch (Exception e) {
+            logger.error("Failed to fetch all residents", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
 
     @Override
     public void update(Context ctx) { throw new UnsupportedOperationException(); }

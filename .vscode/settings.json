@@ -1,0 +1,10 @@
+{
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-21",
+      "path": "/Users/jonathan/Library/Java/JavaVirtualMachines/corretto-21.0.5/Contents/Home",
+      "default": true
+    }
+  ]
+}
