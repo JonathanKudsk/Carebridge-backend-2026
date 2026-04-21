@@ -104,7 +104,7 @@ public class ShiftDAO implements IDAO<Shift, Long> {
 			logger.info("Shift updated: id={}", id);
 			return existing;
 		} catch (ApiRuntimeException e) { throw e; }
-		catch (Exception e) { logger.error("Error updating shift id=" + id, e); throw new ApiRuntimeException(500, "Error updating shift: " + e.getMessage()); }
+		catch (Exception e) { logger.error("Error updating shift id = " + id, e); throw new ApiRuntimeException(500, "Error updating shift: " + e.getMessage()); }
 		finally { em.close(); }
 	}
 
