@@ -272,7 +272,7 @@ Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
 {
-  "firstName": "Test",
+  "firstName": "Calbert",
   "lastName": "Resident",
-  "cprNr": "010190-1234"
+  "cprNr": "030190-1234"
 }
