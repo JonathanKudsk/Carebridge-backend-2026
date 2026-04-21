@@ -2,11 +2,13 @@ package restTest;
 
 import com.carebridge.config.ApplicationConfig;
 import com.carebridge.config.HibernateConfig;
-import io.javalin.http.ContentType;
-import org.junit.jupiter.api.*;
-import io.javalin.Javalin;
 import com.carebridge.config.Populator;
+import com.carebridge.services.TotpService;
+import io.javalin.Javalin;
+import io.javalin.http.ContentType;
 import io.restassured.RestAssured;
+import org.junit.jupiter.api.*;
+
 import java.time.Instant;
 
 import static io.restassured.RestAssured.given;
@@ -32,19 +34,51 @@ public class EventTest {
 
         RestAssured.baseURI = "http://localhost:7070/api";
 
+        TotpService totpService = new TotpService();
+
+        // Alice has totp_enabled=true — full verify flow required
+        String aliceTempToken = given()
+                .contentType(ContentType.JSON)
+                .body("{\"email\":\"alice@carebridge.io\",\"password\":\"password123\"}")
+                .post("/auth/login")
+                .then()
+                .log().ifValidationFails()
+                .statusCode(200)
+                .extract().path("tempToken");
+
         authToken = given()
                 .contentType(ContentType.JSON)
-                .body("{\"email\":\"alice@carebridge.io\", \"password\":\"password123\"}")
-                .post("/auth/login")
+                .header("Authorization", "Bearer " + aliceTempToken)
+                .body("{\"code\":\"" + totpService.generateCurrentCode(Populator.ALICE_TOTP_SECRET) + "\"}")
+                .post("/auth/2fa/verify")
                 .then()
                 .log().ifValidationFails()
                 .statusCode(200)
                 .extract().path("token");
 
+        // Admin has no TOTP configured yet — full setup flow required
+        String adminTempToken = given()
+                .contentType(ContentType.JSON)
+                .body("{\"email\":\"admin@carebridge.io\",\"password\":\"admin123\"}")
+                .post("/auth/login")
+                .then()
+                .log().ifValidationFails()
+                .statusCode(200)
+                .extract().path("tempToken");
+
+        String adminSecret = given()
+                .header("Authorization", "Bearer " + adminTempToken)
+                .get("/auth/2fa/setup")
+                .then()
+                .log().ifValidationFails()
+                .statusCode(200)
+                .extract().path("secret");
+
         adminAuthToken = given()
                 .contentType(ContentType.JSON)
-                .body("{\"email\":\"admin@carebridge.io\", \"password\":\"admin123\"}")
-                .post("/auth/login")
+                .header("Authorization", "Bearer " + adminTempToken)
+                .body("{\"code\":\"" + totpService.generateCurrentCode(adminSecret) + "\"}")
+                .post("/auth/2fa/confirm")
                 .then()
                 .log().ifValidationFails()
                 .statusCode(200)
