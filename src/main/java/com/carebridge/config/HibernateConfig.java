@@ -1,6 +1,7 @@
 package com.carebridge.config;
 
 
+import com.carebridge.dtos.ChatRoomDTO;
 import com.carebridge.entities.*;
 import com.carebridge.entities.enums.Role;
 import com.carebridge.utils.Utils;
@@ -49,6 +50,8 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(Journal.class);
         configuration.addAnnotatedClass(Resident.class);
         configuration.addAnnotatedClass(ChatRoom.class);
+        configuration.addAnnotatedClass(ChatRoomUser.class);
+        configuration.addAnnotatedClass(Message.class);
     }
 
     private static EntityManagerFactory createEMF(boolean forTest) {

@@ -5,14 +5,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatRoomDTO {
-    private Long id;
-    private List<ChatRoomUserDTO> members;
-}
 
+public class MessageDTO {
+    private Long id;
+    private Long userId;
+    private Long chatRoomId;
+    private String message;
+    private Timestamp timestamp;
+
+}

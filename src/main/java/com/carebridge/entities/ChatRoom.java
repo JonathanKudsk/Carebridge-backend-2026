@@ -1,17 +1,32 @@
 package com.carebridge.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
 
-@Getter
-@Setter
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
+@Table(name = "chat_room")
 public class ChatRoom {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
+
+    @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY)
+    private List<ChatRoomUser> chatRoomUser = new ArrayList<>();
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public List<ChatRoomUser> getChatRoomUser() {
+        return chatRoomUser;
+    }
+
+    public void setChatRoomUser(List<ChatRoomUser> chatRoomUsers) {
+        this.chatRoomUser = chatRoomUsers;
+    }
 }
+

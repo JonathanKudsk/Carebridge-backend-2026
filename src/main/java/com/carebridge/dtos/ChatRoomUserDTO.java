@@ -5,14 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatRoomDTO {
+public class ChatRoomUserDTO {
     private Long id;
-    private List<ChatRoomUserDTO> members;
+    private Long userId;
+    private Long chatRoomId;
 }
 

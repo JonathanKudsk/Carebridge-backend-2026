@@ -2,52 +2,50 @@ package com.carebridge.controllers.impl;
 
 import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.ChatRoomDAO;
+import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dtos.ChatRoomDTO;
 import com.carebridge.entities.ChatRoom;
+import com.carebridge.entities.ChatRoomUser;
 import com.carebridge.exceptions.ApiRuntimeException;
+import com.carebridge.services.mappers.ChatRoomMapper;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 
-public class ChatRoomController implements IController<ChatRoom, Long>{
+public class ChatRoomController implements IController<ChatRoom, Long> {
+
     private static final Logger logger = LoggerFactory.getLogger(ChatRoomController.class);
     private final ChatRoomDAO chatRoomDAO = ChatRoomDAO.getInstance();
+    private final UserDAO userDAO = UserDAO.getInstance();
 
     @Override
     public void read(Context ctx) {
-        try{
-            Long id = parseId(ctx);
-            var entity = chatRoomDAO.read(id);
-
-            if (entity == null){
-               ctx.status(404).json("{\"msg\":\"ChatRoom not found\"}");
-               return;
+        try {
+            Long id = parseId(ctx.pathParam("id"));
+            ChatRoom entity = chatRoomDAO.read(id);
+            if (entity == null) {
+                ctx.status(404).json("{\"msg\":\"Chat room not found\"}");
+                return;
             }
-            ctx.json(toDTO(entity));
-
-
-        } catch (ApiRuntimeException e){
+            ctx.json(ChatRoomMapper.toDTO(entity));
+        } catch (ApiRuntimeException e) {
             ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
-        }catch (Exception e){
-            logger.error("Read chatroom failed", e);
+        } catch (Exception e) {
+            logger.error("read chat room failed", e);
             ctx.status(500).json("{\"msg\":\"Internal error\"}");
         }
-
     }
 
     @Override
     public void readAll(Context ctx) {
-        try{
-            var ChatRooms = chatRoomDAO.readAll()
-                    .stream()
-                    .map(this::toDTO)
-                    .collect(Collectors.toList());
-            ctx.json(ChatRooms);
-
-        }catch (Exception e){
-            logger.error("Read all ChatRooms failed", e);
+        try {
+            // Return rooms as DTOs so the frontend gets member ids instead of entities.
+            var list = chatRoomDAO.readAll().stream().map(ChatRoomMapper::toDTO).toList();
+            ctx.json(list);
+        } catch (Exception e) {
+            logger.error("readAll chat rooms failed", e);
             ctx.status(500).json("{\"msg\":\"Internal error\"}");
         }
     }
@@ -55,11 +53,33 @@ public class ChatRoomController implements IController<ChatRoom, Long>{
     @Override
     public void create(Context ctx) {
         try {
-            ChatRoom created = chatRoomDAO.create(new ChatRoom());
-            ctx.status(201).json(toDTO(created));
+            ChatRoomDTO dto = ctx.bodyAsClass(ChatRoomDTO.class);
+            var members = new ArrayList<ChatRoomUser>();
 
-        } catch (Exception e){
-            logger.error("Create ChatRoom failed", e);
+            // Convert incoming user ids into managed users before creating the room.
+            if (dto.getMembers() != null) {
+                for (var memberDTO : dto.getMembers()) {
+                    if (memberDTO.getUserId() == null) {
+                        throw new ApiRuntimeException(400, "member userId is required");
+                    }
+
+                    var user = userDAO.read(memberDTO.getUserId());
+                    if (user == null) {
+                        throw new ApiRuntimeException(404, "User not found: " + memberDTO.getUserId());
+                    }
+
+                    ChatRoomUser member = new ChatRoomUser();
+                    member.setUser(user);
+                    members.add(member);
+                }
+            }
+
+            ChatRoom created = chatRoomDAO.create(ChatRoomMapper.toEntity(dto, members));
+            ctx.status(201).json(ChatRoomMapper.toDTO(created));
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("create chat room failed", e);
             ctx.status(500).json("{\"msg\":\"Internal error\"}");
         }
     }
@@ -67,52 +87,50 @@ public class ChatRoomController implements IController<ChatRoom, Long>{
     @Override
     public void update(Context ctx) {
         try {
-            Long id = parseId(ctx);
-            ChatRoom existing = chatRoomDAO.read(id);
+            Long id = parseId(ctx.pathParam("id"));
+            ChatRoomDTO dto = ctx.bodyAsClass(ChatRoomDTO.class);
+            var members = new ArrayList<ChatRoomUser>();
 
-            if(existing == null){
-                ctx.status(404).json("{\"msg\":\"ChatRoom not found\"}");
-                return;
+            // Updating a room means replacing the membership list with the new one.
+            if (dto.getMembers() != null) {
+                for (var memberDTO : dto.getMembers()) {
+                    if (memberDTO.getUserId() == null) {
+                        throw new ApiRuntimeException(400, "member userId is required");
+                    }
+
+                    var user = userDAO.read(memberDTO.getUserId());
+                    if (user == null) {
+                        throw new ApiRuntimeException(404, "User not found: " + memberDTO.getUserId());
+                    }
+
+                    ChatRoomUser member = new ChatRoomUser();
+                    member.setUser(user);
+                    members.add(member);
+                }
             }
 
-            ChatRoom updated = chatRoomDAO.update(id, existing);
-
-            ctx.json(toDTO(updated));
-        }catch (ApiRuntimeException e){
-            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage());
-
-        }catch (Exception e){
-            logger.error("Update ChatRoom failed", e);
+            ChatRoom patch = ChatRoomMapper.toEntity(dto, members);
+            ChatRoom updated = chatRoomDAO.update(id, patch);
+            ctx.json(ChatRoomMapper.toDTO(updated));
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("update chat room failed", e);
             ctx.status(500).json("{\"msg\":\"Internal error\"}");
         }
     }
 
     @Override
     public void delete(Context ctx) {
-        try{
-            Long id = parseId(ctx);
+        try {
+            Long id = parseId(ctx.pathParam("id"));
             chatRoomDAO.delete(id);
             ctx.status(204);
-
-        } catch (ApiRuntimeException e){
-           ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
-        }catch (Exception e){
-            logger.error("Delete ChatRoom failed", e);
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("delete chat room failed", e);
             ctx.status(500).json("{\"msg\":\"Internal error\"}");
-        }
-    }
-
-    private ChatRoomDTO toDTO(ChatRoom entity){
-        ChatRoomDTO dto = new ChatRoomDTO();
-        dto.setId(entity.getId());
-        return dto;
-    }
-
-    private Long parseId(Context ctx){
-        try{
-            return Long.parseLong(ctx.pathParam("id"));
-        }catch(Exception e){
-            throw new ApiRuntimeException(400, "Invalid id");
         }
     }
 
@@ -125,4 +143,17 @@ public class ChatRoomController implements IController<ChatRoom, Long>{
     public ChatRoom validateEntity(Context ctx) {
         return ctx.bodyAsClass(ChatRoom.class);
     }
+
+    private Long parseId(String idRaw) {
+        try {
+            Long id = Long.parseLong(idRaw);
+            if (!validatePrimaryKey(id)) {
+                throw new ApiRuntimeException(400, "Invalid id");
+            }
+            return id;
+        } catch (NumberFormatException e) {
+            throw new ApiRuntimeException(400, "Invalid id");
+        }
+    }
 }
+
