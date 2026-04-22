@@ -19,6 +19,9 @@ public class Resident
     @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL)
     private Journal journal;
 
+    @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL)
+    private MedicationChart medicationChart;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "resident_user",
@@ -93,5 +96,13 @@ public class Resident
 
     public void removeUser(User user) {
         this.users.remove(user);
+    }
+
+    public MedicationChart getMedicationChart() {
+        return medicationChart;
+    }
+
+    public void setMedicationChart(MedicationChart medicationChart) {
+        this.medicationChart = medicationChart;
     }
 }
