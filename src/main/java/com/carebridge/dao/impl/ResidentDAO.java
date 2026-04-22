@@ -15,7 +15,6 @@ import java.util.List;
 public class ResidentDAO implements IDAO<Resident, Long> {
 
     private static final Logger logger = LoggerFactory.getLogger(ResidentDAO.class);
-    //Change EMF to not be final
     private final static EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
     private static ResidentDAO instance;
 

@@ -8,6 +8,7 @@ import com.carebridge.dtos.ResidentResponseDTO;
 import com.carebridge.entities.Journal;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
+import com.carebridge.services.ResidentService;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
