@@ -12,14 +12,14 @@ import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public class ResidentController implements IController<Resident, Long> {
 
     private static final Logger logger = LoggerFactory.getLogger(ResidentController.class);
     private final ResidentDAO residentDAO = ResidentDAO.getInstance();
     private final UserDAO userDAO = UserDAO.getInstance();
-
-    public ResidentController() {
-    }
+    private final ResidentService residentService = new ResidentService();
 
     // Create resident (POST /api/residents)
     public void create(Context ctx) {
@@ -102,6 +102,18 @@ public class ResidentController implements IController<Resident, Long> {
 
     @Override
     public void readAll(Context ctx) { throw new UnsupportedOperationException(); }
+
+    public void getAllSorted(Context ctx) {
+        try {
+            List<ResidentResponseDTO> residents = residentService.getAllSorted();
+            ctx.status(200).json(residents);
+        }catch (IllegalArgumentException e){
+            ctx.status(400).result(e.getMessage());
+        }catch (Exception e) {
+            logger.error("Failed to fetch sorted residents", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
 
     @Override
     public void update(Context ctx) { throw new UnsupportedOperationException(); }
