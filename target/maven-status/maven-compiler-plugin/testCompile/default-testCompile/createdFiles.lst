@@ -1,0 +1,5 @@
+dao\EventDAOTest.class
+restTest\EventTypeTest.class
+restTest\EventTest.class
+dao\UserDAOTest.class
+dao\EventTypeDAOTest.class
