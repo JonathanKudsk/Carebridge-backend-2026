@@ -20,7 +20,10 @@ public class ResidentResponseDTO {
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
     public Long getJournalId() { return journalId; }
-    public String getCprNr() { return cprNr; }
+
+    public String getCprNr() {
+        return cprNr;
+    }
 
     public ResidentResponseDTO(Long id, String firstName, String lastName, Long journalId, String cprNr) {
         this.cprNr = cprNr;
