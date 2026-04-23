@@ -15,7 +15,7 @@ import java.util.List;
 public class ResidentDAO implements IDAO<Resident, Long> {
 
     private static final Logger logger = LoggerFactory.getLogger(ResidentDAO.class);
-    private static final EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
+    private final static EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
     private static ResidentDAO instance;
 
     public static synchronized ResidentDAO getInstance() {
@@ -108,6 +108,16 @@ public class ResidentDAO implements IDAO<Resident, Long> {
         } catch (Exception e) {
             logger.error("Error deleting resident", e);
             throw new RuntimeException("Error deleting resident.", e);
+        }
+    }
+
+    public List<Resident> getAllSorted(){
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery("SELECT r FROM Resident r ORDER BY r.firstName", Resident.class)
+                    .getResultList();
+        }catch (Exception e) {
+            logger.error("Error retrieving residents sorted from db", e);
+            throw new RuntimeException("Error retrieving residents sorted from db.", e);
         }
     }
 }
