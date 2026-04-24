@@ -12,11 +12,11 @@ public class MessageRoute {
 
     public EndpointGroup getRoutes() {
         return () -> {
-            get("/", controller::readAll, Role.USER, Role.ADMIN);
-            get("/{id}", controller::read, Role.USER, Role.ADMIN);
-            post("/", controller::create, Role.USER, Role.ADMIN);
-            put("/{id}", controller::update, Role.USER, Role.ADMIN);
-            delete("/{id}", controller::delete, Role.USER, Role.ADMIN);
+            get("/", controller::readAll, Role.CAREWORKER, Role.USER, Role.ADMIN);
+            get("/{id}", controller::read, Role.CAREWORKER, Role.USER, Role.ADMIN);
+            post("/", controller::create, Role.CAREWORKER, Role.USER, Role.ADMIN);
+            put("/{id}", controller::update, Role.CAREWORKER, Role.USER, Role.ADMIN);
+            delete("/{id}", controller::delete, Role.CAREWORKER, Role.USER, Role.ADMIN);
         };
     }
 }

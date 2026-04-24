@@ -4,13 +4,17 @@ import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.ChatRoomDAO;
 import com.carebridge.dao.impl.MessageDAO;
 import com.carebridge.dao.impl.UserDAO;
+import com.carebridge.dtos.JwtUserDTO;
 import com.carebridge.dtos.MessageDTO;
 import com.carebridge.entities.Message;
+import com.carebridge.entities.User;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.services.mappers.MessageMapper;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 public class MessageController implements IController<Message, Long> {
 
@@ -59,9 +63,35 @@ public class MessageController implements IController<Message, Long> {
         }
     }
 
+//    @Override
+//    public void create(Context ctx) {
+//        try {
+//            MessageDTO dto = ctx.bodyAsClass(MessageDTO.class);
+//            // Turn the incoming ids into managed entities before persisting the message.
+//            var user = resolveUser(dto.getUserId());
+//            var chatRoom = resolveChatRoom(dto.getChatRoomId());
+//
+//            Message created = messageDAO.create(MessageMapper.toEntity(dto, user, chatRoom));
+//            ctx.status(201).json(MessageMapper.toDTO(created));
+//        } catch (ApiRuntimeException e) {
+//            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+//        } catch (Exception e) {
+//            logger.error("create message failed", e);
+//            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+//        }
+//    }
+
     @Override
     public void create(Context ctx) {
         try {
+            JwtUserDTO jwtUser = ctx.attribute("user");
+            User sender = userDAO.readByEmail(jwtUser.getUsername());
+
+            if (!sender.isEmployed()) {
+                ctx.status(403).json(Map.of("msg", "You are not employed and cannot send messages"));
+                return;
+            }
+
             MessageDTO dto = ctx.bodyAsClass(MessageDTO.class);
             // Turn the incoming ids into managed entities before persisting the message.
             var user = resolveUser(dto.getUserId());
@@ -69,13 +99,15 @@ public class MessageController implements IController<Message, Long> {
 
             Message created = messageDAO.create(MessageMapper.toEntity(dto, user, chatRoom));
             ctx.status(201).json(MessageMapper.toDTO(created));
+
         } catch (ApiRuntimeException e) {
             ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
         } catch (Exception e) {
-            logger.error("create message failed", e);
-            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+            logger.error("create failed", e);
+            ctx.status(500).json(Map.of("msg", "Internal error"));
         }
     }
+
 
     @Override
     public void update(Context ctx) {

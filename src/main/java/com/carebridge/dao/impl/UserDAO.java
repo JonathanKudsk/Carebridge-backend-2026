@@ -133,6 +133,10 @@ public class UserDAO implements IDAO<User, Long> {
             User u = em.find(User.class, id);
             if (u == null)
                 throw new ApiRuntimeException(404, "User not found");
+
+            // Deactivate chat rooms before deleting user making chat read only for the user
+            ChatRoomDAO.getInstance().deactivateChatRoomsForUser(id);
+
             em.remove(u);
             em.getTransaction().commit();
             logger.info("User deleted: id={}", id);
