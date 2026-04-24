@@ -108,6 +108,15 @@ public class MessageDAO implements IDAO<Message, Long> {
         try (var em = em()) {
             em.getTransaction().begin();
 
+            // Check if chat room is active
+            ChatRoom chatRoom = em.find(ChatRoom.class, message.getChatRoom().getId());
+            if (chatRoom == null)  {
+                throw new ApiRuntimeException(404, "Chat room not found");
+            }
+            if (!chatRoom.isActive())  {
+                throw new ApiRuntimeException(403, "This chat room is read-only");
+            }
+
             // Replace detached ids with managed references before persisting.
             User userRef = em.getReference(User.class, message.getUser().getId());
             ChatRoom roomRef = em.getReference(ChatRoom.class, message.getChatRoom().getId());

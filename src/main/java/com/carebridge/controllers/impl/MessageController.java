@@ -96,6 +96,10 @@ public class MessageController implements IController<Message, Long> {
             // Turn the incoming ids into managed entities before persisting the message.
             var user = resolveUser(dto.getUserId());
             var chatRoom = resolveChatRoom(dto.getChatRoomId());
+            if (!chatRoom.isActive())  {
+                ctx.status(403).json(Map.of("msg", "This chat room is read-only"));
+                return;
+            }
 
             Message created = messageDAO.create(MessageMapper.toEntity(dto, user, chatRoom));
             ctx.status(201).json(MessageMapper.toDTO(created));

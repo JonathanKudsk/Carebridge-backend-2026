@@ -135,6 +135,10 @@ public class ChatRoomDAO implements IDAO<ChatRoom, Long> {
 				existing.setChatRoomUser(newMembers);
 			}
 
+            if (updated.isActive() != existing.isActive()) {
+                existing.setIsActive(updated.isActive());
+            }
+
 			em.getTransaction().commit();
 			logger.info("Chat room updated: id={}", id);
 			return existing;
@@ -180,7 +184,7 @@ public class ChatRoomDAO implements IDAO<ChatRoom, Long> {
         try (var em = em())  {
             em.getTransaction().begin();
             List<ChatRoom> chatRooms = em.createQuery(
-                    "SELECT cr FROM ChatRoom cr JOIN cr.users u WHERE u.id = :userId",
+                    "SELECT cr FROM ChatRoom cr JOIN cr.chatRoomUser cru WHERE cru.user.id = :userId",
                     ChatRoom.class
             ).setParameter("userId", userId).getResultList();
 
