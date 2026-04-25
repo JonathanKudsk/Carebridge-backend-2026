@@ -276,3 +276,13 @@ Content-Type: application/json
   "lastName": "Resident",
   "cprNr": "010190-1234"
 }
+
+### 20) get all templates (admin)
+GET {{url}}/templates
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### 20) get specific template (admin)
+GET {{url}}/templates/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
