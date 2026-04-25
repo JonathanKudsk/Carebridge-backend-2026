@@ -86,7 +86,6 @@ public class JournalEntryController implements IController<JournalEntry, Long>
             entry.setJournal(journal);
             entry.setAuthor(author);
             entry.setTitle(requestDTO.getTitle());
-            entry.setContent(requestDTO.getContent());
             entry.setEntryType(requestDTO.getEntryType());
             entry.setRiskAssessment(requestDTO.getRiskAssessment());
 
@@ -104,7 +103,6 @@ public class JournalEntryController implements IController<JournalEntry, Long>
                     journal.getId(),
                     author.getId(),
                     entry.getTitle(),
-                    entry.getContent(),
                     entry.getEntryType(),
                     entry.getRiskAssessment(),
                     entry.getCreatedAt(),
@@ -159,7 +157,6 @@ public class JournalEntryController implements IController<JournalEntry, Long>
                 throw new IllegalArgumentException("Edit window has closed for this entry.");
             }
 
-            entry.setContent(requestDTO.getContent());
             entry.setUpdatedAt(now);
 
             journalEntryDAO.update(entryId, entry);
@@ -169,7 +166,6 @@ public class JournalEntryController implements IController<JournalEntry, Long>
                     journal.getId(),
                     entry.getAuthor() != null ? entry.getAuthor().getId() : null,
                     entry.getTitle(),
-                    entry.getContent(),
                     entry.getEntryType(),
                     entry.getRiskAssessment(),
                     entry.getCreatedAt(),
@@ -221,7 +217,6 @@ public class JournalEntryController implements IController<JournalEntry, Long>
                     entry.getJournal() != null ? entry.getJournal().getId() : null,
                     entry.getAuthor() != null ? entry.getAuthor().getId() : null,
                     entry.getTitle(),
-                    entry.getContent(),
                     entry.getEntryType(),
                     entry.getRiskAssessment(),
                     entry.getCreatedAt(),

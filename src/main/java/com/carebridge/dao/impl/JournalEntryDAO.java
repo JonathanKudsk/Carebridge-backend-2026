@@ -97,7 +97,6 @@ public class JournalEntryDAO implements IDAO<JournalEntry, Long>
             {
                 throw new RuntimeException("JournalEntry not found with ID: " + Id);
             }
-            existingEntry.setContent(journalEntry.getContent());
             existingEntry.setUpdatedAt(journalEntry.getUpdatedAt());
             em.getTransaction().commit();
             return existingEntry;
