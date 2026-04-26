@@ -1,47 +1,65 @@
 package com.carebridge.controllers.impl;
 
 import com.carebridge.controllers.IController;
+import com.carebridge.dao.impl.ResidentDAO;
+import com.carebridge.dao.impl.TemplateDAO;
+import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dtos.TemplateDetailedResponseDTO;
 import com.carebridge.dtos.TemplateResponseDTO;
 import com.carebridge.entities.Field;
 import com.carebridge.entities.JournalEntry;
 import com.carebridge.entities.Template;
 import com.carebridge.enums.FieldType;
+import com.carebridge.exceptions.ApiRuntimeException;
+import com.carebridge.services.mappers.EventMapper;
 import io.javalin.http.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TemplateController implements IController<Template, Long> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ResidentController.class);
+    private final TemplateDAO templateDAO = TemplateDAO.getInstance();
+
     @Override
     public void read(Context ctx) {
-        //todo: implement beyond hardcoded example
-        ArrayList<Field> fields = new ArrayList<>();
-        ArrayList<JournalEntry> journalEntries = new ArrayList<>();
-        Template template = new Template(1L,fields, journalEntries,"example");
-        fields.add(new Field(1L,template,"ExampleTEXT", FieldType.TEXTFIELD));
-        fields.add(new Field(2L,template,"ExampleBOX", FieldType.CHECKBOX));
-        fields.add(new Field(3L,template,"ExampleNUMBER", FieldType.NUMBERFIELD));
-
-        TemplateDetailedResponseDTO responseDTO = new TemplateDetailedResponseDTO(template);
-
-        ctx.status(200);
-        ctx.json(responseDTO);
+        try {
+            Long id = parseId(ctx);
+            Template entity = templateDAO.read(id);
+            if (entity == null) {
+                ctx.status(404).json("{\"msg\":\"Template not found\"}");
+                return;
+            }
+            ctx.status(200);
+            ctx.json(new TemplateDetailedResponseDTO(entity));
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("read Template failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
     }
 
     @Override
     public void readAll(Context ctx) {
-        //todo: implement beyond hardcoded example
-        ArrayList<Field> fields = new ArrayList<>();
-        ArrayList<JournalEntry> journalEntries = new ArrayList<>();
-        List<Template> templates = new ArrayList<>();
-        templates.add(new Template(1L,fields, journalEntries,"example"));
-        templates.add(new Template(2L,fields, journalEntries,"example2"));
-        templates.add(new Template(3L,fields, journalEntries,"example3"));
-
-        TemplateResponseDTO[] responseDTO = templates.stream().map(TemplateResponseDTO::new).toArray(TemplateResponseDTO[]::new);
-        ctx.status(200);
-        ctx.json(responseDTO);
+        try {
+            List<Template> entities = templateDAO.readAll();
+            if (entities == null || entities.isEmpty()) {
+                ctx.status(404).json("{\"msg\":\"Templates not found\"}");
+                return;
+            }
+            TemplateResponseDTO[] responseDTO = entities.stream().map(TemplateResponseDTO::new).toArray(TemplateResponseDTO[]::new);
+            ctx.status(200);
+            ctx.json(responseDTO);
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("read Template failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
     }
 
     @Override
@@ -66,12 +84,20 @@ public class TemplateController implements IController<Template, Long> {
     }
 
     @Override
-    public boolean validatePrimaryKey(Long aLong) {
-        return false;
+    public boolean validatePrimaryKey(Long id) {
+        return id != null && id > 0;
     }
 
     @Override
     public Template validateEntity(Context ctx) {
         return null;
+    }
+
+    private Long parseId(Context ctx) {
+        try {
+            return Long.parseLong(ctx.pathParam("id"));
+        } catch (Exception ex) {
+            throw new ApiRuntimeException(400, "Invalid id");
+        }
     }
 }
