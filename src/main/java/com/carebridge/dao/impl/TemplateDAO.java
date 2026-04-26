@@ -6,6 +6,7 @@ import com.carebridge.entities.Template;
 import com.carebridge.exceptions.ApiRuntimeException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.NoResultException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +29,12 @@ public class TemplateDAO implements IDAO<Template,Long> {
     @Override
     public Template read(Long id) {
         try (var em = em()) {
-            return em.createQuery("SELECT t FROM Template t Join Field f on f.template.id = t.id where t.id = :id", Template.class).setParameter("id",id)
+            return em.createQuery("SELECT t FROM Template t JOIN FETCH t.fields where t.id = :id", Template.class).setParameter("id",id)
                     .getSingleResult();
-        } catch (Exception e) { //todo: better exception handling here
+        } catch (NoResultException e) { //if nothing exists in DB return nothing
+            return null;
+        }
+        catch (Exception e) { //todo: better exception handling here
             logger.error("Error finding Template", e);
             throw new ApiRuntimeException(500, "Error finding Template: " + e.getMessage());
         }
