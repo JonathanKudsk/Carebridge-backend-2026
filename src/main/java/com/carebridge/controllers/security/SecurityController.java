@@ -6,6 +6,7 @@ import com.carebridge.dao.security.SecurityDAO;
 import com.carebridge.dtos.AuthRequest;
 import com.carebridge.dtos.JwtUserDTO;
 import com.carebridge.dtos.RegisterUserDTO;
+import com.carebridge.dtos.TotpCodeRequest;
 import com.carebridge.dtos.UserDTO;
 import com.carebridge.dtos.security.ITokenSecurity;
 import com.carebridge.dtos.security.TokenSecurity;
@@ -14,6 +15,7 @@ import com.carebridge.entities.User;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.NotAuthorizedException;
 import com.carebridge.exceptions.ValidationException;
+import com.carebridge.services.TotpService;
 import com.carebridge.services.mappers.UserMapper;
 import com.carebridge.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,6 +40,7 @@ public class SecurityController implements ISecurityController {
     private static SecurityController instance;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ITokenSecurity tokenSecurity = new TokenSecurity();
+    private final TotpService totpService = new TotpService();
 
     private SecurityController() {
     }
@@ -55,22 +59,103 @@ public class SecurityController implements ISecurityController {
                 AuthRequest req = ctx.bodyAsClass(AuthRequest.class);
                 User verified = securityDAO.getVerifiedUser(req.getEmail(), req.getPassword());
 
-                JwtUserDTO jwtUser = JwtUserDTO.builder()
-                        .username(verified.getEmail())
-                        .roles(Set.of(verified.getRole().name()))
-                        .build();
-
-                String token = createToken(jwtUser);
-                UserDTO safeUser = UserMapper.toDTO(verified);
-
-                ctx.status(200).json(out.put("token", token)
-                        .put("email", safeUser.getEmail())
-                        .put("role", safeUser.getRole().name()));
+                if (!verified.isTotpEnabled()) {
+                    // First login or abandoned setup — must complete TOTP setup before getting a full JWT
+                    String tempToken = createTempToken(verified.getEmail(), "SETUP");
+                    ctx.status(200).json(out.put("requiresTotpSetup", true).put("tempToken", tempToken));
+                } else if (isWithinGracePeriod(verified)) {
+                    // Freshly enrolled — grace period active, skip 2FA challenge
+                    String token = createToken(buildJwtUser(verified));
+                    ctx.status(200).json(out.put("token", token)
+                            .put("email", verified.getEmail())
+                            .put("role", verified.getRole().name()));
+                } else {
+                    // Returning user with 2FA active — must verify TOTP code
+                    String tempToken = createTempToken(verified.getEmail(), "VERIFY");
+                    ctx.status(200).json(out.put("requires2FA", true).put("tempToken", tempToken));
+                }
             } catch (ValidationException e) {
                 ctx.status(401).json(out.put("msg", e.getMessage()));
             } catch (Exception e) {
-
                 logger.error("login failed", e);
+                ctx.status(500).json(out.put("msg", "Internal error"));
+            }
+        };
+    }
+
+    @Override
+    public Handler totpSetup() {
+        return ctx -> {
+            ObjectNode out = objectMapper.createObjectNode();
+            try {
+                String email = validateTempToken(ctx, "SETUP");
+                String secret = totpService.generateSecret();
+                securityDAO.saveTotpSecret(email, secret);
+                String otpauthUri = totpService.getOtpAuthUri(secret, email);
+                ctx.status(200).json(out.put("secret", secret).put("otpauthUri", otpauthUri));
+            } catch (TokenVerificationException e) {
+                ctx.status(401).json(out.put("msg", e.getMessage()));
+            } catch (Exception e) {
+                logger.error("totpSetup failed", e);
+                ctx.status(500).json(out.put("msg", "Internal error"));
+            }
+        };
+    }
+
+    @Override
+    public Handler totpConfirm() {
+        return ctx -> {
+            ObjectNode out = objectMapper.createObjectNode();
+            try {
+                String email = validateTempToken(ctx, "SETUP");
+                TotpCodeRequest req = ctx.bodyAsClass(TotpCodeRequest.class);
+                User user = securityDAO.getUserByEmail(email);
+
+                if (!totpService.verifyCode(user.getTotpSecret(), req.getCode())) {
+                    ctx.status(401).json(out.put("msg", "Invalid TOTP code"));
+                    return;
+                }
+
+                securityDAO.enableTotp(email);
+                securityDAO.renewGracePeriod(email);
+
+                String token = createToken(buildJwtUser(user));
+                ctx.status(200).json(out.put("token", token)
+                        .put("email", email)
+                        .put("role", user.getRole().name()));
+            } catch (TokenVerificationException e) {
+                ctx.status(401).json(out.put("msg", e.getMessage()));
+            } catch (Exception e) {
+                logger.error("totpConfirm failed", e);
+                ctx.status(500).json(out.put("msg", "Internal error"));
+            }
+        };
+    }
+
+    @Override
+    public Handler totpVerify() {
+        return ctx -> {
+            ObjectNode out = objectMapper.createObjectNode();
+            try {
+                String email = validateTempToken(ctx, "VERIFY");
+                TotpCodeRequest req = ctx.bodyAsClass(TotpCodeRequest.class);
+                User user = securityDAO.getUserByEmail(email);
+
+                if (!totpService.verifyCode(user.getTotpSecret(), req.getCode())) {
+                    ctx.status(401).json(out.put("msg", "Invalid TOTP code"));
+                    return;
+                }
+
+                securityDAO.renewGracePeriod(email);
+
+                String token = createToken(buildJwtUser(user));
+                ctx.status(200).json(out.put("token", token)
+                        .put("email", email)
+                        .put("role", user.getRole().name()));
+            } catch (TokenVerificationException e) {
+                ctx.status(401).json(out.put("msg", e.getMessage()));
+            } catch (Exception e) {
+                logger.error("totpVerify failed", e);
                 ctx.status(500).json(out.put("msg", "Internal error"));
             }
         };
@@ -187,6 +272,35 @@ public class SecurityController implements ISecurityController {
         } catch (ParseException | NotAuthorizedException | TokenVerificationException e) {
             throw new ApiRuntimeException(401, "Unauthorized. Could not verify token");
         }
+    }
+
+    private boolean isWithinGracePeriod(User user) {
+        return user.getTotpGracePeriodEnd() != null
+                && Instant.now().isBefore(user.getTotpGracePeriodEnd());
+    }
+
+    private JwtUserDTO buildJwtUser(User user) {
+        return JwtUserDTO.builder()
+                .username(user.getEmail())
+                .roles(Set.of(user.getRole().name()))
+                .build();
+    }
+
+    private String createTempToken(String email, String scope) {
+        boolean deployed = System.getenv("DEPLOYED") != null;
+        String issuer = deployed ? System.getenv("ISSUER") : Utils.getPropertyValue("ISSUER", "application.properties");
+        String secret = deployed ? System.getenv("SECRET_KEY") : Utils.getPropertyValue("SECRET_KEY", "application.properties");
+        return tokenSecurity.createTempToken(email, scope, issuer, secret);
+    }
+
+    private String validateTempToken(Context ctx, String expectedScope) throws ParseException {
+        String header = ctx.header("Authorization");
+        if (header == null || !header.startsWith("Bearer "))
+            throw new TokenVerificationException("Authorization header missing", null);
+        String token = header.substring("Bearer ".length());
+        boolean deployed = System.getenv("DEPLOYED") != null;
+        String secret = deployed ? System.getenv("SECRET_KEY") : Utils.getPropertyValue("SECRET_KEY", "application.properties");
+        return tokenSecurity.validateTempToken(token, expectedScope, secret);
     }
 
     public @NotNull Handler addRole() {
