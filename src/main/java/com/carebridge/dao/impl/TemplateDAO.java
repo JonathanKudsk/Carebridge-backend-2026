@@ -2,7 +2,6 @@ package com.carebridge.dao.impl;
 
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.IDAO;
-import com.carebridge.entities.EventType;
 import com.carebridge.entities.Template;
 import com.carebridge.exceptions.ApiRuntimeException;
 import jakarta.persistence.EntityManager;

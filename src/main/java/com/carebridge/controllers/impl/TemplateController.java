@@ -1,17 +1,11 @@
 package com.carebridge.controllers.impl;
 
 import com.carebridge.controllers.IController;
-import com.carebridge.dao.impl.ResidentDAO;
 import com.carebridge.dao.impl.TemplateDAO;
-import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dtos.TemplateDetailedResponseDTO;
 import com.carebridge.dtos.TemplateResponseDTO;
-import com.carebridge.entities.Field;
-import com.carebridge.entities.JournalEntry;
 import com.carebridge.entities.Template;
-import com.carebridge.enums.FieldType;
 import com.carebridge.exceptions.ApiRuntimeException;
-import com.carebridge.services.mappers.EventMapper;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
