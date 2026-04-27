@@ -8,9 +8,7 @@ import com.carebridge.exceptions.ApiRuntimeException;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -120,7 +118,7 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
             List<Long> fieldids = template.getFields().stream().map(Field::getId).toList();
             for (CreateJournalEntryAnswerRequestDTO answers : requestDTO.getAnswers()) {
                 //todo: this doesn't work for some reason
-                if (fieldids.contains(answers.getFieldId()) ) { 
+                if (fieldids.contains(answers.getFieldId()) ) {
                 }else {
                     throw new IllegalArgumentException("Fieldid " + answers.getFieldId() + " is invalid");
                 }
@@ -129,8 +127,6 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
             }
 
             // --- 3. Build entity ---
-            LocalDateTime now = LocalDateTime.now();
-
             JournalEntry entry = new JournalEntry(
                     journal,
                     author,
