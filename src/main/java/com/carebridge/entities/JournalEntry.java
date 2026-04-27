@@ -59,7 +59,7 @@ public class JournalEntry {
     // --- Constructors ---
     public JournalEntry() {}
 
-    public JournalEntry(Journal journal, User author, String title, RiskAssessment riskAssessment, EntryType entryType) {
+    public JournalEntry(Journal journal, User author, String title, RiskAssessment riskAssessment, EntryType entryType, Template template) {
         this.journal = journal;
         this.author = author;
         this.title = title;
@@ -68,5 +68,6 @@ public class JournalEntry {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.editCloseTime = this.createdAt.plusHours(24);
+        this.template = template;
     }
 }

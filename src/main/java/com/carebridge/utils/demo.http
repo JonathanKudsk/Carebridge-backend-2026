@@ -215,15 +215,15 @@ Content-Type: application/json
   "answers": [
     {
       "answer": "test",
-      "fieldId": 0
-    },
-    {
-      "answer": "true",
       "fieldId": 1
     },
     {
-      "answer": "1234",
+      "answer": "true",
       "fieldId": 2
+    },
+    {
+      "answer": "1234",
+      "fieldId": 3
     }
   ]
 }

@@ -118,11 +118,16 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
             List<Long> fieldids = template.getFields().stream().map(Field::getId).toList();
             for (CreateJournalEntryAnswerRequestDTO answers : requestDTO.getAnswers()) {
                 //todo: this doesn't work for some reason
-                if (fieldids.contains(answers.getFieldId()) ) {
-                }else {
+                boolean isMatch = false;
+                for (Long id : fieldids){
+                    if (id.equals(answers.getFieldId())) {
+                        isMatch = true;
+                        break;
+                    }
+                }
+                if ( ! isMatch){
                     throw new IllegalArgumentException("Fieldid " + answers.getFieldId() + " is invalid");
                 }
-
                 //todo: maybe check if data is good too? not sure about how. maybe some util class to do that
             }
 
@@ -132,7 +137,8 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                     author,
                     requestDTO.getTitle(),
                     requestDTO.getRiskAssessment(),
-                    requestDTO.getEntryType()
+                    requestDTO.getEntryType(),
+                    template
             );
 
             List<JournalEntryAnswer> journalEntryAnswers =
