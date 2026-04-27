@@ -156,6 +156,7 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
 
             // --- 4. Persist ---
             journalEntryDAO.create(entry);
+            //todo: persist children
 
             // --- 5. Build response DTO ---
             JournalEntryDetailedResponseDTO responseDTO = new JournalEntryDetailedResponseDTO(
