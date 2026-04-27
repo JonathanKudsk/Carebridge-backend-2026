@@ -3,8 +3,11 @@ package com.carebridge.dtos;
 import com.carebridge.enums.EntryType;
 import com.carebridge.enums.RiskAssessment;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+
+@NoArgsConstructor
 @Getter // Getters only (response objects are usually read-only)
 public class JournalEntryResponseDTO {
 
@@ -17,9 +20,6 @@ public class JournalEntryResponseDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime editCloseTime;
-
-
-    public JournalEntryResponseDTO() {}
 
     public JournalEntryResponseDTO(Long id, Long journalId, Long authorUserId,
                                    String title, EntryType entryType,
