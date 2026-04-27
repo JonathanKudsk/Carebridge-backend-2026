@@ -1,12 +1,16 @@
 package com.carebridge.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
+
+@Table(name = "journal_entry_Answers")
 public class JournalEntryAnswer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +23,7 @@ public class JournalEntryAnswer {
     @Column(name="answer")
     private String answer;
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.EAGER)
     @JoinColumn(name = "field_id", nullable = false)
     private Field field;
 }

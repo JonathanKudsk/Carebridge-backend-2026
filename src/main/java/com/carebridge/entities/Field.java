@@ -12,6 +12,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+
+@Table(name = "field")
 public class Field {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

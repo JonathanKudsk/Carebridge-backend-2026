@@ -13,6 +13,8 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+
+@Table(name = "template")
 public class Template {
 
     @Id

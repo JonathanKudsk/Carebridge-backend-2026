@@ -5,8 +5,9 @@ import com.carebridge.enums.RiskAssessment;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+
 @Getter // Getters only (response objects are usually read-only)
-public class JournalEntryResponseDTO {
+public class JournalEntryDetailedResponseDTO {
 
     private Long id;
     private Long journalId;
@@ -17,14 +18,15 @@ public class JournalEntryResponseDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime editCloseTime;
+    private JournalEntryAnswerResponseDTO[] journalEntryAnswerResponseDTO;
 
+    public JournalEntryDetailedResponseDTO() {}
 
-    public JournalEntryResponseDTO() {}
-
-    public JournalEntryResponseDTO(Long id, Long journalId, Long authorUserId,
-                                   String title, EntryType entryType,
-                                   RiskAssessment riskAssessment,
-                                   LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime editCloseTime) {
+    public JournalEntryDetailedResponseDTO(Long id, Long journalId, Long authorUserId,
+                                           String title, EntryType entryType,
+                                           RiskAssessment riskAssessment,
+                                           LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime editCloseTime,
+                                           JournalEntryAnswerResponseDTO[] journalEntryAnswerResponseDTO) {
         this.id = id;
         this.journalId = journalId;
         this.authorUserId = authorUserId;
@@ -34,7 +36,6 @@ public class JournalEntryResponseDTO {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.editCloseTime = editCloseTime;
+        this.journalEntryAnswerResponseDTO = journalEntryAnswerResponseDTO;
     }
-
-
 }

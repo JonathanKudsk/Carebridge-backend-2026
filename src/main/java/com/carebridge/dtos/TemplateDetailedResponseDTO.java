@@ -15,3 +15,4 @@ public class TemplateDetailedResponseDTO {
         this.fields = template.getFields().stream().map(FieldResponseDTO::new).toArray(FieldResponseDTO[]::new);
     }
 }
+

@@ -3,6 +3,7 @@ package com.carebridge.entities;
 import com.carebridge.enums.RiskAssessment;
 import com.carebridge.enums.EntryType;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -58,7 +59,8 @@ public class JournalEntry {
     // --- Constructors ---
     public JournalEntry() {}
 
-    public JournalEntry(User author, String title, RiskAssessment riskAssessment, EntryType entryType) {
+    public JournalEntry(Journal journal, User author, String title, RiskAssessment riskAssessment, EntryType entryType) {
+        this.journal = journal;
         this.author = author;
         this.title = title;
         this.riskAssessment = riskAssessment;

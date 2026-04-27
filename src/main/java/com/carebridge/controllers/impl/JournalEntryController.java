@@ -2,28 +2,63 @@ package com.carebridge.controllers.impl;
 
 import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.*;
-import com.carebridge.dtos.CreateJournalEntryRequestDTO;
-import com.carebridge.dtos.EditJournalEntryRequestDTO;
-import com.carebridge.dtos.JournalEntryResponseDTO;
-import com.carebridge.dtos.JwtUserDTO;
-import com.carebridge.entities.JournalEntry;
-import com.carebridge.entities.Journal;
-import com.carebridge.entities.User;
+import com.carebridge.dtos.*;
+import com.carebridge.entities.*;
 import com.carebridge.exceptions.ApiRuntimeException;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class JournalEntryController implements IController<JournalEntry, Long>
-{
+public class JournalEntryController implements IController<JournalEntry, Long> {
 
     private static final Logger logger = LoggerFactory.getLogger(JournalEntryController.class);
     private final JournalEntryDAO journalEntryDAO = JournalEntryDAO.getInstance();
     private final JournalDAO journalDAO = JournalDAO.getInstance();
+    private final TemplateDAO templateDAO = TemplateDAO.getInstance();
     private final UserDAO userDAO = UserDAO.getInstance();
+
+    // Get entry details (logic moved from service)
+    public void read(Context ctx) {
+        try {
+
+            Long entryId = Long.parseLong(ctx.pathParam("entryId"));
+            JournalEntry entry = journalEntryDAO.read(entryId);
+
+            if (entry == null) {
+                throw new IllegalArgumentException("Journal entry with ID " + entryId + " not found");
+            }
+
+            JournalEntryDetailedResponseDTO dto = new JournalEntryDetailedResponseDTO(
+                    entry.getId(),
+                    entry.getJournal() != null ? entry.getJournal().getId() : null,
+                    entry.getAuthor() != null ? entry.getAuthor().getId() : null,
+                    entry.getTitle(),
+                    entry.getEntryType(),
+                    entry.getRiskAssessment(),
+                    entry.getCreatedAt(),
+                    entry.getUpdatedAt(),
+                    entry.getEditCloseTime(),
+                    entry.getJournalEntryAnswers().stream().map(JournalEntryAnswerResponseDTO::new).toArray(JournalEntryAnswerResponseDTO[]::new)
+            );
+
+            ctx.json(dto);
+        } catch (IllegalArgumentException e) {
+            ctx.status(400).result(e.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            ctx.status(500).result("Internal server error");
+        }
+    }
+
+    @Override
+    public void readAll(Context ctx) {
+        //todo: implementation missing?
+    }
 
     // Finding all entries by a journal ID
     public void findAllEntriesByJournal(Context ctx) {
@@ -67,12 +102,14 @@ public class JournalEntryController implements IController<JournalEntry, Long>
                 throw new IllegalArgumentException("Journal not found with ID: " + requestDTO.getJournalId());
             }
 
+            Template template = templateDAO.read(requestDTO.getTemplateId());
+            if (template == null) {
+                throw new IllegalArgumentException("Template not found with ID: " + requestDTO.getTemplateId());
+            }
+
             // --- 2. Validate Required Input ---
             if (requestDTO.getTitle() == null || requestDTO.getTitle().isBlank()) {
                 throw new IllegalArgumentException("Title is required.");
-            }
-            if (requestDTO.getContent() == null || requestDTO.getContent().isBlank()) {
-                throw new IllegalArgumentException("Content is required.");
             }
             if (requestDTO.getEntryType() == null) {
                 throw new IllegalArgumentException("Entry type is required.");
@@ -80,25 +117,46 @@ public class JournalEntryController implements IController<JournalEntry, Long>
             if (requestDTO.getRiskAssessment() == null) {
                 throw new IllegalArgumentException("Risk assessment is required.");
             }
+            List<Long> fieldids = template.getFields().stream().map(Field::getId).toList();
+            for (CreateJournalEntryAnswerRequestDTO answers : requestDTO.getAnswers()) {
+                //todo: this doesn't work for some reason
+                if (fieldids.contains(answers.getFieldId()) ) { 
+                }else {
+                    throw new IllegalArgumentException("Fieldid " + answers.getFieldId() + " is invalid");
+                }
+
+                //todo: maybe check if data is good too? not sure about how. maybe some util class to do that
+            }
 
             // --- 3. Build entity ---
-            JournalEntry entry = new JournalEntry();
-            entry.setJournal(journal);
-            entry.setAuthor(author);
-            entry.setTitle(requestDTO.getTitle());
-            entry.setEntryType(requestDTO.getEntryType());
-            entry.setRiskAssessment(requestDTO.getRiskAssessment());
-
             LocalDateTime now = LocalDateTime.now();
-            entry.setCreatedAt(now);
-            entry.setUpdatedAt(now);
-            entry.setEditCloseTime(now.plusHours(24));
+
+            JournalEntry entry = new JournalEntry(
+                    journal,
+                    author,
+                    requestDTO.getTitle(),
+                    requestDTO.getRiskAssessment(),
+                    requestDTO.getEntryType()
+            );
+
+            List<JournalEntryAnswer> journalEntryAnswers =
+                    Arrays.stream(requestDTO.getAnswers()).
+                            map(answer -> {
+                                Field field = template.getFields().stream().filter(f -> f.getId().equals(answer.getFieldId())).findAny().get(); //was validified earlier to exist //also filtering everything to then get what is remaining is suboptimal
+                                return JournalEntryAnswer.builder().
+                                        journalEntry(entry).
+                                        answer(answer.getAnswer()).
+                                        field(field)
+                                        .build();
+                            }).
+                            toList();
+            entry.setJournalEntryAnswers(journalEntryAnswers);
 
             // --- 4. Persist ---
             journalEntryDAO.create(entry);
 
             // --- 5. Build response DTO ---
-            JournalEntryResponseDTO responseDTO = new JournalEntryResponseDTO(
+            JournalEntryDetailedResponseDTO responseDTO = new JournalEntryDetailedResponseDTO(
                     entry.getId(),
                     journal.getId(),
                     author.getId(),
@@ -107,12 +165,13 @@ public class JournalEntryController implements IController<JournalEntry, Long>
                     entry.getRiskAssessment(),
                     entry.getCreatedAt(),
                     entry.getUpdatedAt(),
-                    entry.getEditCloseTime()
+                    entry.getEditCloseTime(),
+                    entry.getJournalEntryAnswers().stream().map(JournalEntryAnswerResponseDTO::new).toArray(JournalEntryAnswerResponseDTO[]::new)
             );
 
             ctx.status(201).json(responseDTO);
 
-            // Add entry to journal (only if creation succeeded)
+            // Add entry to journal (only if creation succeeded) //what??? //todo: add to db first instead of this nonsense
             if (ctx.status().getCode() == 201) {
                 journalDAO.addEntryToJournal(journal, entry);
             }
@@ -126,7 +185,7 @@ public class JournalEntryController implements IController<JournalEntry, Long>
     }
 
     // Edit entry content (logic moved from service)
-    public void update(Context ctx) {
+    public void update(Context ctx) { //todo: fix changing answer
         try {
             Long journalId = Long.parseLong(ctx.pathParam("journalId"));
             Long entryId = Long.parseLong(ctx.pathParam("entryId"));
@@ -184,59 +243,19 @@ public class JournalEntryController implements IController<JournalEntry, Long>
     }
 
     @Override
-    public void delete(Context ctx)
-    {
+    public void delete(Context ctx) {
 
     }
 
     @Override
-    public boolean validatePrimaryKey(Long aLong)
-    {
+    public boolean validatePrimaryKey(Long aLong) {
         return false;
     }
 
     @Override
-    public JournalEntry validateEntity(Context ctx)
-    {
+    public JournalEntry validateEntity(Context ctx) {
         return null;
     }
 
-    // Get entry details (logic moved from service)
-    public void read(Context ctx) {
-        try {
-
-            Long entryId = Long.parseLong(ctx.pathParam("entryId"));
-            JournalEntry entry = journalEntryDAO.read(entryId);
-
-            if (entry == null) {
-                throw new IllegalArgumentException("Journal entry with ID " + entryId + " not found");
-            }
-
-            JournalEntryResponseDTO dto = new JournalEntryResponseDTO(
-                    entry.getId(),
-                    entry.getJournal() != null ? entry.getJournal().getId() : null,
-                    entry.getAuthor() != null ? entry.getAuthor().getId() : null,
-                    entry.getTitle(),
-                    entry.getEntryType(),
-                    entry.getRiskAssessment(),
-                    entry.getCreatedAt(),
-                    entry.getUpdatedAt(),
-                    entry.getEditCloseTime()
-            );
-
-            ctx.json(dto);
-        } catch (IllegalArgumentException e) {
-            ctx.status(400).result(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            ctx.status(500).result("Internal server error");
-        }
-    }
-
-    @Override
-    public void readAll(Context ctx)
-    {
-
-    }
 
 }
