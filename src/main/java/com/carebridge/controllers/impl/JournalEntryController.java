@@ -4,6 +4,8 @@ import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.*;
 import com.carebridge.dtos.*;
 import com.carebridge.entities.*;
+import com.carebridge.enums.EntryType;
+import com.carebridge.enums.RiskAssessment;
 import com.carebridge.exceptions.ApiRuntimeException;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
@@ -205,13 +207,8 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                 throw new IllegalArgumentException("Journal entry not found with ID: " + entryId);
             }
 
-            if (entry.getJournal() == null || entry.getJournal().getId() == null ||
-                    !entry.getJournal().getId().equals(journalId)) {
+            if (entry.getJournal() == null || !entry.getJournal().getId().equals(journalId)) {
                 throw new IllegalArgumentException("Journal entry does not belong to the specified journal.");
-            }
-
-            if (requestDTO.getContent() == null || requestDTO.getContent().isBlank()) {
-                throw new IllegalArgumentException("Content is required.");
             }
 
             LocalDateTime now = LocalDateTime.now();
@@ -219,11 +216,56 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                 throw new IllegalArgumentException("Edit window has closed for this entry.");
             }
 
+            if (requestDTO.getTitle() != null && !requestDTO.getTitle().isBlank()) {
+                entry.setTitle(requestDTO.getTitle());
+            }
+
+            if (requestDTO.getRiskAssessment() != null) {
+                try {
+                    entry.setRiskAssessment(
+                            RiskAssessment.valueOf(requestDTO.getRiskAssessment().toUpperCase())
+                    );
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid riskAssessment: " + requestDTO.getRiskAssessment());
+                }
+            }
+
+            if (requestDTO.getEntryType() != null) {
+                try {
+                    entry.setEntryType(
+                            EntryType.valueOf(requestDTO.getEntryType().toUpperCase())
+                    );
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid entryType: " + requestDTO.getEntryType());
+                }
+            }
+
+            // --- Update answers ---
+            if (requestDTO.getAnswers() != null) {
+
+                var existingAnswers = entry.getJournalEntryAnswers().stream()
+                        .collect(java.util.stream.Collectors.toMap(
+                                a -> a.getField().getId(),
+                                a -> a
+                        ));
+                for (CreateJournalEntryAnswerRequestDTO incoming : requestDTO.getAnswers()) {
+
+                    JournalEntryAnswer existing = existingAnswers.get(incoming.getFieldId());
+
+                    if (existing == null) {
+                        throw new IllegalArgumentException("Invalid fieldId: " + incoming.getFieldId());
+                    }
+
+                    existing.setAnswer(incoming.getAnswer());
+                }
+            }
             entry.setUpdatedAt(now);
 
+            // Persist entry
             journalEntryDAO.update(entryId, entry);
 
-            JournalEntryResponseDTO responseDTO = new JournalEntryResponseDTO(
+            //Journal response
+            JournalEntryDetailedResponseDTO responseDTO = new JournalEntryDetailedResponseDTO(
                     entry.getId(),
                     journal.getId(),
                     entry.getAuthor() != null ? entry.getAuthor().getId() : null,
@@ -232,7 +274,10 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                     entry.getRiskAssessment(),
                     entry.getCreatedAt(),
                     entry.getUpdatedAt(),
-                    entry.getEditCloseTime()
+                    entry.getEditCloseTime(),
+                    entry.getJournalEntryAnswers().stream()
+                            .map(JournalEntryAnswerResponseDTO::new)
+                            .toArray(JournalEntryAnswerResponseDTO[]::new)
             );
 
             ctx.status(200).json(responseDTO);

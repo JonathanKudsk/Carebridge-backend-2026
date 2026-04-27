@@ -29,7 +29,7 @@ public class JournalEntry {
     @JoinColumn(name = "template_id", nullable = false)
     private Template template;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "journalEntry")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "journalEntry", cascade = CascadeType.PERSIST)
     private List<JournalEntryAnswer> journalEntryAnswers;
 
     @Column(nullable = false, length = 255)

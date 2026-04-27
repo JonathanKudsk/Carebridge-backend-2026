@@ -38,7 +38,7 @@ public class JournalEntryDAO implements IDAO<JournalEntry, Long> {
     public JournalEntry read(Long id) {
         try (EntityManager em = emf.createEntityManager()) {
 
-            return em.createQuery("SELECT Je FROM JournalEntry Je JOIN FETCH Je.journalEntryAnswers where JE.id = :id", JournalEntry.class).setParameter("id", id)
+            return em.createQuery("SELECT je FROM JournalEntry je JOIN FETCH je.journalEntryAnswers where je.id = :id", JournalEntry.class).setParameter("id", id)
                     .getSingleResult();
         } catch (NoResultException e) { //if nothing exists in DB return nothing
             return null;
