@@ -154,7 +154,7 @@ public class MessageDAOTest {
         message.setMessage("Should fail or be marked read-only");
         message.setTimestamp(Timestamp.from(Instant.now()));
 
-        // Assert that creation fails with appropriate exception
+        // Assert that creation fails with appropriate exception.
         assertThrows(ApiRuntimeException.class, () -> {
             messageDAO.create(message);
         });
