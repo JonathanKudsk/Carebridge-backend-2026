@@ -68,7 +68,9 @@ public class MessageController implements IController<Message, Long> {
             var chatRoom = resolveChatRoom(dto.getChatRoomId());
 
             Message created = messageDAO.create(MessageMapper.toEntity(dto, user, chatRoom));
-            ctx.status(201).json(MessageMapper.toDTO(created));
+            MessageDTO createdDTO = MessageMapper.toDTO(created);
+            ChatRoomWebSocketController.broadcast(dto.getChatRoomId(), createdDTO);
+            ctx.status(201).json(createdDTO);
         } catch (ApiRuntimeException e) {
             ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
         } catch (Exception e) {
