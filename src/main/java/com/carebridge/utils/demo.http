@@ -236,10 +236,27 @@ Content-Type: application/json
 
 ### 15) Edit a journal entry - where window is closed
 PUT {{url}}/journals/2/journal-entries/1
+Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
 {
-  "content": "Updated observation: resident was alert and cooperative after breakfast. No incidents observed."
+  "title": "Updated observation",
+  "riskAssessment": "HIGH",
+  "entryType": "DAILY",
+  "answers": [
+    {
+      "fieldId": 1,
+      "answer": "updated text"
+    },
+    {
+      "fieldId": 2,
+      "answer": "false"
+    },
+    {
+      "fieldId": 3,
+      "answer": "9999"
+    }
+  ]
 }
 
 > {%

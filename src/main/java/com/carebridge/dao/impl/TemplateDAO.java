@@ -34,7 +34,7 @@ public class TemplateDAO implements IDAO<Template,Long> {
         } catch (NoResultException e) { //if nothing exists in DB return nothing
             return null;
         }
-        catch (Exception e) { //todo: better exception handling here
+        catch (Exception e) {
             logger.error("Error finding Template", e);
             throw new ApiRuntimeException(500, "Error finding Template: " + e.getMessage());
         }
@@ -45,7 +45,7 @@ public class TemplateDAO implements IDAO<Template,Long> {
         try (var em = em()) {
             return em.createQuery("SELECT t FROM Template t ORDER BY t.id", Template.class)
                     .getResultList();
-        } catch (Exception e) { //todo: better exception handling here
+        } catch (Exception e) {
             logger.error("Error reading all Templates", e);
             throw new ApiRuntimeException(500, "Error reading all Templates: " + e.getMessage());
         }

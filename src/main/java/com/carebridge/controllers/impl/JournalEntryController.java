@@ -57,7 +57,6 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
 
     @Override
     public void readAll(Context ctx) {
-        //todo: implementation missing?
     }
 
     // Finding all entries by a journal ID
@@ -119,7 +118,6 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
             }
             List<Long> fieldids = template.getFields().stream().map(Field::getId).toList();
             for (CreateJournalEntryAnswerRequestDTO answers : requestDTO.getAnswers()) {
-                //todo: this doesn't work for some reason
                 boolean isMatch = false;
                 for (Long id : fieldids){
                     if (id.equals(answers.getFieldId())) {
@@ -130,7 +128,7 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                 if ( ! isMatch){
                     throw new IllegalArgumentException("Fieldid " + answers.getFieldId() + " is invalid");
                 }
-                //todo: maybe check if data is good too? not sure about how. maybe some util class to do that
+                //maybe check if data is good too? not sure about how. maybe some util class to do that
             }
 
             // --- 3. Build entity ---
@@ -158,7 +156,6 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
 
             // --- 4. Persist ---
             journalEntryDAO.create(entry);
-            //todo: persist children
 
             // --- 5. Build response DTO ---
             JournalEntryDetailedResponseDTO responseDTO = new JournalEntryDetailedResponseDTO(
@@ -176,7 +173,7 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
 
             ctx.status(201).json(responseDTO);
 
-            // Add entry to journal (only if creation succeeded) //what??? //todo: add to db first instead of this nonsense
+            // Add entry to journal (only if creation succeeded) //what??? //todo: add to db first instead of this
             if (ctx.status().getCode() == 201) {
                 journalDAO.addEntryToJournal(journal, entry);
             }
@@ -190,7 +187,7 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
     }
 
     // Edit entry content (logic moved from service)
-    public void update(Context ctx) { //todo: fix changing answer
+    public void update(Context ctx) {
         try {
             Long journalId = Long.parseLong(ctx.pathParam("journalId"));
             Long entryId = Long.parseLong(ctx.pathParam("entryId"));
