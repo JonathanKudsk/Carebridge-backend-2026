@@ -6,6 +6,7 @@ import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dtos.CreateResidentRequestDTO;
 import com.carebridge.dtos.ResidentResponseDTO;
 import com.carebridge.entities.Journal;
+import com.carebridge.entities.MedicationChart;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 import io.javalin.http.Context;
@@ -47,6 +48,11 @@ public class ResidentController implements IController<Resident, Long> {
             // Important: set the back-reference on the owning side
             journal.setResident(resident);
 
+            // create single linked medication chart
+            MedicationChart medicationChart = new MedicationChart();
+            medicationChart.setResident(resident);
+            resident.setMedicationChart(medicationChart);
+
             // --- Extract authenticated user and attach to resident/journal if desired ---
             var tokenUser = ctx.attribute("user");
             String email = null;
@@ -68,11 +74,13 @@ public class ResidentController implements IController<Resident, Long> {
             Resident created = residentDAO.create(resident);
 
             Long journalId = created.getJournal() != null ? created.getJournal().getId() : null;
+            Long chartId = created.getMedicationChart() != null ? created.getMedicationChart().getId() : null;
             ResidentResponseDTO resp = new ResidentResponseDTO(
                     created.getId(),
                     created.getFirstName(),
                     created.getLastName(),
-                    journalId
+                    journalId,
+                    chartId
             );
 
             ctx.status(201);
