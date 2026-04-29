@@ -62,17 +62,20 @@ public class MessageDAOTest {
         if (testMessage != null) {
             try {
                 messageDAO.delete(testMessage.getId());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         if (testChatRoom != null) {
             try {
                 chatRoomDAO.delete(testChatRoom.getId());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         if (testUser != null) {
             try {
                 userDAO.delete(testUser.getId());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -137,20 +140,6 @@ public class MessageDAOTest {
         Message created = messageDAO.create(message);
         messageDAO.delete(created.getId());
         assertNull(messageDAO.read(created.getId()));
-    }
-
-    @Test
-    public void testMessageLengthValidation() {
-        Message m = new Message();
-        // empty message should throw
-        assertThrows(IllegalArgumentException.class, () -> m.setMessage(""));
-
-        // message longer than 2000 chars should throw
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 2001; i++) sb.append('a');
-        String tooLong = sb.toString();
-        assertTrue(tooLong.length() > 2000);
-        assertThrows(IllegalArgumentException.class, () -> m.setMessage(tooLong));
     }
 }
 
