@@ -4,6 +4,7 @@ import com.carebridge.dao.impl.ResidentDAO;
 import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
+import com.carebridge.enums.Role;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.crud.logic.MappingService;
 import com.carebridge.config.Populator;
@@ -99,7 +100,7 @@ public class UserController {
             throw new ApiRuntimeException(401, "Authentication required");
         }
         Object roles = jwtUser.get("roles");
-        boolean isAdmin = roles instanceof java.util.Set<?> roleSet && roleSet.contains("ADMIN");
+        boolean isAdmin = roles instanceof java.util.Set<?> roleSet && roleSet.contains(Role.ADMIN.name());
         if (!isAdmin) {
             throw new ApiRuntimeException(403, "Admin access required");
         }
