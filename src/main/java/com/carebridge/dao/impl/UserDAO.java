@@ -2,6 +2,7 @@ package com.carebridge.dao.impl;
 
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.IDAO;
+import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 import com.carebridge.entities.enums.Role;
 import com.carebridge.exceptions.ApiRuntimeException;
@@ -123,6 +124,67 @@ public class UserDAO implements IDAO<User, Long> {
         } catch (Exception e) {
             logger.error("Error updating user {}", id, e);
             throw new ApiRuntimeException(500, "Error updating user: " + e.getMessage());
+        }
+    }
+
+    public User linkResidents(Long guardianId, List<Resident> residents) {
+        if (guardianId == null) {
+            throw new ApiRuntimeException(400, "Guardian id is required");
+        }
+        if (residents == null) {
+            throw new ApiRuntimeException(400, "Residents are required");
+        }
+
+        try (var em = em()) {
+            em.getTransaction().begin();
+
+            User guardian = em.find(User.class, guardianId);
+            if (guardian == null) {
+                throw new ApiRuntimeException(404, "Guardian not found");
+            }
+            if (guardian.getRole() != Role.GUARDIAN) {
+                throw new ApiRuntimeException(400, "User is not a guardian");
+            }
+
+            for (Resident resident : residents) {
+                if (resident != null && resident.getId() != null) {
+                    guardian.addResident(em.getReference(Resident.class, resident.getId()));
+                }
+            }
+
+            em.merge(guardian);
+            em.getTransaction().commit();
+            return guardian;
+        } catch (ApiRuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error linking residents to guardian {}", guardianId, e);
+            throw new ApiRuntimeException(500, "Error linking residents: " + e.getMessage());
+        }
+    }
+
+    public User clearResidents(Long guardianId) {
+        if (guardianId == null) {
+            throw new ApiRuntimeException(400, "Guardian id is required");
+        }
+
+        try (var em = em()) {
+            em.getTransaction().begin();
+
+            User guardian = em.find(User.class, guardianId);
+            if (guardian == null) {
+                throw new ApiRuntimeException(404, "Guardian not found");
+            }
+
+            guardian.getResidents().clear();
+            em.merge(guardian);
+            em.getTransaction().commit();
+            return guardian;
+        } catch (ApiRuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error clearing residents for guardian {}", guardianId, e);
+            throw new ApiRuntimeException(500, "Error clearing residents: " + e.getMessage());
         }
     }
 
