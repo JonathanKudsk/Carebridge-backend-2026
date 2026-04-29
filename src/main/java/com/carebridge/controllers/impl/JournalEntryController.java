@@ -73,6 +73,10 @@ public class JournalEntryController {
             }
         }
 
+        if (entry.getAuthor() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         JournalEntry created = journalEntryDAO.create(entry);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }

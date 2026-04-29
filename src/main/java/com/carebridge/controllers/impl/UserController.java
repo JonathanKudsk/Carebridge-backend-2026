@@ -94,14 +94,31 @@ public class UserController {
     }
 
     @PostMapping("/populate")
-    public Map<String, String> populate() {
+    public Map<String, String> populate(@RequestAttribute(value = "user", required = false) Map<String, Object> jwtUser) {
+        if (jwtUser == null) {
+            throw new ApiRuntimeException(401, "Authentication required");
+        }
+        Object roles = jwtUser.get("roles");
+        boolean isAdmin = roles instanceof java.util.Set<?> roleSet && roleSet.contains("ADMIN");
+        if (!isAdmin) {
+            throw new ApiRuntimeException(403, "Admin access required");
+        }
         populator.populate();
         return Map.of("msg", "Database populated");
     }
 
     @PostMapping("/{id}/link-residents")
     public Map<String, String> linkResidents(@PathVariable Long id, @RequestBody Map<String, Object> body) {
-        List<Number> residentIds = (List<Number>) body.get("residentIds");
+        Object rawIds = body.get("residentIds");
+        if (rawIds == null) {
+            throw new ApiRuntimeException(400, "residentIds is required");
+        }
+        List<Number> residentIds;
+        try {
+            residentIds = (List<Number>) rawIds;
+        } catch (ClassCastException e) {
+            throw new ApiRuntimeException(400, "residentIds must be a list of numbers");
+        }
         User user = userDAO.read(id);
         if (user == null) {
             throw new ApiRuntimeException(404, "User not found");

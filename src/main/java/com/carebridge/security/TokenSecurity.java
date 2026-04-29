@@ -54,7 +54,11 @@ public class TokenSecurity implements ITokenSecurity {
     @Override
     public int timeToExpire(String token) throws ParseException {
         var jwt = SignedJWT.parse(token);
-        return (int) (jwt.getJWTClaimsSet().getExpirationTime().getTime() - new Date().getTime());
+        var expirationTime = jwt.getJWTClaimsSet().getExpirationTime();
+        if (expirationTime == null) {
+            return -1;
+        }
+        return (int) (expirationTime.getTime() - new Date().getTime());
     }
 
     @Override

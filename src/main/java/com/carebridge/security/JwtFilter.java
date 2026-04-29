@@ -1,10 +1,11 @@
 package com.carebridge.security;
 
-import com.carebridge.security.TokenSecurity;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
     private final TokenSecurity tokenSecurity = new TokenSecurity();
     
@@ -49,7 +52,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     request.setAttribute("user", userMap);
                 }
             } catch (Exception e) {
-                // Invalid token, just continue
+                logger.warn("Invalid or expired JWT token: {}", e.getMessage());
             }
         }
 

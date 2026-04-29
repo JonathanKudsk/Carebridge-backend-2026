@@ -24,6 +24,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ex.getStatusCode()).body(Map.of("error", msg));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException ex) {
+        String msg = ex.getMessage() != null ? ex.getMessage() : "Invalid argument";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", msg));
+    }
+
+    @ExceptionHandler(ClassCastException.class)
+    public ResponseEntity<?> handleClassCast(ClassCastException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Invalid request body format"));
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntime(RuntimeException ex) {
         String msg = ex.getMessage() != null ? ex.getMessage() : "Internal Server Error";

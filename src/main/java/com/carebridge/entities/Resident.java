@@ -3,6 +3,7 @@ package com.carebridge.entities;
 import com.carebridge.crud.annotations.CrudResource;
 import com.carebridge.crud.data.core.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,8 +12,15 @@ import java.util.Set;
 @CrudResource(path = "residents")
 public class Resident extends BaseEntity
 {
+    @NotBlank
+    @Column(nullable = false)
     private String firstName;
+
+    @NotBlank
+    @Column(nullable = false)
     private String lastName;
+
+    @Column(nullable = false, unique = true)
     private String cprNr;
 
     @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL)

@@ -12,7 +12,7 @@ import java.util.List;
 public class Journal extends BaseEntity {
 
     // 1 Journal → mange entries
-    @OneToMany(mappedBy = "journal",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "journal", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<JournalEntry> entries = new java.util.ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

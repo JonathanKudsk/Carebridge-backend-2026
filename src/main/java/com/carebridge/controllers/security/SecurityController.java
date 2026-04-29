@@ -44,11 +44,17 @@ public class SecurityController {
             String email = body.get("email");
             String password = body.get("password");
 
+            if (email == null || email.isBlank() || password == null || password.isBlank()) {
+                throw new ApiRuntimeException(400, "Email and password are required");
+            }
+
             User user = securityDAO.getVerifiedUser(email, password);
             String token = createTokenInternal(Map.of("username", user.getEmail(), "roles", Set.of(user.getRole().name())));
             return ResponseEntity.ok(Map.of("token", token, "email", email));
         } catch (ValidationException e) {
             throw new ApiRuntimeException(401, e.getMessage());
+        } catch (ApiRuntimeException e) {
+            throw e;
         } catch (Exception e) {
             logger.error("login failed", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("msg", "Internal error"));
@@ -58,6 +64,14 @@ public class SecurityController {
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, Object> body) {
         try {
+            String roleName = ((String) body.getOrDefault("role", "USER")).toUpperCase();
+            Role role;
+            try {
+                role = Role.valueOf(roleName);
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body(Map.of("msg", "Invalid role: " + roleName));
+            }
+
             User user = securityDAO.createUser(
                     (String) body.get("name"),
                     (String) body.get("email"),
@@ -67,7 +81,7 @@ public class SecurityController {
                     (String) body.get("displayPhone"),
                     (String) body.get("internalEmail"),
                     (String) body.get("internalPhone"),
-                    Role.valueOf(((String) body.getOrDefault("role", "USER")).toUpperCase())
+                    role
             );
 
             String token = createTokenInternal(Map.of("username", user.getEmail(), "roles", Set.of(user.getRole().name())));
