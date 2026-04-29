@@ -17,6 +17,7 @@ import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.text.html.parser.Parser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -106,7 +107,21 @@ public class UserController implements IController<User, Long> {
         }
     }
 
-
+    public void readByEmail(Context ctx) {
+        try {
+            String email = ctx.pathParam("email");
+            if (!validatePrimaryKey(email)) {
+                throw new ApiRuntimeException(400, "Invalid email");
+            }
+            User user = userDAO.readByEmail(email);
+            ctx.status(200).json(user);
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("Reading email failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
 
 
     public void me(Context ctx) {
