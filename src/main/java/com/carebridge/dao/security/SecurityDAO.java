@@ -42,7 +42,15 @@ public class SecurityDAO implements ISecurityDAO {
         user.setDisplayPhone(displayPhone);
         user.setInternalEmail(internalEmail);
         user.setInternalPhone(internalPhone);
-        user.setRole(role);
+        user.setRole(role != null ? role : Role.USER);
+
+        boolean exists = !em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
+                .setParameter("email", email)
+                .getResultList().isEmpty();
+        if (exists) {
+            throw new ApiRuntimeException(409, "Email already registered");
+        }
+
         em.persist(user);
         return user;
     }

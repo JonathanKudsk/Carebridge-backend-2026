@@ -80,6 +80,10 @@ public class UserDAO implements IDAO<User, Long> {
             throw new ApiRuntimeException(400, "Name is required");
         }
 
+        if (u.getRole() == null) {
+            u.setRole(Role.USER);
+        }
+
         boolean exists = !em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
                 .setParameter("email", u.getEmail())
                 .getResultList().isEmpty();
