@@ -138,6 +138,20 @@ public class MessageDAOTest {
         messageDAO.delete(created.getId());
         assertNull(messageDAO.read(created.getId()));
     }
+
+    @Test
+    public void testMessageLengthValidation() {
+        Message m = new Message();
+        // empty message should throw
+        assertThrows(IllegalArgumentException.class, () -> m.setMessage(""));
+
+        // message longer than 2000 chars should throw
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 2001; i++) sb.append('a');
+        String tooLong = sb.toString();
+        assertTrue(tooLong.length() > 2000);
+        assertThrows(IllegalArgumentException.class, () -> m.setMessage(tooLong));
+    }
 }
 
 

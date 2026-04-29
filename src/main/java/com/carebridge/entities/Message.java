@@ -24,10 +24,17 @@ public class Message {
     @Column(nullable = false, updatable = false)
     private Timestamp timestamp;
 
-    @Setter
+
     @NotNull
     @Column(nullable = false)
     private String message;
+    // Manuel setter method for boundaries in msg string
+    public void setMessage(String message) {
+        if(message == null || message.length() < 1 || message.length() > 2000) {
+            throw new IllegalArgumentException("Message must be between 1 and 2000 characters");
+        }
+        this.message = message;
+    }
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
