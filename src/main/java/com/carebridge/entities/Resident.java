@@ -1,9 +1,14 @@
 package com.carebridge.entities;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
+
+@Getter
+@Setter
 
 @Entity
 public class Resident
@@ -15,6 +20,8 @@ public class Resident
     private String firstName;
     private String lastName;
     private String cprNr;
+    private Integer age;
+    private String gender;
 
     @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL)
     private Journal journal;

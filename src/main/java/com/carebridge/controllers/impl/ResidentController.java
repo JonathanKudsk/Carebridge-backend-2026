@@ -79,6 +79,9 @@ public class ResidentController implements IController<Resident, Long> {
                     created.getId(),
                     created.getFirstName(),
                     created.getLastName(),
+                    created.getCprNr(),
+                    created.getAge(),
+                    created.getGender(),
                     journalId,
                     chartId
             );
@@ -117,6 +120,9 @@ public class ResidentController implements IController<Resident, Long> {
                     r.getId(),
                     r.getFirstName(),
                     r.getLastName(),
+                    r.getCprNr(),
+                    r.getAge(),
+                    r.getGender(),
                     r.getJournal() != null ? r.getJournal().getId() : null,
                     r.getMedicationChart() != null ? r.getMedicationChart().getId() : null
             )).toList();
