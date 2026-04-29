@@ -62,17 +62,20 @@ public class MessageDAOTest {
         if (testMessage != null) {
             try {
                 messageDAO.delete(testMessage.getId());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         if (testChatRoom != null) {
             try {
                 chatRoomDAO.delete(testChatRoom.getId());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         if (testUser != null) {
             try {
                 userDAO.delete(testUser.getId());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
