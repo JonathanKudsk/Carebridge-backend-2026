@@ -1,207 +1,141 @@
 package com.carebridge.controllers.impl;
 
-import com.carebridge.config.HibernateConfig;
-import com.carebridge.config.Populator;
-import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.ResidentDAO;
 import com.carebridge.dao.impl.UserDAO;
-import com.carebridge.dtos.JwtUserDTO;
-import com.carebridge.dtos.LinkResidentsRequest;
-import com.carebridge.dtos.UserDTO;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
-import com.carebridge.entities.enums.Role;
+import com.carebridge.enums.Role;
 import com.carebridge.exceptions.ApiRuntimeException;
-import com.carebridge.services.mappers.UserMapper;
-import io.javalin.http.Context;
+import com.carebridge.crud.logic.MappingService;
+import com.carebridge.config.Populator;
+import com.carebridge.crud.annotations.DynamicDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-public class UserController implements IController<User, Long> {
+@RestController
+@RequestMapping("/users")
+public class UserController {
 
+    private final UserDAO userDAO;
+    private final ResidentDAO residentDAO;
+    private final MappingService mappingService;
+    private final Populator populator;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-    private final UserDAO userDAO = UserDAO.getInstance();
-    private final ResidentDAO residentDAO = ResidentDAO.getInstance();
 
-    @Override
-    public void read(Context ctx) {
+    public UserController(UserDAO userDAO, ResidentDAO residentDAO, MappingService mappingService, Populator populator) {
+        this.userDAO = userDAO;
+        this.residentDAO = residentDAO;
+        this.mappingService = mappingService;
+        this.populator = populator;
+    }
+
+    @GetMapping("/{id}")
+    @DynamicDTO
+    public ResponseEntity<User> read(@PathVariable Long id) {
+        User user = userDAO.read(id);
+        if (user == null) {
+            throw new ApiRuntimeException(400, "User cannot be null");
+        }
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping
+    @DynamicDTO
+    public List<User> readAll() {
+        return userDAO.readAll();
+    }
+
+    @PostMapping
+    @DynamicDTO
+    public ResponseEntity<User> create(@RequestBody Map<String, Object> body) {
+        User user = mappingService.toEntity(body, User.class);
+        if (body.get("password") != null) {
+            user.setPassword((String) body.get("password"));
+        }
+        User created = userDAO.create(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PutMapping("/{id}")
+    @DynamicDTO
+    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        User user = mappingService.toEntity(body, User.class);
+        if (body.get("password") != null) {
+            user.setPassword((String) body.get("password"));
+        }
+        User updated = userDAO.update(id, user);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        userDAO.delete(id);
+    }
+
+    @GetMapping("/me")
+    @DynamicDTO
+    public ResponseEntity<User> me(@RequestAttribute(value = "user", required = false) Map<String, Object> jwtUser) {
+        if (jwtUser == null) {
+            throw new ApiRuntimeException(400, "JWT user cannot be null");
+        }
+        String email = (String) jwtUser.get("username");
+        User user = userDAO.readByEmail(email);
+        if (user == null) {
+            throw new ApiRuntimeException(404, "User not found");
+        }
+        return ResponseEntity.ok(user);
+    }
+
+    @PostMapping("/populate")
+    public Map<String, String> populate(@RequestAttribute(value = "user", required = false) Map<String, Object> jwtUser) {
+        if (jwtUser == null) {
+            throw new ApiRuntimeException(401, "Authentication required");
+        }
+        Object roles = jwtUser.get("roles");
+        boolean isAdmin = roles instanceof java.util.Set<?> roleSet && roleSet.contains(Role.ADMIN.name());
+        if (!isAdmin) {
+            throw new ApiRuntimeException(403, "Admin access required");
+        }
+        populator.populate();
+        return Map.of("msg", "Database populated");
+    }
+
+    @PostMapping("/{id}/link-residents")
+    public Map<String, String> linkResidents(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        Object rawIds = body.get("residentIds");
+        if (rawIds == null) {
+            throw new ApiRuntimeException(400, "residentIds is required");
+        }
+        List<Number> residentIds;
         try {
-            Long id = validatePrimaryKey(ctx.pathParam("id")) ? Long.parseLong(ctx.pathParam("id")) : null;
-            User entity = userDAO.read(id);
-            if (entity == null) {
-                ctx.status(404).json("{\"msg\":\"User not found\"}");
-                return;
+            residentIds = (List<Number>) rawIds;
+        } catch (ClassCastException e) {
+            throw new ApiRuntimeException(400, "residentIds must be a list of numbers");
+        }
+        User user = userDAO.read(id);
+        if (user == null) {
+            throw new ApiRuntimeException(404, "User not found");
+        }
+
+        List<Resident> residentsToLink = new ArrayList<>();
+        for (Number residentId : residentIds) {
+            Resident r = residentDAO.read(residentId.longValue());
+            if (r != null) {
+                residentsToLink.add(r);
             }
-            ctx.json(UserMapper.toDTO(entity));
-        } catch (ApiRuntimeException e) {
-            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
-        } catch (Exception e) {
-            logger.error("read user failed", e);
-            ctx.status(500).json("{\"msg\":\"Internal error\"}");
         }
-    }
 
-    @Override
-    public void readAll(Context ctx) {
-        try {
-            var list = userDAO.readAll().stream().map(UserMapper::toDTO).collect(Collectors.toList());
-            ctx.json(list);
-        } catch (Exception e) {
-            logger.error("readAll users failed", e);
-            ctx.status(500).json("{\"msg\":\"Internal error\"}");
-        }
-    }
+        user.setResidents(residentsToLink);
+        userDAO.update(id, user);
 
-    @Override
-    public void create(Context ctx) {
-        try {
-            var dto = ctx.bodyAsClass(UserDTO.class);
-            var entity = UserMapper.toEntity(dto);
-            var created = userDAO.create(entity);
-            ctx.status(201).json(UserMapper.toDTO(created));
-        } catch (ApiRuntimeException e) {
-            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
-        } catch (Exception e) {
-            logger.error("create user failed", e);
-            ctx.status(500).json("{\"msg\":\"Internal error\"}");
-        }
-    }
-
-    @Override
-    public void update(Context ctx) {
-        try {
-            Long id = validatePrimaryKey(ctx.pathParam("id")) ? Long.parseLong(ctx.pathParam("id")) : null;
-            var dto = ctx.bodyAsClass(UserDTO.class);
-            var patch = UserMapper.toEntity(dto);
-            var updated = userDAO.update(id, patch);
-            if (updated == null) {
-                ctx.status(404).json("{\"msg\":\"User not found\"}");
-                return;
-            }
-            ctx.json(UserMapper.toDTO(updated));
-        } catch (ApiRuntimeException e) {
-            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
-        } catch (Exception e) {
-            logger.error("update user failed", e);
-            ctx.status(500).json("{\"msg\":\"Internal error\"}");
-        }
-    }
-
-    @Override
-    public void delete(Context ctx) {
-        try {
-            Long id = validatePrimaryKey(ctx.pathParam("id")) ? Long.parseLong(ctx.pathParam("id")) : null;
-            userDAO.delete(id);
-            ctx.status(204);
-        } catch (ApiRuntimeException e) {
-            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
-        } catch (Exception e) {
-            logger.error("delete user failed", e);
-            ctx.status(500).json("{\"msg\":\"Internal error\"}");
-        }
-    }
-
-
-
-
-    public void me(Context ctx) {
-        try {
-            var jwtUser = ctx.attribute("user");
-            if (jwtUser == null) {
-                ctx.status(401).json("{\"msg\":\"Unauthorized\"}");
-                return;
-            }
-            String email = null;
-            if (jwtUser instanceof com.carebridge.dtos.JwtUserDTO ju) email = ju.getUsername();
-            else if (jwtUser instanceof com.carebridge.dtos.UserDTO ud) email = ud.getEmail();
-
-            if (email == null) {
-                ctx.status(401).json("{\"msg\":\"Unauthorized\"}");
-                return;
-            }
-
-            var entity = userDAO.readByEmail(email);
-            if (entity == null) {
-                ctx.status(404).json("{\"msg\":\"User not found\"}");
-                return;
-            }
-            ctx.json(UserMapper.toDTO(entity));
-        } catch (Exception e) {
-            logger.error("me failed", e);
-            ctx.status(500).json("{\"msg\":\"Internal error\"}");
-        }
-    }
-
-    public void populate(Context ctx) {
-        try {
-            Populator.populate(HibernateConfig.getEntityManagerFactory());
-            ctx.status(200).json("{\"msg\":\"Database populated\"}");
-        } catch (Exception e) {
-            logger.error("Populate failed", e);
-            ctx.status(500).json("{\"msg\":\"Populate failed\"}");
-        }
-    }
-
-    @Override
-    public boolean validatePrimaryKey(Long id) {
-        return id != null && id > 0;
-    }
-
-    public boolean validatePrimaryKey(String idStr) {
-        try {
-            return idStr != null && Long.parseLong(idStr) > 0;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-
-    public void linkResidents(Context ctx) {
-        try {
-            Long guardianId = Long.parseLong(ctx.pathParam("id"));
-            LinkResidentsRequest request = ctx.bodyAsClass(LinkResidentsRequest.class);
-
-            User guardian = userDAO.read(guardianId);
-            if (guardian == null) {
-                ctx.status(404).json(Map.of("msg", "Guardian ikke fundet"));
-                return;
-            }
-
-            if (guardian.getRole() != Role.GUARDIAN) {
-                ctx.status(400).json(Map.of("msg", "Brugeren er ikke en pårørende"));
-                return;
-            }
-
-            // Hent residents
-            List<Resident> residentsToLink = new ArrayList<>();
-            for (Long residentId : request.getResidentIds()) {
-                Resident resident = residentDAO.read(residentId);
-                if (resident != null) {
-                    residentsToLink.add(resident);
-                }
-            }
-
-            // Tilknyt residents til guardian
-            guardian.getResidents().addAll(residentsToLink);
-            userDAO.update(guardianId, guardian);
-
-            ctx.status(200).json(Map.of("msg", "Beboere tilknyttet", "count", residentsToLink.size()));
-
-        } catch (NumberFormatException e) {
-            ctx.status(400).json(Map.of("msg", "Ugyldigt ID"));
-        } catch (Exception e) {
-            logger.error("Link residents failed", e);
-            ctx.status(500).json(Map.of("msg", "Kunne ikke tilknytte beboere"));
-        }
-    }
-
-    @Override
-    public User validateEntity(Context ctx) {
-        return ctx.bodyAsClass(User.class);
+        return Map.of("msg", "Beboere tilknyttet");
     }
 }

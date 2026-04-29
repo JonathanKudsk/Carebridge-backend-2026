@@ -1,117 +1,61 @@
 package com.carebridge.dao.impl;
 
-import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.IDAO;
 import com.carebridge.entities.JournalEntry;
+import com.carebridge.exceptions.ApiRuntimeException;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.persistence.PersistenceContext;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public class JournalEntryDAO implements IDAO<JournalEntry, Long>
-{
-    private static final Logger logger = LoggerFactory.getLogger(JournalEntryDAO.class);
-    private static final EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
-    private static JournalEntryDAO instance;
+@Repository
+public class JournalEntryDAO implements IDAO<JournalEntry, Long> {
 
-    public static synchronized JournalEntryDAO getInstance() {
-        if (instance == null) instance = new JournalEntryDAO();
-        return instance;
-    }
+    @PersistenceContext
+    private EntityManager em;
 
-    public JournalEntry create(JournalEntry journalEntry)
-    {
-        try (EntityManager em = emf.createEntityManager())
-        {
-            em.getTransaction().begin();
-            em.persist(journalEntry);
-            em.getTransaction().commit();
-            return journalEntry;
-        }
-        catch (Exception e)
-        {
-            logger.error("Error persisting JournalEntry to db", e);
-            throw new RuntimeException("Error persisting JournalEntry to db. ", e);
-        }
-    }
-
-    public JournalEntry read(Long id)
-    {
-        try (EntityManager em = emf.createEntityManager())
-        {
-            JournalEntry entry = em.find(JournalEntry.class, id);
-            if (entry == null)
-            {
-                throw new RuntimeException("JournalEntry not found with ID: " + id);
-            }
-            return entry;
-        }
-        catch (Exception e)
-        {
-            logger.error("Error retrieving JournalEntry from db", e);
-            throw new RuntimeException("Error retrieving JournalEntry from db. ", e);
-        }
-    }
-
-    public List<JournalEntry> readAll()
-    {
-        try (EntityManager em = emf.createEntityManager())
-        {
-            List<JournalEntry> entries = em.createQuery("SELECT je FROM JournalEntry je", JournalEntry.class)
-                    .getResultList();
-            if (entries.isEmpty())
-            {
-                throw new EntityNotFoundException("No journal entries found");
-            }
-            return entries;
-        }
-    }
-
-    public List<Long> getEntryIdsByJournalId(Long journalId)
-    {
-        try (EntityManager em = emf.createEntityManager())
-        {
-            return em.createQuery(
-                            "SELECT je.id FROM JournalEntry je WHERE je.journal.id = :journalId",
-                            Long.class)
-                    .setParameter("journalId", journalId)
-                    .getResultList();
-        }
-        catch (Exception e)
-        {
-            logger.error("Error querying entry IDs by journalId", e);
-            throw new RuntimeException("Error querying entry IDs by journalId. ", e);
-        }
-    }
-
-    public JournalEntry update(Long Id, JournalEntry journalEntry)
-    {
-        try (EntityManager em = emf.createEntityManager())
-        {
-            em.getTransaction().begin();
-            JournalEntry existingEntry = em.find(JournalEntry.class, Id);
-            if (existingEntry == null)
-            {
-                throw new RuntimeException("JournalEntry not found with ID: " + Id);
-            }
-            existingEntry.setContent(journalEntry.getContent());
-            existingEntry.setUpdatedAt(journalEntry.getUpdatedAt());
-            em.getTransaction().commit();
-            return existingEntry;
-        }
-        catch (Exception e)
-        {
-            logger.error("Error updating JournalEntry in db", e);
-            throw new RuntimeException("Error updating JournalEntry in db. ", e);
-        }
+    public JournalEntryDAO() {
     }
 
     @Override
-    public void delete(Long id)
-    {
+    @Transactional
+    public JournalEntry create(JournalEntry entry) {
+        em.persist(entry);
+        return entry;
+    }
 
+    @Override
+    public JournalEntry read(Long id) {
+        return em.find(JournalEntry.class, id);
+    }
+
+    @Override
+    public List<JournalEntry> readAll() {
+        return em.createQuery("FROM JournalEntry", JournalEntry.class).getResultList();
+    }
+
+    @Override
+    @Transactional
+    public JournalEntry update(Long id, JournalEntry updated) {
+        JournalEntry existing = em.find(JournalEntry.class, id);
+        if (existing == null) throw new ApiRuntimeException(404, "Entry not found");
+        if (updated.getContent() != null) existing.setContent(updated.getContent());
+        if (updated.getTitle() != null) existing.setTitle(updated.getTitle());
+        return existing;
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        JournalEntry entry = em.find(JournalEntry.class, id);
+        if (entry != null) em.remove(entry);
+    }
+
+    public List<Long> getEntryIdsByJournalId(Long journalId) {
+        return em.createQuery("SELECT e.id FROM JournalEntry e WHERE e.journal.id = :jid", Long.class)
+                .setParameter("jid", journalId)
+                .getResultList();
     }
 }

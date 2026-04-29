@@ -1,40 +1,34 @@
 package com.carebridge.entities;
 
+import com.carebridge.crud.annotations.CrudResource;
+import com.carebridge.crud.data.core.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 
 @Entity
-public class Journal {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@CrudResource(path = "journals")
+public class Journal extends BaseEntity {
 
     // 1 Journal → mange entries
-    @OneToMany(mappedBy = "journal",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<JournalEntry> entries;
+    @OneToMany(mappedBy = "journal", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<JournalEntry> entries = new java.util.ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "resident_id", referencedColumnName = "id")
     private Resident resident;
 
     // Bi-directional relationship - adding an entry to the journal
-    public void addEntry(JournalEntry entry) {
-        if(entry != null) {
+    public void addEntry(@NotNull JournalEntry entry) {
             entries.add(entry);
             entry.setJournal(this);
-        }
+        
     }
 
     // Getters + Setters
-    public Long getId() { return id; }
     public List<JournalEntry> getEntries() { return entries; }
     public void setEntries(List<JournalEntry> entries) { this.entries = entries; }
-
-    public void setId(Long id)
-    {
-        this.id = id;
-    }
 
     public Resident getResident()
     {

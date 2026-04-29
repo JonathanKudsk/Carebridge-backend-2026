@@ -1,19 +1,26 @@
 package com.carebridge.entities;
 
+import com.carebridge.crud.annotations.CrudResource;
+import com.carebridge.crud.data.core.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class Resident
+@CrudResource(path = "residents")
+public class Resident extends BaseEntity
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @NotBlank
+    @Column(nullable = false)
     private String firstName;
+
+    @NotBlank
+    @Column(nullable = false)
     private String lastName;
+
+    @Column(nullable = false, unique = true)
     private String cprNr;
 
     @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL)
@@ -36,15 +43,12 @@ public class Resident
         this.lastName = lastName;
         this.cprNr = cprNr;
         this.journal = journal;
-        this.users = users != null ? users : new HashSet<>();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        if (this.users == null) {
+            this.users = new HashSet<>();
+        }
+        if (guardian != null) {
+            this.users.add(guardian);
+        }
     }
 
     public String getCprNr() {

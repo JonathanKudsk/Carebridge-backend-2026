@@ -1,6 +1,6 @@
 package com.carebridge.entities.security;
 
-import com.carebridge.entities.enums.Role;
+import com.carebridge.enums.Role;
 
 public interface ISecurityUser {
     boolean verifyPassword(String pw);
