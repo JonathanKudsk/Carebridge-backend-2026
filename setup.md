@@ -54,7 +54,7 @@ We use the **@DynamicDTO** pattern to keep controllers clean:
 
 ### 📦 `com.carebridge.config`
 - **`ApplicationConfig.java`**: Configures global beans, specifically the Jackson `ObjectMapper` with support for Java Time types.
-- **`Populator.java`**: A utility service that seeds the database with initial event types and an administrator account.
+- **`Populator.java`**: A utility service that seeds the database with an administrator account.
 - **`PopulatorRunner.java`**: A `CommandLineRunner` that triggers the `Populator` when the app starts (disabled in the `test` profile).
 
 ### 📦 `com.carebridge.crud.annotations`
