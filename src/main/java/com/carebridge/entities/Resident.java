@@ -1,17 +1,16 @@
 package com.carebridge.entities;
 
+import com.carebridge.crud.annotations.CrudResource;
+import com.carebridge.crud.data.core.BaseEntity;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class Resident
+@CrudResource(path = "residents")
+public class Resident extends BaseEntity
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     private String firstName;
     private String lastName;
     private String cprNr;
@@ -36,15 +35,7 @@ public class Resident
         this.lastName = lastName;
         this.cprNr = cprNr;
         this.journal = journal;
-        this.users = users != null ? users : new HashSet<>();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        this.users = new HashSet<>();
     }
 
     public String getCprNr() {

@@ -1,108 +1,93 @@
 package com.carebridge.controllers.impl;
 
-import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.ResidentDAO;
 import com.carebridge.dao.impl.UserDAO;
-import com.carebridge.dtos.CreateResidentRequestDTO;
-import com.carebridge.dtos.ResidentResponseDTO;
 import com.carebridge.entities.Journal;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
-import io.javalin.http.Context;
+import com.carebridge.crud.logic.MappingService;
+import com.carebridge.crud.annotations.DynamicDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-public class ResidentController implements IController<Resident, Long> {
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/residents")
+public class ResidentController {
 
     private static final Logger logger = LoggerFactory.getLogger(ResidentController.class);
-    private final ResidentDAO residentDAO = ResidentDAO.getInstance();
-    private final UserDAO userDAO = UserDAO.getInstance();
+    private final ResidentDAO residentDAO;
+    private final UserDAO userDAO;
+    private final MappingService mappingService;
 
-    public ResidentController() {
+    public ResidentController(ResidentDAO residentDAO, UserDAO userDAO, MappingService mappingService) {
+        this.residentDAO = residentDAO;
+        this.userDAO = userDAO;
+        this.mappingService = mappingService;
     }
 
-    // Create resident (POST /api/residents)
-    public void create(Context ctx) {
+    @GetMapping
+    @DynamicDTO
+    public List<Resident> getAll() {
+        return residentDAO.readAll();
+    }
+
+    @GetMapping("/{id}")
+    @DynamicDTO
+    public ResponseEntity<Resident> getById(@PathVariable Long id) {
+        Resident r = residentDAO.read(id);
+        if (r == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(r);
+    }
+
+    @GetMapping("/cpr/{cpr}")
+    @DynamicDTO
+    public ResponseEntity<Resident> getByCpr(@PathVariable String cpr) {
+        Resident r = residentDAO.readByCpr(cpr);
+        if (r == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(r);
+    }
+
+    @PostMapping("/create")
+    @DynamicDTO
+    public ResponseEntity<Resident> create(
+            @RequestBody Map<String, Object> body,
+            @RequestAttribute(value = "user", required = false) Map<String, Object> jwtUser) {
+        
         try {
-            CreateResidentRequestDTO req = ctx.bodyAsClass(CreateResidentRequestDTO.class);
+            Resident resident = mappingService.toEntity(body, Resident.class);
 
-            if (req == null) {
-                throw new IllegalArgumentException("Request body is required");
+            if (resident.getFirstName() == null || resident.getFirstName().isBlank()) {
+                return ResponseEntity.badRequest().build();
             }
-            if (req.getFirstName() == null || req.getFirstName().isBlank()) {
-                throw new IllegalArgumentException("firstName is required");
-            }
-            if (req.getLastName() == null || req.getLastName().isBlank()) {
-                throw new IllegalArgumentException("lastName is required");
+            if (resident.getLastName() == null || resident.getLastName().isBlank()) {
+                return ResponseEntity.badRequest().build();
             }
 
-            Resident resident = new Resident();
-            resident.setFirstName(req.getFirstName());
-            resident.setLastName(req.getLastName());
-            resident.setCprNr(req.getCprNr());
-
-            // create single linked journal
             Journal journal = new Journal();
             resident.setJournal(journal);
-            // Important: set the back-reference on the owning side
             journal.setResident(resident);
 
-            // --- Extract authenticated user and attach to resident/journal if desired ---
-            var tokenUser = ctx.attribute("user");
-            String email = null;
-            if (tokenUser instanceof com.carebridge.dtos.JwtUserDTO ju) email = ju.getUsername();
-            else if (tokenUser instanceof com.carebridge.dtos.UserDTO du) email = du.getEmail();
-            else if (tokenUser != null) email = tokenUser.toString();
-
-            if (email != null) {
+            if (jwtUser != null) {
+                String email = (String) jwtUser.get("username");
                 User user = userDAO.readByEmail(email);
                 if (user != null) {
-                    // attach user to resident (many-to-many)
                     resident.addUser(user);
-                    // if you also want to mark journal creator, add a setter on Journal and set it
-                    // journal.setCreatedBy(user);
                 }
             }
-            // -----------------------------------------------------------------------
 
             Resident created = residentDAO.create(resident);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .header("Location", "/api/residents/" + created.getId())
+                    .body(created);
 
-            Long journalId = created.getJournal() != null ? created.getJournal().getId() : null;
-            ResidentResponseDTO resp = new ResidentResponseDTO(
-                    created.getId(),
-                    created.getFirstName(),
-                    created.getLastName(),
-                    journalId
-            );
-
-            ctx.status(201);
-            ctx.header("Location", "/api/residents/" + created.getId());
-            ctx.json(resp);
-
-        } catch (IllegalArgumentException e) {
-            ctx.status(400).result(e.getMessage());
         } catch (Exception e) {
-            logger.error("Failed to create resident", e);
-            ctx.status(500).result("Internal server error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-    // Unused interface methods kept minimal
-    @Override
-    public void delete(Context ctx) { throw new UnsupportedOperationException(); }
-
-    @Override
-    public boolean validatePrimaryKey(Long aLong) { return false; }
-
-    @Override
-    public Resident validateEntity(Context ctx) { return null; }
-
-    @Override
-    public void read(Context ctx) { throw new UnsupportedOperationException(); }
-
-    @Override
-    public void readAll(Context ctx) { throw new UnsupportedOperationException(); }
-
-    @Override
-    public void update(Context ctx) { throw new UnsupportedOperationException(); }
 }

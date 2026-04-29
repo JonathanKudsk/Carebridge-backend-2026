@@ -1,40 +1,40 @@
 package com.carebridge.dao.impl;
 
-import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.IDAO;
 import com.carebridge.entities.User;
-import com.carebridge.entities.enums.Role;
+import com.carebridge.enums.Role;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.ValidationException;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Repository
 public class UserDAO implements IDAO<User, Long> {
 
     private static final Logger logger = LoggerFactory.getLogger(UserDAO.class);
-    private static final EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
-    private static UserDAO instance;
 
-    private UserDAO() {
-    }
+    @PersistenceContext
+    private EntityManager em;
 
-    public static synchronized UserDAO getInstance() {
-        if (instance == null) instance = new UserDAO();
-        return instance;
-    }
-
-    private EntityManager em() {
-        return emf.createEntityManager();
+    public UserDAO() {
     }
 
     @Override
     public User read(Long id) {
-        try (var em = em()) {
-            return em.find(User.class, id);
+        try {
+            var list = em.createQuery(
+                "SELECT DISTINCT u FROM User u " +
+                "LEFT JOIN FETCH u.residents " +
+                "WHERE u.id = :id", User.class)
+                .setParameter("id", id)
+                .getResultList();
+            return list.isEmpty() ? null : list.get(0);
         } catch (Exception e) {
             logger.error("Error reading user {}", id, e);
             throw new ApiRuntimeException(500, "Error reading user: " + e.getMessage());
@@ -42,7 +42,7 @@ public class UserDAO implements IDAO<User, Long> {
     }
 
     public User readByEmail(String email) {
-        try (var em = em()) {
+        try {
             if (email == null || email.isBlank())
                 throw new ValidationException("Email cannot be blank");
 
@@ -61,7 +61,7 @@ public class UserDAO implements IDAO<User, Long> {
 
     @Override
     public List<User> readAll() {
-        try (var em = em()) {
+        try {
             return em.createQuery("SELECT u FROM User u ORDER BY u.id", User.class).getResultList();
         } catch (Exception e) {
             logger.error("Error fetching all users", e);
@@ -70,77 +70,52 @@ public class UserDAO implements IDAO<User, Long> {
     }
 
     @Override
+    @Transactional
     public User create(User u) {
         if (u == null) throw new ApiRuntimeException(400, "User cannot be null");
-        if (u.getEmail() == null || u.getEmail().isBlank())
+        if (u.getEmail() == null || u.getEmail().isBlank()){
             throw new ApiRuntimeException(400, "Email is required");
-        if (u.getName() == null || u.getName().isBlank())
+        }
+        if (u.getName() == null || u.getName().isBlank()){
             throw new ApiRuntimeException(400, "Name is required");
-
-        if (u.getRole() == null)
-            u.setRole(Role.USER);
-
-        try (var em = em()) {
-            em.getTransaction().begin();
-            boolean exists = !em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
-                    .setParameter("email", u.getEmail())
-                    .getResultList().isEmpty();
-            if (exists)
-                throw new ApiRuntimeException(409, "Email already exists");
-
-            em.persist(u);
-            em.getTransaction().commit();
-            logger.info("User created: {}", u.getEmail());
-            return u;
-        } catch (ApiRuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("Error creating user {}", u.getEmail(), e);
-            throw new ApiRuntimeException(500, "Error creating user: " + e.getMessage());
         }
+
+        boolean exists = !em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
+                .setParameter("email", u.getEmail())
+                .getResultList().isEmpty();
+        if (exists)
+            throw new ApiRuntimeException(409, "Email already exists");
+
+        em.persist(u);
+        logger.info("User created: {}", u.getEmail());
+        return u;
     }
 
     @Override
+    @Transactional
     public User update(Long id, User updated) {
-        try (var em = em()) {
-            em.getTransaction().begin();
-            User existing = em.find(User.class, id);
-            if (existing == null)
-                throw new ApiRuntimeException(404, "User not found");
+        User existing = em.find(User.class, id);
+        if (existing == null)
+            throw new ApiRuntimeException(404, "User not found");
 
-            if (updated.getName() != null && !updated.getName().isBlank())
-                existing.setName(updated.getName());
-            if (updated.getEmail() != null && !updated.getEmail().isBlank())
-                existing.setEmail(updated.getEmail());
-            if (updated.getRole() != null)
-                existing.setRole(updated.getRole());
+        if (updated.getName() != null && !updated.getName().isBlank())
+            existing.setName(updated.getName());
+        if (updated.getEmail() != null && !updated.getEmail().isBlank())
+            existing.setEmail(updated.getEmail());
+        if (updated.getRole() != null)
+            existing.setRole(updated.getRole());
 
-            em.getTransaction().commit();
-            logger.info("User updated: id={}", id);
-            return existing;
-        } catch (ApiRuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("Error updating user {}", id, e);
-            throw new ApiRuntimeException(500, "Error updating user: " + e.getMessage());
-        }
+        logger.info("User updated: id={}", id);
+        return existing;
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        try (var em = em()) {
-            em.getTransaction().begin();
-            User u = em.find(User.class, id);
-            if (u == null)
-                throw new ApiRuntimeException(404, "User not found");
-            em.remove(u);
-            em.getTransaction().commit();
-            logger.info("User deleted: id={}", id);
-        } catch (ApiRuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("Error deleting user {}", id, e);
-            throw new ApiRuntimeException(500, "Error deleting user: " + e.getMessage());
-        }
+        User u = em.find(User.class, id);
+        if (u == null)
+            throw new ApiRuntimeException(404, "User not found");
+        em.remove(u);
+        logger.info("User deleted: id={}", id);
     }
 }

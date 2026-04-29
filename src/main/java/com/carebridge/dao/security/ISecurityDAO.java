@@ -2,7 +2,7 @@ package com.carebridge.dao.security;
 
 
 import com.carebridge.entities.User;
-import com.carebridge.entities.enums.Role;
+import com.carebridge.enums.Role;
 import com.carebridge.exceptions.ValidationException;
 
 public interface ISecurityDAO {
@@ -19,5 +19,5 @@ public interface ISecurityDAO {
             String internalPhone,
             Role role
     );
-    User changeRole(Long userId, com.carebridge.entities.enums.Role newRole);
+    User changeRole(Long userId, com.carebridge.enums.Role newRole);
 }

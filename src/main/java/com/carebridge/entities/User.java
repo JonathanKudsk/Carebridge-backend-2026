@@ -1,7 +1,12 @@
 package com.carebridge.entities;
 
-import com.carebridge.entities.enums.Role;
+import com.carebridge.crud.annotations.CrudResource;
+import com.carebridge.crud.annotations.ExcludeFromDTO;
+import com.carebridge.crud.annotations.ExcludeFromMeta;
+import com.carebridge.crud.data.core.BaseEntity;
 import com.carebridge.entities.security.ISecurityUser;
+import com.carebridge.enums.Role;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -18,11 +23,8 @@ import java.util.Objects;
         name = "users",
         uniqueConstraints = @UniqueConstraint(name = "uq_users_email", columnNames = "email")
 )
-public class User implements ISecurityUser {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@CrudResource(path = "users")
+public class User extends BaseEntity implements ISecurityUser {
 
     @NotBlank
     @Size(max = 120)
@@ -36,11 +38,13 @@ public class User implements ISecurityUser {
 
     @NotBlank
     @Column(name = "password_hash", nullable = false)
+    @ExcludeFromDTO
+    @ExcludeFromMeta
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)
-    private Role role = Role.USER;
+    private Role role;
 
     @Column(nullable = false, updatable = false)
     private Instant created_at;
@@ -139,19 +143,15 @@ public class User implements ISecurityUser {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof User other)) return false;
-        return id != null && id.equals(other.id);
+        return getId() != null && getId().equals(other.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hashCode(getId());
     }
 
     // ========== GETTERS & SETTERS ==========
-
-    public Long getId() {
-        return id;
-    }
 
     public String getName() {
         return name;

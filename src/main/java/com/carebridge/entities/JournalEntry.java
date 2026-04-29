@@ -1,5 +1,7 @@
 package com.carebridge.entities;
 
+import com.carebridge.crud.annotations.CrudResource;
+import com.carebridge.crud.data.core.BaseEntity;
 import com.carebridge.enums.RiskAssessment;
 import com.carebridge.enums.EntryType;
 import jakarta.persistence.*;
@@ -7,11 +9,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "journal_entries")
-public class JournalEntry {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@CrudResource(path = "journal-entries")
+public class JournalEntry extends BaseEntity {
 
     // Relationship to User (the CareWorker or Admin who wrote it)
     @ManyToOne
@@ -59,8 +58,21 @@ public class JournalEntry {
         this.editCloseTime = this.createdAt.plusHours(24);
     }
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        if (this.editCloseTime == null) {
+            this.editCloseTime = this.createdAt.plusHours(24);
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
     // --- Getters & Setters ---
-    public Long getId() { return id; }
 
     public User getAuthor() { return author; }
     public void setAuthor(User author) { this.author = author; }

@@ -1,94 +1,63 @@
 package com.carebridge.dao.security;
 
 import com.carebridge.entities.User;
-import com.carebridge.entities.enums.Role;
+import com.carebridge.enums.Role;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.ValidationException;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+@Repository
 public class SecurityDAO implements ISecurityDAO {
 
-    private final EntityManagerFactory emf;
+    @PersistenceContext
+    private EntityManager em;
 
-    public SecurityDAO(EntityManagerFactory emf) {
-        this.emf = emf;
-    }
-
-    private EntityManager em() {
-        return emf.createEntityManager();
+    public SecurityDAO() {
     }
 
     @Override
     public User getVerifiedUser(String email, String password) throws ValidationException {
-        try (var em = em()) {
-            User user = findByEmail(em, email);
-            if (user == null) throw new ValidationException("Invalid email or password");
-            if (!user.verifyPassword(password)) throw new ValidationException("Invalid email or password");
-            return user;
+        User user = readByEmail(email);
+        if (user == null || !BCrypt.checkpw(password, user.getPasswordHash())) {
+            throw new ValidationException("Wrong username or password");
         }
+        return user;
     }
 
     @Override
-    public User createUser(
-            String name,
-            String email,
-            String rawPassword,
-            String displayName,
-            String displayEmail,
-            String displayPhone,
-            String internalEmail,
-            String internalPhone,
-            Role role
-    ) {
-        try (var em = em()) {
-            if (findByEmail(em, email) != null) {
-                throw new ApiRuntimeException(409, "Email already exists");
-            }
-
-
-            var user = new User();
-            user.setName(name);
-            user.setEmail(email);
-            user.setPassword(rawPassword);
-            user.setRole(role != null ? role : Role.USER);
-            user.setDisplayName(displayName);
-            user.setDisplayEmail(displayEmail);
-            user.setDisplayPhone(displayPhone);
-            user.setInternalEmail(internalEmail);
-            user.setInternalPhone(internalPhone);
-
-            em.getTransaction().begin();
-            em.persist(user);
-            em.getTransaction().commit();
-            return user;
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new ApiRuntimeException(400, ex.getMessage());
-        }
+    @Transactional
+    public User createUser(String name, String email, String rawPassword, String displayName, String displayEmail, String displayPhone, String internalEmail, String internalPhone, Role role) {
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(rawPassword);
+        user.setDisplayName(displayName);
+        user.setDisplayEmail(displayEmail);
+        user.setDisplayPhone(displayPhone);
+        user.setInternalEmail(internalEmail);
+        user.setInternalPhone(internalPhone);
+        user.setRole(role);
+        em.persist(user);
+        return user;
     }
 
-
     @Override
+    @Transactional
     public User changeRole(Long userId, Role newRole) {
-        if (newRole == null) throw new ApiRuntimeException(400, "Role must not be null");
-        try (var em = em()) {
-            em.getTransaction().begin();
-            User u = em.find(User.class, userId);
-            if (u == null) {
-                em.getTransaction().rollback();
-                throw new ApiRuntimeException(404, "User not found: id=" + userId);
-            }
-            u.setRole(newRole);
-            em.getTransaction().commit();
-            return u;
+        User user = em.find(User.class, userId);
+        if (user != null) {
+            user.setRole(newRole);
         }
+        return user;
     }
 
-    private User findByEmail(EntityManager em, String email) {
+    private User readByEmail(String email) {
         try {
             TypedQuery<User> q = em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class);
             q.setParameter("email", email);
