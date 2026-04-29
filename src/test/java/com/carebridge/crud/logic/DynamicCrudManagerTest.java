@@ -17,28 +17,26 @@ public class DynamicCrudManagerTest {
 
     @Test
     @Order(1)
-    void initialResourcesIsEmpty() {
+    void shouldReturnEmptyResourcesMapWhenInitialized() {
         assertTrue(manager.getResources().isEmpty(), "Resources map should be empty before any registration");
     }
 
     @Test
     @Order(2)
-    void getMetadataReturnsNullForUnknownPath() {
+    void shouldReturnNullWhenGettingMetadataForUnknownPath() {
         assertNull(manager.getMetadata("nonexistent"), "Metadata for unknown path should be null");
     }
 
     @Test
     @Order(3)
-    void registerInterceptorStoresInterceptor() {
+    void shouldNotThrowWhenRegisteringInterceptor() {
         CrudInterceptor<BaseEntity> interceptor = new CrudInterceptor<>() {};
-        // registering should not throw
         assertDoesNotThrow(() -> manager.registerInterceptor(BaseEntity.class, interceptor));
     }
 
     @Test
     @Order(4)
-    void registerResourceIgnoresNonBaseEntityClass() {
-        // A class that does not extend BaseEntity must be silently ignored
+    void shouldIgnoreResourceWhenRegisteringNonBaseEntityClass() {
         assertDoesNotThrow(() -> manager.registerResource(String.class));
         assertTrue(manager.getResources().isEmpty());
     }

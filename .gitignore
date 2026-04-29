@@ -1,7 +1,8 @@
 # ===== Environment files =====
 .env
 .env.local
-src/main/resources/application.properties
+# NOTE: application.properties is committed with safe placeholder defaults.
+#       Override carebridge.jwt.secret and datasource settings for production.
 
 # ===== Maven build =====
 /target/
