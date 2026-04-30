@@ -15,6 +15,7 @@ public class Routes {
     private final JournalEntryRoutes journalEntryRoute = new JournalEntryRoutes();
     private final ResidentRoute residentRoute = new ResidentRoute();
     private final ShiftRoute shiftRoute = new ShiftRoute();
+    private final ShiftAssignmentRoute shiftAssignmentRoute = new ShiftAssignmentRoute();
 
     public EndpointGroup getRoutes() {
         return () -> {
@@ -24,6 +25,7 @@ public class Routes {
             path("/residents", residentRoute.getRoutes());
             path("/journals", journalEntryRoute.getRoutes());
             path("/shifts", shiftRoute.getRoutes());
+            path("/shift-assignments", shiftAssignmentRoute.getRoutes());
 
             get("/populate", controller::populate, Role.ANYONE);
             post("/populate", controller::populate, Role.ANYONE);
