@@ -114,6 +114,9 @@ public class UserDAO implements IDAO<User, Long> {
                 existing.setEmail(updated.getEmail());
             if (updated.getRole() != null)
                 existing.setRole(updated.getRole());
+            if (updated.isEmployed() != existing.isEmployed()) {
+                existing.setIsEmployed(updated.isEmployed());
+            }
 
             em.getTransaction().commit();
             logger.info("User updated: id={}", id);
