@@ -17,6 +17,7 @@ public class ResidentRoute {
             delete("/{id}", controller::delete, Role.ADMIN);
             get("/", controller::readAll, Role.ADMIN);
             get("/{id}", controller::read, Role.ADMIN);
+            put("/deactivate/{id}", controller::deactivate, Role.ADMIN);
             // Define resident-related routes here
         };
     }
