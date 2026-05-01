@@ -45,7 +45,6 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(Role.class);
         configuration.addAnnotatedClass(Event.class);
         configuration.addAnnotatedClass(EventType.class);
-        configuration.addAnnotatedClass(ShiftAssignment.class);
         configuration.addAnnotatedClass(JournalEntry.class);
         configuration.addAnnotatedClass(Journal.class);
         configuration.addAnnotatedClass(Resident.class);
