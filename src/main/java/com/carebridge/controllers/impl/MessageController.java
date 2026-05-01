@@ -63,23 +63,7 @@ public class MessageController implements IController<Message, Long> {
         }
     }
 
-//    @Override
-//    public void create(Context ctx) {
-//        try {
-//            MessageDTO dto = ctx.bodyAsClass(MessageDTO.class);
-//            // Turn the incoming ids into managed entities before persisting the message.
-//            var user = resolveUser(dto.getUserId());
-//            var chatRoom = resolveChatRoom(dto.getChatRoomId());
-//
-//            Message created = messageDAO.create(MessageMapper.toEntity(dto, user, chatRoom));
-//            ctx.status(201).json(MessageMapper.toDTO(created));
-//        } catch (ApiRuntimeException e) {
-//            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
-//        } catch (Exception e) {
-//            logger.error("create message failed", e);
-//            ctx.status(500).json("{\"msg\":\"Internal error\"}");
-//        }
-//    }
+
 
     @Override
     public void create(Context ctx) {
