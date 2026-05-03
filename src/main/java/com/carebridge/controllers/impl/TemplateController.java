@@ -63,9 +63,7 @@ public class TemplateController implements IController<Template, Long> {
 
     @Override
     public void update(Context ctx) {
-        //todo: implement
-        ctx.status(501);
-        ctx.json("not yet implemented feature");
+        //as templates can't get changed without it effecting journal entries it might be best to leave empty to avoid issues
     }
 
     @Override
