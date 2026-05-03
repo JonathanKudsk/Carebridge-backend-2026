@@ -13,6 +13,7 @@ public class UserRoute {
         return () -> {
             get("/", controller::readAll, Role.ADMIN);
             get("/{id}", controller::read, Role.ADMIN);
+            get("/careworkers", controller::readAllCareWorkers, Role.PLANNER, Role.ADMIN);
 
 
             post("/", controller::create, Role.ADMIN);
