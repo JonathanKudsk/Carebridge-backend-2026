@@ -30,7 +30,7 @@ public class TemplateDAO implements IDAO<Template,Long> {
     @Override
     public Template read(Long id) {
         try (var em = em()) {
-            return em.createQuery("SELECT t FROM Template t JOIN FETCH t.fields where t.id = :id and t.isUsable = true", Template.class).setParameter("id",id)
+            return em.createQuery("SELECT t FROM Template t LEFT JOIN FETCH t.fields where t.id = :id and t.isUsable = TRUE", Template.class).setParameter("id",id)
                     .getSingleResult();
         } catch (NoResultException e) { //if nothing exists in DB return nothing
             return null;
@@ -44,7 +44,7 @@ public class TemplateDAO implements IDAO<Template,Long> {
     @Override
     public List<Template> readAll() {
         try (var em = em()) {
-            return em.createQuery("SELECT t FROM Template t where t.isUsable = true ORDER BY t.id  ", Template.class)
+            return em.createQuery("SELECT t FROM Template t where t.isUsable = TRUE ORDER BY t.id  ", Template.class)
                     .getResultList();
         } catch (Exception e) {
             logger.error("Error reading all Templates", e);
