@@ -7,6 +7,7 @@ import com.carebridge.exceptions.ApiRuntimeException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.NoResultException;
+import org.hibernate.sql.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ public class TemplateDAO implements IDAO<Template,Long> {
     @Override
     public Template read(Long id) {
         try (var em = em()) {
-            return em.createQuery("SELECT t FROM Template t JOIN FETCH t.fields where t.id = :id", Template.class).setParameter("id",id)
+            return em.createQuery("SELECT t FROM Template t JOIN FETCH t.fields where t.id = :id and t.isUsable = true", Template.class).setParameter("id",id)
                     .getSingleResult();
         } catch (NoResultException e) { //if nothing exists in DB return nothing
             return null;
@@ -43,7 +44,7 @@ public class TemplateDAO implements IDAO<Template,Long> {
     @Override
     public List<Template> readAll() {
         try (var em = em()) {
-            return em.createQuery("SELECT t FROM Template t ORDER BY t.id", Template.class)
+            return em.createQuery("SELECT t FROM Template t where t.isUsable = true ORDER BY t.id  ", Template.class)
                     .getResultList();
         } catch (Exception e) {
             logger.error("Error reading all Templates", e);
@@ -63,7 +64,26 @@ public class TemplateDAO implements IDAO<Template,Long> {
 
     @Override
     public void delete(Long id) {
-        //todo: missing implementation
+        try (var em = em()) {
+            //saves the amount of rows that was updated because of the query
+            int amountUpdated = em.createQuery("UPDATE Template t SET t.isUsable = FALSE WHERE t.id = :id", Template.class).setParameter("id",id).executeUpdate();
+
+
+            //if the amount of rows updated isn't 1, something has gone wrong
+            if(amountUpdated > 1){
+                throw new Exception("more rows were updated than possible");
+            }
+            if(amountUpdated < 1){
+                throw new ApiRuntimeException(404, "no Template was found");
+            }
+        }
+        catch (ApiRuntimeException e){ //we want to continue to throw ApiRuntimeException in the cases where it happens
+            throw e;
+        }
+        catch (Exception e) {
+            logger.error("Error finding Template", e);
+            throw new ApiRuntimeException(500, "Error Deleting Template: " + e.getMessage());
+        }
     }
 
     private EntityManager em() {
