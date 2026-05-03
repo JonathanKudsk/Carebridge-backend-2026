@@ -1,7 +1,9 @@
 package com.carebridge;
 
 import com.carebridge.config.ApplicationConfig;
+import com.carebridge.controllers.impl.UserController;
 import io.javalin.Javalin;
+
 
 public class App {
     public static void main(String[] args) {

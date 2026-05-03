@@ -237,6 +237,31 @@ public class JournalEntryController implements IController<JournalEntry, Long>
             ctx.status(500).result("Internal server error");
         }
     }
+    public void findAllEntriesByJournalToDTO(Context ctx) {
+        try {
+            Long journalId = Long.parseLong(ctx.pathParam("journalId"));
+            List<JournalEntry> entries = journalEntryDAO.getEntriesByJournalId(journalId);
+            List<JournalEntryResponseDTO> dtos = entries.stream()
+                    .map(entry -> new JournalEntryResponseDTO(
+                            entry.getId(),
+                            entry.getJournal().getId(),
+                            entry.getAuthor().getId(),
+                            entry.getTitle(),
+                            entry.getContent(),
+                            entry.getEntryType(),
+                            entry.getRiskAssessment(),
+                            entry.getCreatedAt(),
+                            entry.getUpdatedAt(),
+                            entry.getEditCloseTime()))
+                    .toList();
+            ctx.json(dtos);
+        } catch (IllegalArgumentException e) {
+            ctx.status(400).result(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            ctx.status(500).result("Internal server error");
+        }
+    }
 
     @Override
     public void readAll(Context ctx)

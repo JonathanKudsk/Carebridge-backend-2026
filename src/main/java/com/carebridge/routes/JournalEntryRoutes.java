@@ -17,6 +17,7 @@ public class JournalEntryRoutes
             post("/{journalId}/journal-entries", controller::create, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
             put("/{journalId}/journal-entries/{entryId}", controller::update, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
             get("/{journalId}/journal-entries/{entryId}", controller::read, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
+            get("/{journalId}/journal-entries-data", controller::findAllEntriesByJournalToDTO, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
         };
     }
 }
