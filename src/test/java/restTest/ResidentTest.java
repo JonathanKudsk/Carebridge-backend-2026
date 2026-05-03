@@ -127,25 +127,24 @@ public class ResidentTest {
                 .body("lastName", equalTo("Updated"));
     }
 
-
     @Test
     @Order(5)
-    public void testDeleteResident() {
+    public void testDeactivateResident() {
         given()
                 .header("Authorization", "Bearer " + adminAuthToken)
                 .when()
-                .delete("/residents/" + createdResidentId)
+                .put("/residents/deactivate/" + createdResidentId)
                 .then()
                 .statusCode(204);
 
+        // Test of idempotency == same result
         given()
                 .header("Authorization", "Bearer " + adminAuthToken)
                 .when()
-                .get("/residents/" + createdResidentId)
+                .put("/residents/deactivate/" + createdResidentId)
                 .then()
-                .statusCode(500);
+                .statusCode(204);
     }
-
 
     @Test
     @Order(6)
@@ -171,5 +170,23 @@ public class ResidentTest {
                 .get("/residents/" + createdResidentId)
                 .then()
                 .statusCode(401);
+    }
+
+    @Test
+    @Order(8)
+    public void testDeleteResident() {
+        given()
+                .header("Authorization", "Bearer " + adminAuthToken)
+                .when()
+                .delete("/residents/" + createdResidentId)
+                .then()
+                .statusCode(204);
+
+        given()
+                .header("Authorization", "Bearer " + adminAuthToken)
+                .when()
+                .get("/residents/" + createdResidentId)
+                .then()
+                .statusCode(500);
     }
 }

@@ -10,6 +10,7 @@ import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 import com.carebridge.services.mappers.ResidentMapper;
 import io.javalin.http.Context;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -194,6 +195,28 @@ public class ResidentController implements IController<Resident, Long> {
             ctx.status(400).result("Invalid ID format");
         } catch (Exception e) {
             logger.error("Failed to update resident", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
+
+    public void deactivate(Context ctx) {
+        try {
+            Long id = Long.parseLong(ctx.pathParam("id"));
+
+            Resident resident = residentDAO.read(id);
+            if (resident == null) {
+                ctx.status(404).result("Resident not found with id: " + id);
+                return;
+            }
+            residentDAO.deactivate(id);
+            ctx.status(204);
+
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("Invalid ID format");
+        } catch (EntityNotFoundException e) {
+            ctx.status(404).result(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Failed to deactivate resident", e);
             ctx.status(500).result("Internal server error");
         }
     }
