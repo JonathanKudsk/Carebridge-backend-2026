@@ -143,4 +143,17 @@ public class ShiftDAO implements IDAO<Shift, Long> {
 		}
 		finally { em.close(); }
 	}
+
+	public List<Shift> findByAssignedUserId(Long userId) {
+		EntityManager em = em();
+		try {
+			return em.createQuery(
+							"SELECT s FROM Shift s WHERE s.assignedUserId = :userId", Shift.class)
+					.setParameter("userId", userId)
+					.getResultList();
+		} catch (Exception e) {
+			logger.error("Error finding shifts for userId={}", userId, e);
+			throw new ApiRuntimeException(500, "Error finding shifts: " + e.getMessage());
+		} finally { em.close(); }
+	}
 }
