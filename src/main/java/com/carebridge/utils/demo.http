@@ -331,6 +331,6 @@ Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
 ### 21) get specific template (admin)
-GET {{url}}/templates/2
+GET {{url}}/templates/1
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
