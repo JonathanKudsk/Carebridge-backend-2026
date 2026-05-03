@@ -65,14 +65,17 @@ public class TemplateDAO implements IDAO<Template,Long> {
     public void delete(Long id) {
         try (var em = em()) {
             //saves the amount of rows that was updated because of the query
-            int amountUpdated = em.createQuery("UPDATE Template t SET t.isUsable = FALSE WHERE t.id = :id", Template.class).setParameter("id",id).executeUpdate();
-
+            em.getTransaction().begin();
+            int amountUpdated = em.createQuery("UPDATE Template t SET t.isUsable = FALSE WHERE t.id = :id").setParameter("id",id).executeUpdate();
+            em.getTransaction().commit();
 
             //if the amount of rows updated isn't 1, something has gone wrong
             if(amountUpdated > 1){
+                em.getTransaction().rollback();
                 throw new Exception("more rows were updated than possible");
             }
             if(amountUpdated < 1){
+                em.getTransaction().rollback();
                 throw new ApiRuntimeException(404, "no Template was found");
             }
         }

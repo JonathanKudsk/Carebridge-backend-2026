@@ -334,3 +334,8 @@ Content-Type: application/json
 GET {{url}}/templates/1
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
+
+### 22) Delete specific template (admin)
+DELETE {{url}}/templates/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
