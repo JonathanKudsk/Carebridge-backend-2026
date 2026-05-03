@@ -2,18 +2,18 @@ package com.carebridge.controllers.impl;
 
 import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.TemplateDAO;
-import com.carebridge.dtos.TemplateDetailedResponseDTO;
-import com.carebridge.dtos.TemplateResponseDTO;
-import com.carebridge.entities.Template;
+import com.carebridge.dtos.*;
+import com.carebridge.entities.*;
 import com.carebridge.exceptions.ApiRuntimeException;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Arrays;
 import java.util.List;
 
 public class TemplateController implements IController<Template, Long> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ResidentController.class);
+    private static final Logger logger = LoggerFactory.getLogger(TemplateController.class);
     private final TemplateDAO templateDAO = TemplateDAO.getInstance();
 
     @Override
@@ -56,9 +56,39 @@ public class TemplateController implements IController<Template, Long> {
 
     @Override
     public void create(Context ctx) {
-        //todo: implement
-        ctx.status(501);
-        ctx.json("not yet implemented feature");
+        try {
+            CreateTemplateRequestDTO dto = ctx.bodyAsClass(CreateTemplateRequestDTO.class);
+            if (dto.getTitle() == null || dto.getTitle().isBlank())
+                throw new ApiRuntimeException(400, "title required");
+            if (dto.getFields() == null || dto.getFields().length == 0)
+                throw new ApiRuntimeException(400, "fields required");
+            for (CreateFieldRequestDTO fieldDTO : dto.getFields()){
+                if (fieldDTO.getTitle() == null || fieldDTO.getTitle().isBlank())
+                    throw new ApiRuntimeException(400, "field title required");
+                if (fieldDTO.getFieldType() == null)
+                    throw new ApiRuntimeException(400, "field title required");
+            }
+
+            Template t = Template.builder()
+                    .title(dto.getTitle())
+                    .build();
+            t.setFields(
+                    (Arrays.stream(dto.getFields())
+                    .map(f -> Field.builder()
+                            .fieldType(f.getFieldType())
+                            .title(f.getTitle())
+                            .template(t)
+                            .build())
+                    .toList())
+            );
+            Template created = templateDAO.create(t);
+            ctx.status(201).json(new TemplateDetailedResponseDTO(created));
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("create template failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
     }
 
     @Override
