@@ -78,7 +78,7 @@ public class TemplateController implements IController<Template, Long> {
         } catch (ApiRuntimeException e) {
             ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
         } catch (Exception e) {
-            logger.error("read Template failed", e);
+            logger.error("Delete Template failed", e);
             ctx.status(500).json("{\"msg\":\"Internal error\"}");
         }
     }
