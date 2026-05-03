@@ -1,27 +1,18 @@
 package serviceTest;
 
+import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.impl.ShiftDAO;
 import com.carebridge.entities.Shift;
 import com.carebridge.exceptions.ScheduleConflictException;
 import com.carebridge.services.mappers.ShiftService;
 import org.junit.jupiter.api.*;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ShiftServiceTest {
-
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
-            .withDatabaseName("carebridge_test")
-            .withUsername("test")
-            .withPassword("test");
 
     private static ShiftDAO shiftDAO;
     private static ShiftService shiftService;
@@ -34,11 +25,8 @@ class ShiftServiceTest {
 
     @BeforeAll
     static void setUp() {
-        // Sæt system properties så HibernateConfig bruger test-containeren
-        System.setProperty("DB_URL",      postgres.getJdbcUrl());
-        System.setProperty("DB_USERNAME", postgres.getUsername());
-        System.setProperty("DB_PASSWORD", postgres.getPassword());
-
+        // Brug test-EMF så HibernateConfig ikke forsøger at forbinde til prod/dev databasen
+        HibernateConfig.getEntityManagerFactoryForTest();
         shiftDAO     = ShiftDAO.getInstance();
         shiftService = ShiftService.getInstance();
     }
@@ -46,8 +34,7 @@ class ShiftServiceTest {
     @BeforeEach
     void insertExistingShift() {
         // Arrange — indsæt en kendt vagt i databasen før hver test
-        Shift existing = buildShift(USER_ID, EXISTING_START, EXISTING_END);
-        shiftDAO.create(existing);
+        shiftDAO.create(buildShift(USER_ID, EXISTING_START, EXISTING_END));
     }
 
     @AfterEach
