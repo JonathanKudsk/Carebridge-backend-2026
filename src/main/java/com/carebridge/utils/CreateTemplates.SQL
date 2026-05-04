@@ -1,9 +1,9 @@
 INSERT INTO public.template(
-    title)
+    title, is_usable)
 VALUES
-    ('test1'),
-    ('test2'),
-    ('test3');
+    ('test1', TRUE),
+    ('test2', FALSE),
+    ('test3', TRUE);
 
 INSERT INTO public.field(
     type , template_id, title)

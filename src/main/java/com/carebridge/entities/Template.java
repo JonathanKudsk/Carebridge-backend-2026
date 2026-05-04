@@ -30,4 +30,6 @@ public class Template {
     @Column(name="title")
     private String title;
 
+    @Column(name="is_usable", nullable = false)
+    private boolean isUsable = true;
 }

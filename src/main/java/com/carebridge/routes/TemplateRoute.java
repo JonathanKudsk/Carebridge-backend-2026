@@ -19,6 +19,7 @@ public class TemplateRoute {
             post("/", controller::create, Role.ADMIN);
             put("/{id}", controller::update, Role.ADMIN);
             get("/{id}", controller::read, Role.ADMIN);
+            delete("/{id}", controller::delete, Role.ADMIN);
         };
     }
 }

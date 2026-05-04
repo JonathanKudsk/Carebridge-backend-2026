@@ -298,6 +298,8 @@ Content-Type: application/json
 
 ### 17) Get all journalEntry IDs for journal 1
 GET {{url}}/journals/1/journal-entries
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
 
 > {%
     client.test("List journal entries (journal 1)", function () {
@@ -307,6 +309,8 @@ GET {{url}}/journals/1/journal-entries
 
 ### 18) Get specific journal entry by ID
 GET {{url}}/journals/1/journal-entries/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
 
 > {%
     client.test("Get journal entry 8", function () {
@@ -332,5 +336,10 @@ Content-Type: application/json
 
 ### 21) get specific template (admin)
 GET {{url}}/templates/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### 22) Delete specific template (admin)
+DELETE {{url}}/templates/1
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json

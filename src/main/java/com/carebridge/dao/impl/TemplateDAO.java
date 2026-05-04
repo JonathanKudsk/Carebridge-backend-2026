@@ -6,6 +6,7 @@ import com.carebridge.entities.Template;
 import com.carebridge.exceptions.ApiRuntimeException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class TemplateDAO implements IDAO<Template,Long> {
     @Override
     public Template read(Long id) {
         try (var em = em()) {
-            return em.createQuery("SELECT t FROM Template t JOIN FETCH t.fields where t.id = :id", Template.class).setParameter("id",id)
+            return em.createQuery("SELECT t FROM Template t LEFT JOIN FETCH t.fields where t.id = :id and t.isUsable = TRUE", Template.class).setParameter("id",id)
                     .getSingleResult();
         } catch (NoResultException e) { //if nothing exists in DB return nothing
             return null;
@@ -43,7 +44,7 @@ public class TemplateDAO implements IDAO<Template,Long> {
     @Override
     public List<Template> readAll() {
         try (var em = em()) {
-            return em.createQuery("SELECT t FROM Template t ORDER BY t.id", Template.class)
+            return em.createQuery("SELECT t FROM Template t where t.isUsable = TRUE ORDER BY t.id  ", Template.class)
                     .getResultList();
         } catch (Exception e) {
             logger.error("Error reading all Templates", e);
@@ -63,7 +64,34 @@ public class TemplateDAO implements IDAO<Template,Long> {
 
     @Override
     public void delete(Long id) {
-        //todo: missing implementation
+        try (var em = em()) {
+            EntityTransaction transaction = em.getTransaction();
+            try {
+                transaction.begin();
+
+                int amountUpdated = em.createQuery("UPDATE Template t SET t.isUsable = FALSE WHERE t.id = :id")
+                        .setParameter("id", id)
+                        .executeUpdate();
+
+                if (amountUpdated < 1) {
+                    transaction.rollback();
+                    throw new ApiRuntimeException(404, "no Template was found");
+                }
+                if (amountUpdated > 1) {
+                    transaction.rollback();
+                    throw new ApiRuntimeException(500, "more rows were updated than possible");
+                }
+
+                transaction.commit();
+            } catch (ApiRuntimeException e) {
+                if (transaction.isActive()) transaction.rollback();
+                throw e;
+            } catch (Exception e) {
+                if (transaction.isActive()) transaction.rollback();
+                logger.error("Error deleting Template", e);
+                throw new ApiRuntimeException(500, "Error Deleting Template: " + e.getMessage());
+            }
+        }
     }
 
     private EntityManager em() {
