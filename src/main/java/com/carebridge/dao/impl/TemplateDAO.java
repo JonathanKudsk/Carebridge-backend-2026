@@ -6,6 +6,7 @@ import com.carebridge.entities.Template;
 import com.carebridge.exceptions.ApiRuntimeException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,27 +65,32 @@ public class TemplateDAO implements IDAO<Template,Long> {
     @Override
     public void delete(Long id) {
         try (var em = em()) {
-            //saves the amount of rows that was updated because of the query
-            em.getTransaction().begin();
-            int amountUpdated = em.createQuery("UPDATE Template t SET t.isUsable = FALSE WHERE t.id = :id").setParameter("id",id).executeUpdate();
-            em.getTransaction().commit();
+            EntityTransaction transaction = em.getTransaction();
+            try {
+                transaction.begin();
 
-            //if the amount of rows updated isn't 1, something has gone wrong
-            if(amountUpdated > 1){
-                em.getTransaction().rollback();
-                throw new Exception("more rows were updated than possible");
+                int amountUpdated = em.createQuery("UPDATE Template t SET t.isUsable = FALSE WHERE t.id = :id")
+                        .setParameter("id", id)
+                        .executeUpdate();
+
+                if (amountUpdated < 1) {
+                    transaction.rollback();
+                    throw new ApiRuntimeException(404, "no Template was found");
+                }
+                if (amountUpdated > 1) {
+                    transaction.rollback();
+                    throw new ApiRuntimeException(500, "more rows were updated than possible");
+                }
+
+                transaction.commit();
+            } catch (ApiRuntimeException e) {
+                if (transaction.isActive()) transaction.rollback();
+                throw e;
+            } catch (Exception e) {
+                if (transaction.isActive()) transaction.rollback();
+                logger.error("Error deleting Template", e);
+                throw new ApiRuntimeException(500, "Error Deleting Template: " + e.getMessage());
             }
-            if(amountUpdated < 1){
-                em.getTransaction().rollback();
-                throw new ApiRuntimeException(404, "no Template was found");
-            }
-        }
-        catch (ApiRuntimeException e){ //we want to continue to throw ApiRuntimeException in the cases where it happens
-            throw e;
-        }
-        catch (Exception e) {
-            logger.error("Error finding Template", e);
-            throw new ApiRuntimeException(500, "Error Deleting Template: " + e.getMessage());
         }
     }
 
