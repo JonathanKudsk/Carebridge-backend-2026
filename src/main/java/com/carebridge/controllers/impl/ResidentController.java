@@ -138,7 +138,8 @@ public class ResidentController implements IController<Resident, Long> {
                     resident.getFirstName(),
                     resident.getLastName(),
                     journalId,
-                    resident.getCprNr()
+                    resident.getCprNr(),
+                    resident.isActive()
             );
             ctx.status(200).json(resp);
 

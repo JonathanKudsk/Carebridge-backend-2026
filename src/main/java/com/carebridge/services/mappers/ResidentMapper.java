@@ -18,7 +18,8 @@ public class ResidentMapper {
                 r.getFirstName(),
                 r.getLastName(),
                 journalId,
-                r.getCprNr()
+                r.getCprNr(),
+                r.isActive()
         );
     }
 
