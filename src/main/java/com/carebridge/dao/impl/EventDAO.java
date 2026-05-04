@@ -293,6 +293,7 @@ public class EventDAO implements IDAO<Event, Long> {
                             "LEFT JOIN FETCH e.usersWithAccess " +
                             "LEFT JOIN FETCH e.createdBy " +
                             "LEFT JOIN FETCH e.eventType " +
+                            "LEFT JOIN FETCH e.seenByUsers " +
                             "WHERE e.id = :eventId " +
                             "AND (EXISTS (SELECT u FROM e.usersWithAccess u WHERE u.id = :userId) " +
                             "     OR (e.accessLevel = :roleBased AND :userLevel >= e.riskLevel))",
