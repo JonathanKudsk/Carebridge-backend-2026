@@ -50,6 +50,11 @@ public class EventController implements IController<Event, Long> {
             int userAccessLevel = resolveUserAccessLevel(user);
             Event entity = eventDAO.readAccessibleById(id, user.getId(), userAccessLevel);
             if (entity == null) {
+                Event existingEvent = eventDAO.read(id);
+                if (existingEvent == null) {
+                    ctx.status(404).json("{\"msg\":\"Event not found\"}");
+                    return;
+                }
                 ctx.status(403).json("{\"msg\":\"Access denied\"}");
                 return;
             }
