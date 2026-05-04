@@ -1,10 +1,7 @@
 package com.carebridge.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -13,11 +10,14 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Builder
+@EqualsAndHashCode
 
 @Table(name = "template")
 public class Template {
 
     @Id
+    @EqualsAndHashCode.Exclude
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -30,4 +30,10 @@ public class Template {
     @Column(name="title")
     private String title;
 
+    public void addField(Field f) {
+        fields.add(f);
+        if(f.getTemplate() != this){
+            f.setTemplate(this);
+        }
+    }
 }

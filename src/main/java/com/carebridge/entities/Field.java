@@ -2,15 +2,12 @@ package com.carebridge.entities;
 
 import com.carebridge.enums.FieldType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
+@Builder
 @Entity
 
 @Table(name = "field")
@@ -19,6 +16,7 @@ public class Field {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter(AccessLevel.NONE)
     @ManyToOne
     @JoinColumn(name="template_id",nullable = false)
     private Template template;
@@ -28,4 +26,11 @@ public class Field {
 
     @Column(name="type")
     private FieldType fieldType;
+
+    public void setTemplate(Template template) {
+        this.template = template;
+        if(!template.getFields().contains(this)){
+            template.addField(this);
+        }
+    }
 }
