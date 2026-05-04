@@ -9,6 +9,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.NoResultException;
 import org.junit.jupiter.api.*;
+import populator.TemplatePopulator;
+
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,7 +33,7 @@ class TemplateDaoTest {
 
     @BeforeEach
     void setup(){
-        PopulatorTemplate.populate();
+        TemplatePopulator.populate();
     }
 
     @AfterEach
@@ -56,14 +58,14 @@ class TemplateDaoTest {
     @Test
     void read() {
         //get objects with the same id
-        Object expected = PopulatorTemplate.fetch().get(1);
+        Object expected = TemplatePopulator.fetch().get(1);
         Object actual = dao.read(1L);
         assertEquals(expected, actual);
     }
 
     @Test
     void readAll() {
-        List<Template> expected = PopulatorTemplate.fetch();
+        List<Template> expected = TemplatePopulator.fetch();
         List<Template> actual = dao.readAll();
         assertThat( actual, containsInAnyOrder(expected.toArray()));
     }

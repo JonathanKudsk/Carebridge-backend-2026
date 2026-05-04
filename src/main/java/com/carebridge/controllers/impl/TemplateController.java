@@ -2,13 +2,19 @@ package com.carebridge.controllers.impl;
 
 import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.TemplateDAO;
+import com.carebridge.dtos.CreateFieldDTO;
+import com.carebridge.dtos.CreateTemplateRequestDTO;
 import com.carebridge.dtos.TemplateDetailedResponseDTO;
 import com.carebridge.dtos.TemplateResponseDTO;
+import com.carebridge.entities.Field;
 import com.carebridge.entities.Template;
+import com.carebridge.enums.FieldType;
 import com.carebridge.exceptions.ApiRuntimeException;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class TemplateController implements IController<Template, Long> {
@@ -56,9 +62,35 @@ public class TemplateController implements IController<Template, Long> {
 
     @Override
     public void create(Context ctx) {
-        //todo: implement
-        ctx.status(501);
-        ctx.json("not yet implemented feature");
+        try {
+            CreateTemplateRequestDTO dto = ctx.bodyAsClass(CreateTemplateRequestDTO.class);
+
+            Template template = new Template();
+            template.setTitle(dto.getTitle());
+
+            List<Field> fields = new ArrayList<>();
+
+            for (CreateFieldDTO fieldDTO : dto.getFields()) {
+                Field field = new Field();
+                field.setTitle(fieldDTO.getTitle());
+
+                // Convert string to enum
+                field.setFieldType(FieldType.valueOf(fieldDTO.getFieldType().toUpperCase()));
+
+                field.setTemplate(template);
+                fields.add(field);
+            }
+
+            template.setFields(fields);
+
+            templateDAO.create(template);
+
+            ctx.status(201).json(template);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            ctx.status(400).result("Error creating template");
+        }
     }
 
     @Override

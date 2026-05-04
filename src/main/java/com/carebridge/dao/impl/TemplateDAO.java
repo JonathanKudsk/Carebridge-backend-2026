@@ -53,7 +53,18 @@ public class TemplateDAO implements IDAO<Template,Long> {
 
     @Override
     public Template create(Template template) {
-        return null; //todo: missing implementation
+        try (var em = em()) {
+            em.getTransaction().begin();
+
+            em.persist(template);
+
+            em.getTransaction().commit();
+            return template;
+
+        } catch (Exception e) {
+            logger.error("Error creating Template", e);
+            throw new ApiRuntimeException(500, "Error creating Template: " + e.getMessage());
+        }
     }
 
     @Override

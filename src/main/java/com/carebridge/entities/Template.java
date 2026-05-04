@@ -1,8 +1,10 @@
 package com.carebridge.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -21,8 +23,9 @@ public class Template {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "template")
-    private List<Field> fields;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "template", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Field> fields = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "template")
     private List<JournalEntry> journalEntries;

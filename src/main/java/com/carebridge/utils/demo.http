@@ -334,3 +334,40 @@ Content-Type: application/json
 GET {{url}}/templates/1
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
+
+### 22) Create template (ADMIN) NEED TO ATTACH A JOURNAL ENTRY LATER
+POST {{url}}/templates
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "title": "HTTP Test Template",
+  "fields": [
+    {
+      "title": "true",
+      "fieldType": "CHECKBOX"
+    },
+    {
+      "title": "96767",
+      "fieldType": "NUMBERFIELD"
+    },
+    {
+      "title": "Hello",
+      "fieldType": "TEXTFIELD"
+    }
+  ]
+}
+
+> {%
+    client.test("Create template (admin)", function () {
+        client.assert([200, 201].includes(response.status), "Template creation failed");
+
+        if (response.body && response.body.id) {
+            client.global.set("new_template_id", response.body.id);
+        }
+
+        client.assert(response.body.title === "HTTP Test Template", "Wrong title");
+
+        client.assert(response.body.fields.length === 2, "Fields not created");
+    });
+%}

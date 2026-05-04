@@ -1,6 +1,7 @@
 package com.carebridge.entities;
 
 import com.carebridge.enums.FieldType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class Field {
     @Setter(AccessLevel.NONE)
     @ManyToOne
     @JoinColumn(name="template_id",nullable = false)
+    @JsonBackReference
     private Template template;
 
     @Column(name="title")
