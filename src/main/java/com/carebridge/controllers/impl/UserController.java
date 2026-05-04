@@ -204,4 +204,18 @@ public class UserController implements IController<User, Long> {
     public User validateEntity(Context ctx) {
         return ctx.bodyAsClass(User.class);
     }
+
+    public void readAllCareWorkers(Context ctx) {
+        try {
+            var list = userDAO.readAll()
+                    .stream()
+                    .filter(u -> u.getRole() == Role.CAREWORKER)
+                    .map(UserMapper::toDTO)
+                    .collect(Collectors.toList());
+            ctx.json(list);
+        } catch (Exception e) {
+            logger.error("readAllCareWorkers failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
 }

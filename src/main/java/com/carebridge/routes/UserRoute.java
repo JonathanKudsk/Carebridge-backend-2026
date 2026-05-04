@@ -12,7 +12,9 @@ public class UserRoute {
     public EndpointGroup getRoutes() {
         return () -> {
             get("/", controller::readAll, Role.ADMIN);
+            get("/careworkers", controller::readAllCareWorkers, Role.PLANNER, Role.ADMIN);
             get("/{id}", controller::read, Role.ADMIN);
+
 
 
             post("/", controller::create, Role.ADMIN);
