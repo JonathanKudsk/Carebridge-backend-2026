@@ -98,9 +98,17 @@ public class TemplateController implements IController<Template, Long> {
 
     @Override
     public void delete(Context ctx) {
-        //todo: implement
-        ctx.status(501);
-        ctx.json("not yet implemented feature");
+        try {
+            Long id = parseId(ctx);
+            templateDAO.delete(id);
+            ctx.status(200);
+            ctx.json("Template successfully deleted");
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("Delete Template failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
     }
 
     @Override
