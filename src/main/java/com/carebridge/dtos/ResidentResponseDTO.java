@@ -6,6 +6,7 @@ public class ResidentResponseDTO {
     private String lastName;
     private Long journalId;
     private String cprNr;
+    private boolean isActive;
 
     public ResidentResponseDTO() {}
 
@@ -25,11 +26,16 @@ public class ResidentResponseDTO {
         return cprNr;
     }
 
-    public ResidentResponseDTO(Long id, String firstName, String lastName, Long journalId, String cprNr) {
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public ResidentResponseDTO(Long id, String firstName, String lastName, Long journalId, String cprNr, boolean isActive) {
         this.cprNr = cprNr;
         this.journalId = journalId;
         this.lastName = lastName;
         this.firstName = firstName;
         this.id = id;
+        this.isActive = isActive;
     }
 }
