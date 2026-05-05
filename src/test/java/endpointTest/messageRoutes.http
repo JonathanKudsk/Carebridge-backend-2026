@@ -1,0 +1,39 @@
+### Healthcheck (no auth)
+GET {{url}}/auth/healthcheck
+
+### Seed data (no auth)
+POST {{url}}/populate
+
+### Login as seeded USER and store JWT
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@carebridge.io",
+  "password": "password123"
+}
+
+> {%
+  client.global.set("jwt_token", response.body.token);
+%}
+
+### Read all chat rooms (requires USER/ADMIN)
+GET {{url}}/chatrooms
+Authorization: Bearer {{jwt_token}}
+
+### Read messages for a seeded room (replace chatRoomId if needed)
+GET {{url}}/messages?chatRoomId=1
+Authorization: Bearer {{jwt_token}}
+
+### Create message
+POST {{url}}/messages
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "userId": 2,
+  "chatRoomId": 1,
+  "message": "Hello World!"
+}
+
+
