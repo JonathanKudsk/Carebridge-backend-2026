@@ -115,7 +115,7 @@ public class Resident {
     public void setDosages(List<Dosage> dosages) {
         this.dosages = dosages;
     }
-}
+
     public MedicationChart getMedicationChart() {
         return medicationChart;
     }
