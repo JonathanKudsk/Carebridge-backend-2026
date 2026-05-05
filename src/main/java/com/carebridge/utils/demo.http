@@ -501,3 +501,43 @@ Authorization: Bearer {{jwt_token}}
         client.assert(response.body.medications.length === 1, "Expected 1 medication, got " + response.body.medications.length);
     });
 %}
+
+### ---- TEMPLATE API ----
+
+### Get all templates
+GET {{url}}/templates
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### Get specific template
+GET {{url}}/templates/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### Delete specific template
+DELETE {{url}}/templates/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### Create template
+POST {{url}}/templates
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "title": "HTTP Test Template",
+  "fields": [
+    {
+      "title": "true",
+      "fieldType": "CHECKBOX"
+    },
+    {
+      "title": "96767",
+      "fieldType": "NUMBERFIELD"
+    },
+    {
+      "title": "Hello",
+      "fieldType": "TEXTFIELD"
+    }
+  ]
+}
