@@ -15,7 +15,7 @@ import java.util.List;
 
 public class TemplateDAO implements IDAO<Template,Long> {
 
-    private static final Logger logger = LoggerFactory.getLogger(EventTypeDAO.class);
+    private static final Logger logger = LoggerFactory.getLogger(TemplateDAO.class);
     private static final EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
     private static TemplateDAO instance;
 
@@ -54,7 +54,15 @@ public class TemplateDAO implements IDAO<Template,Long> {
 
     @Override
     public Template create(Template template) {
-        return null; //todo: missing implementation
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            em.persist(template);
+            em.getTransaction().commit();
+            return template;
+        } catch (Exception e) {
+            logger.error("Error persisting Template to db", e);
+            throw new RuntimeException("Error persisting Template to db. ", e);
+        }
     }
 
     @Override

@@ -334,7 +334,7 @@ GET {{url}}/templates
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
-### 21) get specific template (admin)
+### 21) get specific template (admin)impl
 GET {{url}}/templates/1
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
@@ -343,3 +343,22 @@ Content-Type: application/json
 DELETE {{url}}/templates/1
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
+
+### 23) create template (admin)
+POST {{url}}/templates
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "title": "test",
+  "fields": [
+    {
+      "title": "test",
+      "fieldType": "TEXTFIELD"
+    },
+    {
+      "title": "test",
+      "fieldType": "CHECKBOX"
+    }
+  ]
+}

@@ -2,16 +2,14 @@ package com.carebridge.entities;
 
 import com.carebridge.enums.FieldType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
+@Builder
 
 @Table(name = "field")
 public class Field {
