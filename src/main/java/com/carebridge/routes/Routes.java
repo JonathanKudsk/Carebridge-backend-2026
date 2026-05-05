@@ -13,7 +13,6 @@ public class Routes {
     private final UserController controller = new UserController();
     private final JournalEntryRoutes journalEntryRoute = new JournalEntryRoutes();
     private final ResidentRoute residentRoute = new ResidentRoute();
-<<<<<<< HEAD
     private final DosageRoute dosageRoute = new DosageRoute();
     private final MedicationRoute medicationRoute = new MedicationRoute();
     private final AuditLogRoute auditLogRoute = new AuditLogRoute();
@@ -21,9 +20,7 @@ public class Routes {
     private final ChatRoomUserRoute chatRoomUserRoute = new ChatRoomUserRoute();
     private final MessageRoute messageRoute = new MessageRoute();
     private final ShiftRoute shiftRoute = new ShiftRoute();
-=======
     private final TemplateRoute templateRoute = new TemplateRoute();
->>>>>>> TEAM-3
 
     public EndpointGroup getRoutes() {
         return () -> {
@@ -32,7 +29,6 @@ public class Routes {
             path("/events", eventRoute.getRoutes());
             path("/residents", residentRoute.getRoutes());
             path("/journals", journalEntryRoute.getRoutes());
-<<<<<<< HEAD
             path("/dosages", dosageRoute.getRoutes());
             path("/medication-charts", medicationRoute.getRoutes());
             path("/audit-logs", auditLogRoute.getRoutes());
@@ -40,10 +36,7 @@ public class Routes {
             path("/chatroom-users", chatRoomUserRoute.getRoutes());
             path("/messages", messageRoute.getRoutes());
             path("/shifts", shiftRoute.getRoutes());
-
-=======
             path("/templates",templateRoute.getRoutes());
->>>>>>> TEAM-3
             get("/populate", controller::populate, Role.ANYONE);
             post("/populate", controller::populate, Role.ANYONE);
             SecurityRoutes.getSecurityRoutes().addEndpoints();
