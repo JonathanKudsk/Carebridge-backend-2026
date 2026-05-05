@@ -9,6 +9,7 @@ public class ResidentResponseDTO {
     private String cprNr;
     private Integer age;
     private String gender;
+    private boolean isActive;
 
     public ResidentResponseDTO() {}
 
@@ -20,7 +21,17 @@ public class ResidentResponseDTO {
         this.medicationChartId = medicationChartId;
     }
 
-    public ResidentResponseDTO(Long id, String firstName, String lastName, String cprNr, Integer age, String gender, Long journalId, Long medicationChartId){
+    public ResidentResponseDTO(
+            Long id,
+            String firstName,
+            String lastName,
+            String cprNr,
+            Integer age,
+            String gender,
+            Long journalId,
+            Long medicationChartId,
+            boolean isActive
+    ) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -29,6 +40,7 @@ public class ResidentResponseDTO {
         this.cprNr = cprNr;
         this.age = age;
         this.gender = gender;
+        this.isActive = isActive;
     }
 
     public ResidentResponseDTO(Long id, String firstName, String lastName, Long journalId) {
@@ -38,13 +50,48 @@ public class ResidentResponseDTO {
         this.journalId = journalId;
     }
 
-    public Long getId() { return id; }
-    public String getFirstName() { return firstName; }
-    public String getLastName() { return lastName; }
-    public Long getJournalId() { return journalId; }
-    public Long getMedicationChartId() { return medicationChartId;}
-    public String getCprNr() { return cprNr; }
-    public Integer getAge() { return age; }
-    public String getGender() { return gender; }
+    public ResidentResponseDTO(Long id, String firstName, String lastName, Long journalId, String cprNr, boolean isActive) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.journalId = journalId;
+        this.cprNr = cprNr;
+        this.isActive = isActive;
+    }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public Long getJournalId() {
+        return journalId;
+    }
+
+    public Long getMedicationChartId() {
+        return medicationChartId;
+    }
+
+    public String getCprNr() {
+        return cprNr;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
 }

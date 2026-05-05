@@ -111,11 +111,30 @@ public class ResidentDAO implements IDAO<Resident, Long> {
         }
     }
 
-    public List<Resident> getAllSorted(){
+    public void deactivate(Long id) {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+
+            Resident managed = em.find(Resident.class, id);
+            if (managed == null) {
+                em.getTransaction().rollback();
+                throw new EntityNotFoundException("Resident not found with ID: " + id);
+            }
+
+            managed.setActive(false);
+            em.getTransaction().commit();
+
+        } catch (Exception e) {
+            logger.error("Error deactivating resident", e);
+            throw new RuntimeException("Error deactivating resident.", e);
+        }
+    }
+
+    public List<Resident> getAllSorted() {
         try (EntityManager em = emf.createEntityManager()) {
             return em.createQuery("SELECT r FROM Resident r ORDER BY r.firstName", Resident.class)
                     .getResultList();
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Error retrieving residents sorted from db", e);
             throw new RuntimeException("Error retrieving residents sorted from db.", e);
         }

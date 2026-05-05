@@ -14,9 +14,10 @@ public class JournalEntryRoutes
         return () ->
         {
             get("/{journalId}/journal-entries", controller::findAllEntriesByJournal, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
-            post("/{journalId}/journal-entries", controller::create, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
-            put("/{journalId}/journal-entries/{entryId}", controller::update, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
+            post("/{journalId}/journal-entries", controller::create, Role.ADMIN, Role.CAREWORKER);
+            put("/{journalId}/journal-entries/{entryId}", controller::update, Role.ADMIN, Role.CAREWORKER);
             get("/{journalId}/journal-entries/{entryId}", controller::read, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
+            get("/{journalId}/journal-entries-data", controller::findAllEntriesByJournalToDTO, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
         };
     }
 }
