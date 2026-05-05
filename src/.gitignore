@@ -1,0 +1,23 @@
+# ===== Environment files =====
+.env
+.env.local
+src/main/resources/application.properties
+
+# ===== Maven build =====
+/target/
+*.log
+
+# ===== IntelliJ / IDE =====
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# ===== OS-specific =====
+.DS_Store
+Thumbs.db
+
+# ===== Temporary files =====
+*.tmp
+*.swp
