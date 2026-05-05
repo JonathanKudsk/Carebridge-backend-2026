@@ -16,6 +16,9 @@ public class SecurityRoutes {
                 post("/login", security.login(), Role.ANYONE);
                 post("/register", security.register(), Role.ADMIN);
                 post("/user/addrole", security.addRole(), Role.ADMIN);
+                post("/refresh", security.refresh(), Role.ANYONE);
+                post("/logout", security.logout(), Role.ANYONE);
+                get("/session", security.sessionInfo(), Role.ANYONE);
             });
         };
     }
