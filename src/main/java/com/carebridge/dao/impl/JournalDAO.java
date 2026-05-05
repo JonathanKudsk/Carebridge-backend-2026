@@ -98,4 +98,27 @@ public class JournalDAO implements IDAO<Journal, Long>
             throw new RuntimeException("Error updating journal with new entry. ", e);
         }
     }
+
+    // Checks whether a guardian is linked to the resident that owns the requested journal.
+    public boolean guardianHasAccessToJournal(String guardianEmail, Long journalId) {
+        if (guardianEmail == null || journalId == null) return false;
+
+        try (EntityManager em = emf.createEntityManager()) {
+            Long count = em.createQuery(
+                            "SELECT COUNT(j) FROM User u " +
+                                    "JOIN u.residents r " +
+                                    "JOIN r.journal j " +
+                                    "WHERE u.email = :email AND j.id = :journalId",
+                            Long.class)
+                    .setParameter("email", guardianEmail)
+                    .setParameter("journalId", journalId)
+                    .getSingleResult();
+
+            return count > 0;
+        } catch (Exception e) {
+            logger.error("Error checking guardian journal access", e);
+            throw new RuntimeException("Error checking journal access", e);
+        }
+    }
+
 }
