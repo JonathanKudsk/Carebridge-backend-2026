@@ -4,6 +4,8 @@ import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.IDAO;
 import com.carebridge.entities.Event;
 import com.carebridge.entities.User;
+import com.carebridge.entities.enums.Role;
+import com.carebridge.enums.EventAccessLevel;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.ValidationException;
 import jakarta.persistence.EntityManager;
@@ -215,6 +217,97 @@ public class EventDAO implements IDAO<Event, Long> {
         } catch (Exception e) {
             logger.error("Error unmarking event as seen. eventId={}, userId={}", eventId, user.getId(), e);
             throw new ApiRuntimeException(500, "Error unmarking event as seen: " + e.getMessage());
+        }
+    }
+
+    private int roleToAccessLevel(Role role) {
+        return switch (role) {
+            case ADMIN      -> 5;
+            case GUARDIAN   -> 4;
+            case CAREWORKER -> 3;
+            default         -> 1;
+        };
+    }
+
+    public List<Event> readAccessibleEvents(Long userId) {
+        try (var em = em()) {
+            User user = em.find(User.class, userId);
+            if (user == null) throw new ApiRuntimeException(404, "User not found");
+            int userLevel = roleToAccessLevel(user.getRole());
+
+            return em.createQuery(
+                            "SELECT DISTINCT e FROM Event e " +
+                            "LEFT JOIN FETCH e.usersWithAccess " +
+                            "LEFT JOIN FETCH e.createdBy " +
+                            "LEFT JOIN FETCH e.eventType " +
+                            "WHERE EXISTS (SELECT u FROM e.usersWithAccess u WHERE u.id = :userId) " +
+                            "   OR (e.accessLevel = :roleBased AND :userLevel >= e.riskLevel) " +
+                            "ORDER BY e.startAt",
+                            Event.class)
+                    .setParameter("userId", userId)
+                    .setParameter("roleBased", EventAccessLevel.ROLE_BASED)
+                    .setParameter("userLevel", userLevel)
+                    .getResultList();
+        } catch (ApiRuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error reading accessible events for userId={}", userId, e);
+            throw new ApiRuntimeException(500, "Error reading accessible events: " + e.getMessage());
+        }
+    }
+
+    public List<Event> readAccessibleEventsBetween(Long userId, Instant from, Instant to) {
+        try (var em = em()) {
+            User user = em.find(User.class, userId);
+            if (user == null) throw new ApiRuntimeException(404, "User not found");
+            int userLevel = roleToAccessLevel(user.getRole());
+
+            return em.createQuery(
+                            "SELECT DISTINCT e FROM Event e " +
+                            "LEFT JOIN FETCH e.usersWithAccess " +
+                            "LEFT JOIN FETCH e.createdBy " +
+                            "LEFT JOIN FETCH e.eventType " +
+                            "LEFT JOIN FETCH e.seenByUsers " +
+                            "WHERE e.startAt >= :from AND e.startAt < :to " +
+                            "AND (EXISTS (SELECT u FROM e.usersWithAccess u WHERE u.id = :userId) " +
+                            "     OR (e.accessLevel = :roleBased AND :userLevel >= e.riskLevel)) " +
+                            "ORDER BY e.startAt ASC",
+                            Event.class)
+                    .setParameter("userId", userId)
+                    .setParameter("from", from)
+                    .setParameter("to", to)
+                    .setParameter("roleBased", EventAccessLevel.ROLE_BASED)
+                    .setParameter("userLevel", userLevel)
+                    .getResultList();
+        } catch (ApiRuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error reading accessible events between {} and {} for userId={}", from, to, userId, e);
+            throw new ApiRuntimeException(500, "Error reading accessible events between dates: " + e.getMessage());
+        }
+    }
+
+    public Event readAccessibleById(Long eventId, Long userId, Integer userAccessLevel) {
+        try (var em = em()) {
+            var list = em.createQuery(
+                            "SELECT DISTINCT e FROM Event e " +
+                            "LEFT JOIN FETCH e.usersWithAccess " +
+                            "LEFT JOIN FETCH e.createdBy " +
+                            "LEFT JOIN FETCH e.eventType " +
+                            "LEFT JOIN FETCH e.seenByUsers " +
+                            "WHERE e.id = :eventId " +
+                            "AND (EXISTS (SELECT u FROM e.usersWithAccess u WHERE u.id = :userId) " +
+                            "     OR (e.accessLevel = :roleBased AND :userLevel >= e.riskLevel))",
+                            Event.class)
+                    .setParameter("eventId", eventId)
+                    .setParameter("userId", userId)
+                    .setParameter("roleBased", EventAccessLevel.ROLE_BASED)
+                    .setParameter("userLevel", userAccessLevel)
+                    .getResultList();
+            return list.isEmpty() ? null : list.get(0);
+        } catch (Exception e) {
+            logger.error("Error reading accessible event id={} for userId={}", eventId, userId, e);
+            throw new ApiRuntimeException(500, "Error reading event: " + e.getMessage());
         }
     }
 

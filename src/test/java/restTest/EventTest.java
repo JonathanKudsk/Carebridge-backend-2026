@@ -22,6 +22,7 @@ public class EventTest {
     private static String adminAuthToken;
     private static int eventTypeId;
     private static int createdEventId;
+    private static int residentId;
     private Javalin app;
 
     @BeforeAll
@@ -91,6 +92,15 @@ public class EventTest {
                 .then()
                 .statusCode(200)
                 .extract().path("[0].id");
+
+        residentId = given()
+                .header("Authorization", "Bearer " + adminAuthToken)
+                .contentType(ContentType.JSON)
+                .body("{\"firstName\":\"Test\",\"lastName\":\"Resident\",\"cprNr\":\"010101-0001\"}")
+                .post("/residents/create")
+                .then()
+                .statusCode(201)
+                .extract().path("id");
     }
 
     @AfterAll
@@ -126,9 +136,10 @@ public class EventTest {
                 "description": "JUnit event",
                 "startAt": "%s",
                 "showOnBoard": true,
-                "eventTypeId": %d
+                "eventTypeId": %d,
+                "residentId": %d
         }
-        """, futureStartAt, eventTypeId);
+        """, futureStartAt, eventTypeId, residentId);
 
         createdEventId = given()
                 .header("Authorization", "Bearer " + adminAuthToken)
@@ -196,6 +207,137 @@ public class EventTest {
                 .delete("/events/" + createdEventId)  // Only ADMIN allowed
                 .then()
                 .statusCode(anyOf(is(200), is(204), is(403))); // depends on your implementation
+    }
+
+    // ---------------------------
+    // POST /events — manglende residentId
+    // ---------------------------
+    @Test
+    @Order(7)
+    public void testCreateEvent_missingResidentId_returns400() {
+        String futureStartAt = Instant.now().plusSeconds(60).toString();
+
+        String payload = String.format("""
+        {
+            "title": "Event Without Resident",
+            "startAt": "%s",
+            "showOnBoard": false,
+            "eventTypeId": %d
+        }
+        """, futureStartAt, eventTypeId);
+
+        given()
+                .header("Authorization", "Bearer " + adminAuthToken)
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .when()
+                .post("/events")
+                .then()
+                .statusCode(400);
+    }
+
+    // ---------------------------
+    // GET /events/{id} — ingen adgang → 403
+    // ---------------------------
+    @Test
+    @Order(8)
+    public void testReadEventById_noAccess_returns403() {
+        String futureStartAt = Instant.now().plusSeconds(60).toString();
+
+        String payload = String.format("""
+        {
+            "title": "Admin Only Event",
+            "startAt": "%s",
+            "showOnBoard": false,
+            "eventTypeId": %d,
+            "residentId": %d,
+            "isPrivate": true
+        }
+        """, futureStartAt, eventTypeId, residentId);
+
+        int privateEventId = given()
+                .header("Authorization", "Bearer " + adminAuthToken)
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .when()
+                .post("/events")
+                .then()
+                .statusCode(201)
+                .extract().path("id");
+
+        given()
+                .header("Authorization", "Bearer " + authToken)
+                .when()
+                .get("/events/" + privateEventId)
+                .then()
+                .statusCode(403);
+    }
+
+    // ---------------------------
+    // GET /events — kun tilgængelige events returneres
+    // ---------------------------
+    @Test
+    @Order(9)
+    public void testReadAll_returnsOnlyAccessibleEvents() {
+        String futureStartAt = Instant.now().plusSeconds(60).toString();
+
+        String payload = String.format("""
+        {
+            "title": "Hidden From Alice",
+            "startAt": "%s",
+            "showOnBoard": false,
+            "eventTypeId": %d,
+            "residentId": %d,
+            "isPrivate": true
+        }
+        """, futureStartAt, eventTypeId, residentId);
+
+        int hiddenEventId = given()
+                .header("Authorization", "Bearer " + adminAuthToken)
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .when()
+                .post("/events")
+                .then()
+                .statusCode(201)
+                .extract().path("id");
+
+        given()
+                .header("Authorization", "Bearer " + authToken)
+                .when()
+                .get("/events")
+                .then()
+                .statusCode(200)
+                .body("id", not(hasItem(hiddenEventId)));
+    }
+
+    // ---------------------------
+    // POST /events — med residentId → 201
+    // ---------------------------
+    @Test
+    @Order(10)
+    public void testCreateEvent_withResidentId_returns201() {
+        String futureStartAt = Instant.now().plusSeconds(60).toString();
+
+        String payload = String.format("""
+        {
+            "title": "Event With Resident",
+            "startAt": "%s",
+            "showOnBoard": false,
+            "eventTypeId": %d,
+            "residentId": %d
+        }
+        """, futureStartAt, eventTypeId, residentId);
+
+        given()
+                .header("Authorization", "Bearer " + adminAuthToken)
+                .contentType(ContentType.JSON)
+                .body(payload)
+                .when()
+                .post("/events")
+                .then()
+                .statusCode(201)
+                .body("residentId", equalTo(residentId));
     }
 
     // ---------------------------

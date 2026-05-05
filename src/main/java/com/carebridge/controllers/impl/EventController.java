@@ -3,13 +3,18 @@ package com.carebridge.controllers.impl;
 import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.EventDAO;
 import com.carebridge.dao.impl.EventTypeDAO;
+import com.carebridge.dao.impl.ResidentDAO;
 import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dtos.EventDTO;
 import com.carebridge.dtos.JwtUserDTO;
 import com.carebridge.entities.Event;
 import com.carebridge.entities.EventType;
+import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
+import com.carebridge.entities.enums.Role;
+import com.carebridge.enums.EventAccessLevel;
 import com.carebridge.exceptions.ApiRuntimeException;
+import com.carebridge.services.EventAccessPolicyService;
 import com.carebridge.services.mappers.EventMapper;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
@@ -18,6 +23,9 @@ import org.slf4j.LoggerFactory;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class EventController implements IController<Event, Long> {
@@ -26,17 +34,31 @@ public class EventController implements IController<Event, Long> {
     private final EventDAO eventDAO = EventDAO.getInstance();
     private final EventTypeDAO eventTypeDAO = EventTypeDAO.getInstance();
     private final UserDAO userDAO = UserDAO.getInstance();
+    private final ResidentDAO residentDAO = ResidentDAO.getInstance();
+    private final EventAccessPolicyService policyService = new EventAccessPolicyService();
 
     @Override
     public void read(Context ctx) {
         try {
             Long id = parseId(ctx);
-            var entity = eventDAO.read(id);
+            var tokenUser = ctx.attribute("user");
+            String email = extractEmailFromToken(tokenUser);
+            if (email == null) throw new ApiRuntimeException(401, "Unauthorized");
+            User user = userDAO.readByEmail(email);
+            if (user == null) throw new ApiRuntimeException(401, "Unauthorized");
+
+            int userAccessLevel = resolveUserAccessLevel(user);
+            Event entity = eventDAO.readAccessibleById(id, user.getId(), userAccessLevel);
             if (entity == null) {
-                ctx.status(404).json("{\"msg\":\"Event not found\"}");
+                Event existingEvent = eventDAO.read(id);
+                if (existingEvent == null) {
+                    ctx.status(404).json("{\"msg\":\"Event not found\"}");
+                    return;
+                }
+                ctx.status(403).json("{\"msg\":\"Access denied\"}");
                 return;
             }
-            ctx.json(EventMapper.toDTO(entity));
+            ctx.json(EventMapper.toDTO(entity, user.getId()));
         } catch (ApiRuntimeException e) {
             ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
         } catch (Exception e) {
@@ -54,6 +76,7 @@ public class EventController implements IController<Event, Long> {
 
             var tokenUser = ctx.attribute("user");
             Long currentUserId = extractUserIdFromToken(tokenUser);
+            if (currentUserId == null) throw new ApiRuntimeException(401, "Unauthorized");
 
             if (fromParam != null || toParam != null) {
                 ZoneId zone = resolveZone(tzParam);
@@ -65,7 +88,7 @@ public class EventController implements IController<Event, Long> {
                 Instant fromInstant = fromDate.atStartOfDay(zone).toInstant();
                 Instant toInstant = toDate.plusDays(1).atStartOfDay(zone).toInstant();
 
-                var list = eventDAO.readBetween(fromInstant, toInstant).stream()
+                var list = eventDAO.readAccessibleEventsBetween(currentUserId, fromInstant, toInstant).stream()
                         .map(e -> EventMapper.toDTO(e, currentUserId))
                         .toList();
 
@@ -73,12 +96,13 @@ public class EventController implements IController<Event, Long> {
                 return;
             }
 
-            var list = eventDAO.readAll().stream()
-                    .sorted((a, b) -> a.getStartAt().compareTo(b.getStartAt()))
+            var list = eventDAO.readAccessibleEvents(currentUserId).stream()
                     .map(e -> EventMapper.toDTO(e, currentUserId))
                     .toList();
             ctx.json(list);
 
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
         } catch (Exception e) {
             logger.error("readAll events failed", e);
             ctx.status(500).json("{\"msg\":\"Internal error\"}");
@@ -110,6 +134,22 @@ public class EventController implements IController<Event, Long> {
         }
     }
 
+    private String extractEmailFromToken(Object tokenUser) {
+        if (tokenUser instanceof JwtUserDTO ju) return ju.getUsername();
+        if (tokenUser instanceof com.carebridge.dtos.UserDTO du) return du.getEmail();
+        if (tokenUser != null) return tokenUser.toString();
+        return null;
+    }
+
+    private int resolveUserAccessLevel(User user) {
+        return switch (user.getRole()) {
+            case ADMIN      -> 5;
+            case GUARDIAN   -> 4;
+            case CAREWORKER -> 3;
+            default         -> 1;
+        };
+    }
+
     private Long extractUserIdFromToken(Object tokenUser) {
         if (tokenUser instanceof JwtUserDTO ju) {
             var u = userDAO.readByEmail(ju.getUsername());
@@ -126,19 +166,15 @@ public class EventController implements IController<Event, Long> {
     public void create(Context ctx) {
         try {
             var dto = ctx.bodyAsClass(EventDTO.class);
-            if (dto.getTitle() == null || dto.getTitle().isBlank())
-                throw new ApiRuntimeException(400, "title required");
+
+            if (dto.getResidentId() == null) throw new ApiRuntimeException(400, "residentId required");
+            if (dto.getTitle() == null || dto.getTitle().isBlank()) throw new ApiRuntimeException(400, "title required");
             if (dto.getStartAt() == null) throw new ApiRuntimeException(400, "startAt required");
-            if (dto.getStartAt().isBefore(Instant.now()))
-                throw new ApiRuntimeException(400, "startAt must be in future");
+            if (dto.getStartAt().isBefore(Instant.now())) throw new ApiRuntimeException(400, "startAt must be in future");
             if (dto.getEventTypeId() == null) throw new ApiRuntimeException(400, "eventTypeId required");
 
             var tokenUser = ctx.attribute("user");
-            String email = null;
-            if (tokenUser instanceof JwtUserDTO ju) email = ju.getUsername();
-            else if (tokenUser instanceof com.carebridge.dtos.UserDTO du) email = du.getEmail();
-            else if (tokenUser != null) email = tokenUser.toString();
-
+            String email = extractEmailFromToken(tokenUser);
             if (email == null) throw new ApiRuntimeException(401, "Unauthorized");
 
             User creator = userDAO.readByEmail(email);
@@ -147,9 +183,42 @@ public class EventController implements IController<Event, Long> {
             EventType et = eventTypeDAO.read(dto.getEventTypeId());
             if (et == null) throw new ApiRuntimeException(404, "EventType not found");
 
-            Event e = new Event(dto.getTitle(), dto.getDescription(), dto.getStartAt(), dto.isShowOnBoard(), creator, et);
-            var created = eventDAO.create(e);
-            ctx.status(201).json(EventMapper.toDTO(created));
+            Resident resident;
+            try {
+                resident = residentDAO.read(dto.getResidentId());
+            } catch (Exception e) {
+                throw new ApiRuntimeException(404, "Resident not found");
+            }
+            if (resident == null) throw new ApiRuntimeException(404, "Resident not found");
+
+            policyService.validateAccessInput(dto);
+
+            Integer riskLevel = dto.getRiskLevel() != null
+                    ? dto.getRiskLevel()
+                    : policyService.resolveDefaultRiskLevel(dto.getEventTypeId());
+
+            EventAccessLevel accessLevel = (dto.getIsPrivate() != null && dto.getIsPrivate())
+                    ? EventAccessLevel.PRIVATE_CREATOR_ONLY
+                    : policyService.resolveDefaultAccessLevel(riskLevel);
+
+            Set<Long> accessUserIds = policyService.resolveUsersWithAccess(
+                    accessLevel, creator.getId(), resident.getId(),
+                    dto.getUsersWithAccessIds(), riskLevel, dto.getIsPrivate());
+
+            Set<User> usersWithAccess = new HashSet<>();
+            for (Long uid : accessUserIds) {
+                User u = userDAO.read(uid);
+                if (u != null) usersWithAccess.add(u);
+            }
+
+            Event event = new Event(dto.getTitle(), dto.getDescription(), dto.getStartAt(), dto.isShowOnBoard(), creator, et);
+            event.setRiskLevel(riskLevel);
+            event.setAccessLevel(accessLevel);
+            event.setUsersWithAccess(usersWithAccess);
+            event.setResident(resident);
+
+            var created = eventDAO.create(event);
+            ctx.status(201).json(EventMapper.toDTO(created, creator.getId()));
         } catch (ApiRuntimeException e) {
             ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
         } catch (Exception e) {
