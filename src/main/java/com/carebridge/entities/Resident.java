@@ -1,13 +1,14 @@
 package com.carebridge.entities;
 
 import jakarta.persistence.*;
-
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
-public class Resident
-{
+public class Resident {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,11 +28,12 @@ public class Resident
     )
     private Set<User> users = new HashSet<>();
 
-    public Resident()
-    {
-    }
-    public Resident(String firstName, String lastName, String cprNr, Journal journal, User guardian)
-    {
+    @OneToMany(mappedBy = "resident", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Dosage> dosages = new ArrayList<>();
+
+    public Resident() {}
+
+    public Resident(String firstName, String lastName, String cprNr, Journal journal, User guardian) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.cprNr = cprNr;
@@ -93,5 +95,13 @@ public class Resident
 
     public void removeUser(User user) {
         this.users.remove(user);
+    }
+
+    public List<Dosage> getDosages() {
+        return dosages;
+    }
+
+    public void setDosages(List<Dosage> dosages) {
+        this.dosages = dosages;
     }
 }
