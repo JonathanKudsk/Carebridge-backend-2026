@@ -16,6 +16,9 @@ public class Routes {
     private final DosageRoute dosageRoute = new DosageRoute();
     private final MedicationRoute medicationRoute = new MedicationRoute();
     private final AuditLogRoute auditLogRoute = new AuditLogRoute();
+    private final ChatRoomRoutes chatRoomRoute = new ChatRoomRoutes();
+    private final ChatRoomUserRoute chatRoomUserRoute = new ChatRoomUserRoute();
+    private final MessageRoute messageRoute = new MessageRoute();
 
     public EndpointGroup getRoutes() {
         return () -> {
@@ -27,6 +30,9 @@ public class Routes {
             path("/dosages", dosageRoute.getRoutes());
             path("/medication-charts", medicationRoute.getRoutes());
             path("/audit-logs", auditLogRoute.getRoutes());
+            path("/chatrooms", chatRoomRoute.getRoutes());
+            path("/chatroom-users", chatRoomUserRoute.getRoutes());
+            path("/messages", messageRoute.getRoutes());
 
             get("/populate", controller::populate, Role.ANYONE);
             post("/populate", controller::populate, Role.ANYONE);
