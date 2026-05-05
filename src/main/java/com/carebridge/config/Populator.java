@@ -1,6 +1,7 @@
 package com.carebridge.config;
 
 import com.carebridge.entities.EventType;
+import com.carebridge.entities.Template;
 import com.carebridge.entities.Journal;
 import com.carebridge.entities.User;
 import com.carebridge.entities.Resident;
@@ -72,6 +73,14 @@ public class Populator {
                 em.persist(guardian);
             }
 
+            Template defaultTemplate = findTemplateByTitle(em, "Default Test Template");
+            if (defaultTemplate == null) {
+                defaultTemplate = new Template();
+                defaultTemplate.setTitle("Default Test Template");
+                defaultTemplate.setUsable(true);
+                em.persist(defaultTemplate);
+            }
+
             Resident linkedResident = new Resident();
             linkedResident.setFirstName("Anna");
             linkedResident.setLastName("Andersen");
@@ -90,6 +99,7 @@ public class Populator {
             linkedEntry.setTitle("Linked resident note");
             linkedEntry.setEntryType(EntryType.NOTE);
             linkedEntry.setRiskAssessment(RiskAssessment.LOW);
+            linkedEntry.setTemplate(defaultTemplate);
             linkedEntry.setCreatedAt(LocalDateTime.now());
             linkedEntry.setUpdatedAt(LocalDateTime.now());
             linkedEntry.setEditCloseTime(LocalDateTime.now().plusHours(24));
@@ -113,6 +123,7 @@ public class Populator {
             unlinkedEntry.setTitle("Unlinked resident note");
             unlinkedEntry.setEntryType(EntryType.NOTE);
             unlinkedEntry.setRiskAssessment(RiskAssessment.LOW);
+            unlinkedEntry.setTemplate(defaultTemplate);
             unlinkedEntry.setCreatedAt(LocalDateTime.now());
             unlinkedEntry.setUpdatedAt(LocalDateTime.now());
             unlinkedEntry.setEditCloseTime(LocalDateTime.now().plusHours(24));
@@ -158,6 +169,13 @@ public class Populator {
     private static EventType findEventTypeByName(EntityManager em, String name) {
         var list = em.createQuery("SELECT et FROM EventType et WHERE et.name = :name", EventType.class)
                 .setParameter("name", name)
+                .getResultList();
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    private static Template findTemplateByTitle(EntityManager em, String title) {
+        var list = em.createQuery("SELECT t FROM Template t WHERE t.title = :title", Template.class)
+                .setParameter("title", title)
                 .getResultList();
         return list.isEmpty() ? null : list.get(0);
     }
