@@ -183,8 +183,13 @@ public class EventController implements IController<Event, Long> {
             EventType et = eventTypeDAO.read(dto.getEventTypeId());
             if (et == null) throw new ApiRuntimeException(404, "EventType not found");
 
-            Resident resident = residentDAO.read(dto.getResidentId());
-            if (resident == null) throw new ApiRuntimeException(400, "Resident not found");
+            Resident resident;
+            try {
+                resident = residentDAO.read(dto.getResidentId());
+            } catch (Exception e) {
+                throw new ApiRuntimeException(404, "Resident not found");
+            }
+            if (resident == null) throw new ApiRuntimeException(404, "Resident not found");
 
             policyService.validateAccessInput(dto);
 
