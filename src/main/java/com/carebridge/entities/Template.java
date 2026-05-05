@@ -35,6 +35,7 @@ public class Template {
     @Column(name="title")
     private String title;
 
+    @Builder.Default
     @Column(name="is_usable", nullable = false)
     private boolean isUsable = true;
 

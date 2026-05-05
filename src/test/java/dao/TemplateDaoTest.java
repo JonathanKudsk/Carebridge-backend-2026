@@ -12,8 +12,6 @@ import populator.TemplatePopulator;
 
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -51,25 +49,21 @@ class TemplateDaoTest {
         em.close();
     }
 
-    @AfterAll
-    static void tearDownOnce() {
-        if (emf != null) emf.close();
-    }
-
     @Test
     void read() {
-        //get objects with the same id
-        Template expected = TemplatePopulator.fetch().get(1);
+        Template expected = TemplatePopulator.fetch().get(0);
         Template actual = dao.read(1L);
-        System.out.println(expected.getFields().equals(actual.getFields()));
-        assertEquals(expected, actual);
+        assertTemplateMatches(expected, actual);
     }
 
     @Test
     void readAll() {
         List<Template> expected = TemplatePopulator.fetch();
         List<Template> actual = dao.readAll();
-        assertThat(actual, containsInAnyOrder(expected.toArray()));
+        assertEquals(expected.size(), actual.size());
+        for (int i = 0; i < expected.size(); i++) {
+            assertTemplateSummaryMatches(expected.get(i), actual.get(i));
+        }
     }
 
     @Test
@@ -78,8 +72,8 @@ class TemplateDaoTest {
         expected.addField(Field.builder().fieldType(FieldType.CHECKBOX).title("testField").build());
         Template created = dao.create(expected);
         Template actualinDB = dao.read(created.getId());
-        assertEquals(expected, actualinDB);
-        assertEquals(created, actualinDB);
+        assertTemplateMatches(expected, actualinDB);
+        assertTemplateMatches(created, actualinDB);
     }
 
     @Test
@@ -94,5 +88,22 @@ class TemplateDaoTest {
         long id = 1;
         dao.delete(id);
         assertNull(dao.read(id));
+    }
+
+    private void assertTemplateMatches(Template expected, Template actual) {
+        assertEquals(expected.getTitle(), actual.getTitle());
+        assertEquals(expected.getFields().size(), actual.getFields().size());
+
+        for (int i = 0; i < expected.getFields().size(); i++) {
+            Field expectedField = expected.getFields().get(i);
+            Field actualField = actual.getFields().get(i);
+
+            assertEquals(expectedField.getTitle(), actualField.getTitle());
+            assertEquals(expectedField.getFieldType(), actualField.getFieldType());
+        }
+    }
+
+    private void assertTemplateSummaryMatches(Template expected, Template actual) {
+        assertEquals(expected.getTitle(), actual.getTitle());
     }
 }

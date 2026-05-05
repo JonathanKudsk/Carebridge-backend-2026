@@ -83,7 +83,6 @@ class TemplateTest {
     @AfterAll
     static void tearDownOnce() {
         ApplicationConfig.stopServer(app);
-        if (emf != null) emf.close();
     }
 
 
@@ -119,7 +118,7 @@ class TemplateTest {
     }
 
     @Test
-    void create() { //idk why it doesn't work //todo: fix
+    void create() {
         Template test = Template
                 .builder()
                 .title("test")
@@ -160,7 +159,7 @@ class TemplateTest {
 
         TemplateDetailedResponseDTO actual = (TemplateDetailedResponseDTO) given().
                 when()
-                .get("/templates/3")
+                .get("/templates/" + added.getId())
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -189,4 +188,3 @@ class TemplateTest {
                 .statusCode(404);
     }
 }
-
