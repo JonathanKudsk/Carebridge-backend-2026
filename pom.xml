@@ -81,6 +81,13 @@
             <scope>provided</scope>
         </dependency>
 
+         <dependency>
+             <groupId>org.mockito</groupId>
+             <artifactId>mockito-core</artifactId>
+             <version>5.11.0</version>
+             <scope>test</scope>
+         </dependency>
+
         <!-- Logging -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
