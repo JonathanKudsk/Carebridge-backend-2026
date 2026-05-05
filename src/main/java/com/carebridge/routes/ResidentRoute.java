@@ -12,6 +12,7 @@ public class ResidentRoute {
 
     public EndpointGroup getRoutes() {
         return () -> {
+            get("/", controller::readAll, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
             post("/create", controller::create, Role.ADMIN);
             put("/{id}", controller::update, Role.ADMIN);
             delete("/{id}", controller::delete, Role.ADMIN);

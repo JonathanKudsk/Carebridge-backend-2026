@@ -6,6 +6,7 @@ import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dtos.CreateResidentRequestDTO;
 import com.carebridge.dtos.ResidentResponseDTO;
 import com.carebridge.entities.Journal;
+import com.carebridge.entities.MedicationChart;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 import com.carebridge.services.mappers.ResidentMapper;
@@ -51,6 +52,11 @@ public class ResidentController implements IController<Resident, Long> {
             // Important: set the back-reference on the owning side
             journal.setResident(resident);
 
+            // create single linked medication chart
+            MedicationChart medicationChart = new MedicationChart();
+            medicationChart.setResident(resident);
+            resident.setMedicationChart(medicationChart);
+
             // --- Extract authenticated user and attach to resident/journal if desired ---
             var tokenUser = ctx.attribute("user");
             String email = null;
@@ -76,7 +82,11 @@ public class ResidentController implements IController<Resident, Long> {
                     created.getId(),
                     created.getFirstName(),
                     created.getLastName(),
-                    journalId
+                    created.getCprNr(),
+                    created.getAge(),
+                    created.getGender(),
+                    journalId,
+                    chartId
             );
 
             ctx.status(201);
@@ -152,6 +162,28 @@ public class ResidentController implements IController<Resident, Long> {
     }
 
     @Override
+    public void readAll(Context ctx) {
+        try {
+            var residents = residentDAO.readAll();
+
+            var response = residents.stream().map(r -> new ResidentResponseDTO(
+                    r.getId(),
+                    r.getFirstName(),
+                    r.getLastName(),
+                    r.getCprNr(),
+                    r.getAge(),
+                    r.getGender(),
+                    r.getJournal() != null ? r.getJournal().getId() : null,
+                    r.getMedicationChart() != null ? r.getMedicationChart().getId() : null
+            )).toList();
+
+            ctx.json(response);
+
+        } catch (Exception e) {
+            logger.error("Failed to get residents", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
     public void readAll(Context ctx) {
         try {
             List<Resident> residents = residentDAO.readAll();
