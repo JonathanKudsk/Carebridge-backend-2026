@@ -14,6 +14,9 @@ public class Routes {
     private final UserController controller = new UserController();
     private final JournalEntryRoutes journalEntryRoute = new JournalEntryRoutes();
     private final ResidentRoute residentRoute = new ResidentRoute();
+    private final ChatRoomRoute chatRoomRoute = new ChatRoomRoute();
+    private final ChatRoomUserRoute chatRoomUserRoute = new ChatRoomUserRoute();
+    private final MessageRoute messageRoute = new MessageRoute();
     private final ShiftRoute shiftRoute = new ShiftRoute();
 
     public EndpointGroup getRoutes() {
@@ -23,6 +26,9 @@ public class Routes {
             path("/events", eventRoute.getRoutes());
             path("/residents", residentRoute.getRoutes());
             path("/journals", journalEntryRoute.getRoutes());
+            path("/chatrooms", chatRoomRoute.getRoutes());
+            path("/chatroom-users", chatRoomUserRoute.getRoutes());
+            path("/messages", messageRoute.getRoutes());
             path("/shifts", shiftRoute.getRoutes());
 
             get("/populate", controller::populate, Role.ANYONE);
