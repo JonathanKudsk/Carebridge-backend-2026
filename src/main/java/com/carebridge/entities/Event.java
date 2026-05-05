@@ -81,6 +81,21 @@ public class Event {
     )
     private Set<User> usersWithAccess = new HashSet<>();
 
+    @Column(name = "resident_id")
+    private Long residentId;
+
+    @Column(name = "risk_level")
+    private Integer riskLevel;
+
+    @Column(name = "risk_color", length = 50)
+    private String riskColor;
+
+    @Column(name = "risk_description")
+    private String riskDescription;
+
+    @Column(name = "access_level", length = 50)
+    private String accessLevel;
+
     public Event() {
     }
 
@@ -192,6 +207,14 @@ public class Event {
         return eventTime;
     }
 
+    public void setEventDate(LocalDate eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    public void setEventTime(LocalTime eventTime) {
+        this.eventTime = eventTime;
+    }
+
     public Set<User> getSeenByUsers() {
         return seenByUsers;
     }
@@ -206,6 +229,46 @@ public class Event {
 
     public void setUsersWithAccess(Set<User> users) {
         this.usersWithAccess = users;
+    }
+
+    public String getAccessLevel() {
+        return accessLevel;
+    }
+
+    public void setAccessLevel(String accessLevel) {
+        this.accessLevel = accessLevel;
+    }
+
+    public String getRiskDescription() {
+        return riskDescription;
+    }
+
+    public void setRiskDescription(String riskDescription) {
+        this.riskDescription = riskDescription;
+    }
+
+    public String getRiskColor() {
+        return riskColor;
+    }
+
+    public void setRiskColor(String riskColor) {
+        this.riskColor = riskColor;
+    }
+
+    public Integer getRiskLevel() {
+        return riskLevel;
+    }
+
+    public void setRiskLevel(Integer riskLevel) {
+        this.riskLevel = riskLevel;
+    }
+
+    public Long getResidentId() {
+        return residentId;
+    }
+
+    public void setResidentId(Long residentId) {
+        this.residentId = residentId;
     }
 
     @Override

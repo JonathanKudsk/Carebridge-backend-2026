@@ -26,7 +26,6 @@ public class EventDTO {
     private LocalTime eventTime;
     private boolean seenByCurrentUser;
     private List<Long> seenByUserIds;
-
     private Long residentId;
     private Boolean isPrivate;
     private String accessLevel;
