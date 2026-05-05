@@ -1,18 +1,34 @@
 package com.carebridge.controllers.impl;
 
 import com.carebridge.controllers.IController;
-import com.carebridge.dao.impl.*;
-import com.carebridge.dtos.*;
-import com.carebridge.entities.*;
+import com.carebridge.dao.impl.JournalDAO;
+import com.carebridge.dao.impl.JournalEntryDAO;
+import com.carebridge.dao.impl.TemplateDAO;
+import com.carebridge.dao.impl.UserDAO;
+import com.carebridge.dtos.CreateJournalEntryAnswerRequestDTO;
+import com.carebridge.dtos.CreateJournalEntryRequestDTO;
+import com.carebridge.dtos.EditJournalEntryRequestDTO;
+import com.carebridge.dtos.JournalEntryAnswerResponseDTO;
+import com.carebridge.dtos.JournalEntryDetailedResponseDTO;
+import com.carebridge.dtos.JournalEntryResponseDTO;
+import com.carebridge.dtos.JwtUserDTO;
+import com.carebridge.entities.Field;
+import com.carebridge.entities.Journal;
+import com.carebridge.entities.JournalEntry;
+import com.carebridge.entities.JournalEntryAnswer;
+import com.carebridge.entities.Template;
+import com.carebridge.entities.User;
 import com.carebridge.enums.EntryType;
 import com.carebridge.enums.RiskAssessment;
 import com.carebridge.exceptions.ApiRuntimeException;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class JournalEntryController implements IController<JournalEntry, Long> {
 
@@ -22,15 +38,54 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
     private final TemplateDAO templateDAO = TemplateDAO.getInstance();
     private final UserDAO userDAO = UserDAO.getInstance();
 
-    // Get entry details (logic moved from service)
+    // Admins and careworkers can access all journals, while guardians can only
+    // access journals belonging to residents they are linked to.
+    private boolean canAccessJournal(Context ctx, Long journalId) {
+        var tokenUser = ctx.attribute("user");
+
+        if (!(tokenUser instanceof JwtUserDTO jwtUser)) {
+            ctx.status(401).json("{\"msg\":\"Unauthorized\"}");
+            return false;
+        }
+
+        boolean isAdminOrCareworker = jwtUser.getRoles().stream()
+                .map(String::toUpperCase)
+                .anyMatch(role -> role.equals("ADMIN") || role.equals("CAREWORKER"));
+
+        if (isAdminOrCareworker) {
+            return true;
+        }
+
+        boolean isGuardian = jwtUser.getRoles().stream()
+                .map(String::toUpperCase)
+                .anyMatch(role -> role.equals("GUARDIAN"));
+
+        if (isGuardian && journalDAO.guardianHasAccessToJournal(jwtUser.getUsername(), journalId)) {
+            return true;
+        }
+
+        ctx.status(403).json("{\"msg\":\"Forbidden\"}");
+        return false;
+    }
+
+    @Override
     public void read(Context ctx) {
         try {
-
+            Long journalId = Long.parseLong(ctx.pathParam("journalId"));
             Long entryId = Long.parseLong(ctx.pathParam("entryId"));
-            JournalEntry entry = journalEntryDAO.read(entryId);
 
+            if (!canAccessJournal(ctx, journalId)) {
+                return;
+            }
+
+            JournalEntry entry = journalEntryDAO.read(entryId);
             if (entry == null) {
                 throw new IllegalArgumentException("Journal entry with ID " + entryId + " not found");
+            }
+
+            if (entry.getJournal() == null || !entry.getJournal().getId().equals(journalId)) {
+                ctx.status(404).json("{\"msg\":\"Journal entry not found in this journal\"}");
+                return;
             }
 
             JournalEntryDetailedResponseDTO dto = new JournalEntryDetailedResponseDTO(
@@ -43,14 +98,16 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                     entry.getCreatedAt(),
                     entry.getUpdatedAt(),
                     entry.getEditCloseTime(),
-                    entry.getJournalEntryAnswers().stream().map(JournalEntryAnswerResponseDTO::new).toArray(JournalEntryAnswerResponseDTO[]::new)
+                    entry.getJournalEntryAnswers().stream()
+                            .map(JournalEntryAnswerResponseDTO::new)
+                            .toArray(JournalEntryAnswerResponseDTO[]::new)
             );
 
             ctx.json(dto);
         } catch (IllegalArgumentException e) {
             ctx.status(400).result(e.getMessage());
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             ctx.status(500).result("Internal server error");
         }
     }
@@ -59,35 +116,43 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
     public void readAll(Context ctx) {
     }
 
-    // Finding all entries by a journal ID
     public void findAllEntriesByJournal(Context ctx) {
         try {
             Long journalId = Long.parseLong(ctx.pathParam("journalId"));
+
+            if (!canAccessJournal(ctx, journalId)) {
+                return;
+            }
+
             List<Long> ids = journalEntryDAO.getEntryIdsByJournalId(journalId);
             ctx.json(ids);
         } catch (IllegalArgumentException e) {
             ctx.status(400).result(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to find journal entry ids", e);
             ctx.status(500).result("Internal server error");
         }
     }
 
-    // Create a new journal entry (logic moved from service)
     public void create(Context ctx) {
         try {
             Long journalId = Long.parseLong(ctx.pathParam("journalId"));
             CreateJournalEntryRequestDTO requestDTO = ctx.bodyAsClass(CreateJournalEntryRequestDTO.class);
             requestDTO.setJournalId(journalId);
 
-            //Hentning af User er taget fra EventController
             var tokenUser = ctx.attribute("user");
             String email = null;
-            if (tokenUser instanceof JwtUserDTO ju) email = ju.getUsername();
-            else if (tokenUser instanceof com.carebridge.dtos.UserDTO du) email = du.getEmail();
-            else if (tokenUser != null) email = tokenUser.toString();
+            if (tokenUser instanceof JwtUserDTO ju) {
+                email = ju.getUsername();
+            } else if (tokenUser instanceof com.carebridge.dtos.UserDTO du) {
+                email = du.getEmail();
+            } else if (tokenUser != null) {
+                email = tokenUser.toString();
+            }
 
-            if (email == null) throw new ApiRuntimeException(401, "Could not find user from token");
+            if (email == null) {
+                throw new ApiRuntimeException(401, "Could not find user from token");
+            }
 
             User author = userDAO.readByEmail(email);
             if (author == null) {
@@ -95,7 +160,6 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                 return;
             }
 
-            // --- 1. Fetch Journal and Author ---
             Journal journal = journalDAO.read(requestDTO.getJournalId());
             if (journal == null) {
                 throw new IllegalArgumentException("Journal not found with ID: " + requestDTO.getJournalId());
@@ -106,7 +170,6 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                 throw new IllegalArgumentException("Template not found with ID: " + requestDTO.getTemplateId());
             }
 
-            // --- 2. Validate Required Input ---
             if (requestDTO.getTitle() == null || requestDTO.getTitle().isBlank()) {
                 throw new IllegalArgumentException("Title is required.");
             }
@@ -116,22 +179,21 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
             if (requestDTO.getRiskAssessment() == null) {
                 throw new IllegalArgumentException("Risk assessment is required.");
             }
-            List<Long> fieldids = template.getFields().stream().map(Field::getId).toList();
+
+            List<Long> fieldIds = template.getFields().stream().map(Field::getId).toList();
             for (CreateJournalEntryAnswerRequestDTO answers : requestDTO.getAnswers()) {
                 boolean isMatch = false;
-                for (Long id : fieldids){
+                for (Long id : fieldIds) {
                     if (id.equals(answers.getFieldId())) {
                         isMatch = true;
                         break;
                     }
                 }
-                if ( ! isMatch){
+                if (!isMatch) {
                     throw new IllegalArgumentException("Fieldid " + answers.getFieldId() + " is invalid");
                 }
-                //maybe check if data is good too? not sure about how. maybe some util class to do that
             }
 
-            // --- 3. Build entity ---
             JournalEntry entry = new JournalEntry(
                     journal,
                     author,
@@ -141,23 +203,23 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                     template
             );
 
-            List<JournalEntryAnswer> journalEntryAnswers =
-                    Arrays.stream(requestDTO.getAnswers()).
-                            map(answer -> {
-                                Field field = template.getFields().stream().filter(f -> f.getId().equals(answer.getFieldId())).findAny().get(); //was validified earlier to exist //also filtering everything to then get what is remaining is suboptimal
-                                return JournalEntryAnswer.builder().
-                                        journalEntry(entry).
-                                        answer(answer.getAnswer()).
-                                        field(field)
-                                        .build();
-                            }).
-                            toList();
+            List<JournalEntryAnswer> journalEntryAnswers = Arrays.stream(requestDTO.getAnswers())
+                    .map(answer -> {
+                        Field field = template.getFields().stream()
+                                .filter(f -> f.getId().equals(answer.getFieldId()))
+                                .findAny()
+                                .orElseThrow();
+                        return JournalEntryAnswer.builder()
+                                .journalEntry(entry)
+                                .answer(answer.getAnswer())
+                                .field(field)
+                                .build();
+                    })
+                    .toList();
             entry.setJournalEntryAnswers(journalEntryAnswers);
 
-            // --- 4. Persist ---
             journalEntryDAO.create(entry);
 
-            // --- 5. Build response DTO ---
             JournalEntryDetailedResponseDTO responseDTO = new JournalEntryDetailedResponseDTO(
                     entry.getId(),
                     journal.getId(),
@@ -168,30 +230,28 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                     entry.getCreatedAt(),
                     entry.getUpdatedAt(),
                     entry.getEditCloseTime(),
-                    entry.getJournalEntryAnswers().stream().map(JournalEntryAnswerResponseDTO::new).toArray(JournalEntryAnswerResponseDTO[]::new)
+                    entry.getJournalEntryAnswers().stream()
+                            .map(JournalEntryAnswerResponseDTO::new)
+                            .toArray(JournalEntryAnswerResponseDTO[]::new)
             );
 
             ctx.status(201).json(responseDTO);
 
-            // Add entry to journal (only if creation succeeded) //what??? //todo: add to db first instead of this
             if (ctx.status().getCode() == 201) {
                 journalDAO.addEntryToJournal(journal, entry);
             }
-
         } catch (IllegalArgumentException e) {
             ctx.status(400).result(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to create journal entry", e);
             ctx.status(500).result("Internal server error");
         }
     }
 
-    // Edit entry content (logic moved from service)
     public void update(Context ctx) {
         try {
             Long journalId = Long.parseLong(ctx.pathParam("journalId"));
             Long entryId = Long.parseLong(ctx.pathParam("entryId"));
-
             EditJournalEntryRequestDTO requestDTO = ctx.bodyAsClass(EditJournalEntryRequestDTO.class);
 
             Journal journal = journalDAO.read(journalId);
@@ -219,9 +279,7 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
 
             if (requestDTO.getRiskAssessment() != null) {
                 try {
-                    entry.setRiskAssessment(
-                            RiskAssessment.valueOf(requestDTO.getRiskAssessment().toUpperCase())
-                    );
+                    entry.setRiskAssessment(RiskAssessment.valueOf(requestDTO.getRiskAssessment().toUpperCase()));
                 } catch (IllegalArgumentException e) {
                     throw new IllegalArgumentException("Invalid riskAssessment: " + requestDTO.getRiskAssessment());
                 }
@@ -229,24 +287,17 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
 
             if (requestDTO.getEntryType() != null) {
                 try {
-                    entry.setEntryType(
-                            EntryType.valueOf(requestDTO.getEntryType().toUpperCase())
-                    );
+                    entry.setEntryType(EntryType.valueOf(requestDTO.getEntryType().toUpperCase()));
                 } catch (IllegalArgumentException e) {
                     throw new IllegalArgumentException("Invalid entryType: " + requestDTO.getEntryType());
                 }
             }
 
-            // --- Update answers ---
             if (requestDTO.getAnswers() != null) {
-
                 var existingAnswers = entry.getJournalEntryAnswers().stream()
-                        .collect(java.util.stream.Collectors.toMap(
-                                a -> a.getField().getId(),
-                                a -> a
-                        ));
-                for (CreateJournalEntryAnswerRequestDTO incoming : requestDTO.getAnswers()) {
+                        .collect(Collectors.toMap(a -> a.getField().getId(), a -> a));
 
+                for (CreateJournalEntryAnswerRequestDTO incoming : requestDTO.getAnswers()) {
                     JournalEntryAnswer existing = existingAnswers.get(incoming.getFieldId());
 
                     if (existing == null) {
@@ -256,12 +307,10 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                     existing.setAnswer(incoming.getAnswer());
                 }
             }
-            entry.setUpdatedAt(now);
 
-            // Persist entry
+            entry.setUpdatedAt(now);
             journalEntryDAO.update(entryId, entry);
 
-            //Journal response
             JournalEntryDetailedResponseDTO responseDTO = new JournalEntryDetailedResponseDTO(
                     entry.getId(),
                     journal.getId(),
@@ -278,18 +327,16 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
             );
 
             ctx.status(200).json(responseDTO);
-
         } catch (IllegalArgumentException e) {
             ctx.status(400).result(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to update journal entry", e);
             ctx.status(500).result("Internal server error");
         }
     }
 
     @Override
     public void delete(Context ctx) {
-
     }
 
     @Override
@@ -302,5 +349,34 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
         return null;
     }
 
+    public void findAllEntriesByJournalToDTO(Context ctx) {
+        try {
+            Long journalId = Long.parseLong(ctx.pathParam("journalId"));
 
+            if (!canAccessJournal(ctx, journalId)) {
+                return;
+            }
+
+            List<JournalEntry> entries = journalEntryDAO.getEntriesByJournalId(journalId);
+            List<JournalEntryResponseDTO> dtos = entries.stream()
+                    .map(entry -> new JournalEntryResponseDTO(
+                            entry.getId(),
+                            entry.getJournal().getId(),
+                            entry.getAuthor().getId(),
+                            entry.getTitle(),
+                            entry.getEntryType(),
+                            entry.getRiskAssessment(),
+                            entry.getCreatedAt(),
+                            entry.getUpdatedAt(),
+                            entry.getEditCloseTime()
+                    ))
+                    .toList();
+            ctx.json(dtos);
+        } catch (IllegalArgumentException e) {
+            ctx.status(400).result(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Failed to fetch journal entries", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
 }

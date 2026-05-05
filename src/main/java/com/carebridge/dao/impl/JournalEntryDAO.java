@@ -93,4 +93,21 @@ public class JournalEntryDAO implements IDAO<JournalEntry, Long> {
     public void delete(Long id) {
 
     }
+
+    public List<JournalEntry> getEntriesByJournalId(Long journalId)
+    {
+        try (EntityManager em = emf.createEntityManager())
+        {
+            return em.createQuery(
+                            "SELECT je FROM JournalEntry je WHERE je.journal.id = :journalId",
+                            JournalEntry.class)
+                    .setParameter("journalId", journalId)
+                    .getResultList();
+        }
+        catch (Exception e)
+        {
+            logger.error("Error querying entries by journalId", e);
+            throw new RuntimeException("Error querying entries by journalId. ", e);
+        }
+    }
 }
