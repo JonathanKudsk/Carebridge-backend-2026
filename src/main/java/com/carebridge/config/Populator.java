@@ -88,7 +88,6 @@ public class Populator {
             linkedEntry.setAuthor(alice);
             linkedEntry.setJournal(linkedJournal);
             linkedEntry.setTitle("Linked resident note");
-            linkedEntry.setContent("Guardian should be allowed to see this note.");
             linkedEntry.setEntryType(EntryType.NOTE);
             linkedEntry.setRiskAssessment(RiskAssessment.LOW);
             linkedEntry.setCreatedAt(LocalDateTime.now());
@@ -112,7 +111,6 @@ public class Populator {
             unlinkedEntry.setAuthor(alice);
             unlinkedEntry.setJournal(unlinkedJournal);
             unlinkedEntry.setTitle("Unlinked resident note");
-            unlinkedEntry.setContent("Guardian should NOT be allowed to see this note.");
             unlinkedEntry.setEntryType(EntryType.NOTE);
             unlinkedEntry.setRiskAssessment(RiskAssessment.LOW);
             unlinkedEntry.setCreatedAt(LocalDateTime.now());
