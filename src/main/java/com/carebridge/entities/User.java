@@ -10,8 +10,10 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(
@@ -79,6 +81,9 @@ public class User implements ISecurityUser {
     // Hvis brugeren er en RESIDENT - link til deres Resident profil
     /*@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Resident residentProfile;*/
+
+    @ManyToMany(mappedBy = "usersWithAccess")
+    private Set<Event> accessibleEvents = new HashSet<>();
 
     // Hvis brugeren er en GUARDIAN - deres tilknyttede beboere
     @ManyToMany
@@ -272,6 +277,14 @@ public class User implements ISecurityUser {
     public void setResidentProfile(Resident residentProfile) {
         this.residentProfile = residentProfile;
     }*/
+
+    public Set<Event> getAccessibleEvents() {
+        return accessibleEvents;
+    }
+
+    public void setAccessibleEvents(Set<Event> events) {
+        this.accessibleEvents = events;
+    }
 
     public List<Resident> getResidents() {
         return residents;
