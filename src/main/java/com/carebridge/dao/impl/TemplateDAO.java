@@ -60,8 +60,8 @@ public class TemplateDAO implements IDAO<Template,Long> {
             em.getTransaction().commit();
             return template;
         } catch (Exception e) {
-            logger.error("Error persisting Template to db", e);
-            throw new RuntimeException("Error persisting Template to db. ", e);
+            logger.error("Error creating Template", e);
+            throw new ApiRuntimeException(500, "Error creating Template: " + e.getMessage());
         }
     }
 

@@ -334,7 +334,7 @@ GET {{url}}/templates
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
-### 21) get specific template (admin)impl
+### 21) get specific template (admin)
 GET {{url}}/templates/1
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
@@ -359,6 +359,30 @@ Content-Type: application/json
     {
       "title": "test",
       "fieldType": "CHECKBOX"
+    }
+  ]
+}
+
+
+### 23) Create template (ADMIN) NEED TO ATTACH A JOURNAL ENTRY LATER
+POST {{url}}/templates
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "title": "HTTP Test Template",
+  "fields": [
+    {
+      "title": "true",
+      "fieldType": "CHECKBOX"
+    },
+    {
+      "title": "96767",
+      "fieldType": "NUMBERFIELD"
+    },
+    {
+      "title": "Hello",
+      "fieldType": "TEXTFIELD"
     }
   ]
 }
