@@ -43,9 +43,9 @@ public class HibernateConfig {
 
     private static void getAnnotationConfiguration(Configuration configuration) {
         configuration.addAnnotatedClass(User.class);
-        configuration.addAnnotatedClass(Role.class);
         configuration.addAnnotatedClass(Event.class);
         configuration.addAnnotatedClass(EventType.class);
+        configuration.addAnnotatedClass(Shift.class);
         configuration.addAnnotatedClass(JournalEntry.class);
         configuration.addAnnotatedClass(Journal.class);
         configuration.addAnnotatedClass(Resident.class);
@@ -56,6 +56,7 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(ChatRoom.class);
         configuration.addAnnotatedClass(ChatRoomUser.class);
         configuration.addAnnotatedClass(Message.class);
+        configuration.addAnnotatedClass(ShiftAssignment.class);
     }
 
     private static EntityManagerFactory createEMF(boolean forTest) {

@@ -19,6 +19,7 @@ public class Routes {
     private final ChatRoomRoutes chatRoomRoute = new ChatRoomRoutes();
     private final ChatRoomUserRoute chatRoomUserRoute = new ChatRoomUserRoute();
     private final MessageRoute messageRoute = new MessageRoute();
+    private final ShiftRoute shiftRoute = new ShiftRoute();
 
     public EndpointGroup getRoutes() {
         return () -> {
@@ -33,6 +34,7 @@ public class Routes {
             path("/chatrooms", chatRoomRoute.getRoutes());
             path("/chatroom-users", chatRoomUserRoute.getRoutes());
             path("/messages", messageRoute.getRoutes());
+            path("/shifts", shiftRoute.getRoutes());
 
             get("/populate", controller::populate, Role.ANYONE);
             post("/populate", controller::populate, Role.ANYONE);
