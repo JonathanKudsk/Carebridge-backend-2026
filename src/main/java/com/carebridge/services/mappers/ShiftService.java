@@ -10,9 +10,15 @@ import java.util.List;
 public class ShiftService {
 
     private static ShiftService instance;
-    private final ShiftDAO shiftDAO = ShiftDAO.getInstance();
+    private ShiftDAO shiftDAO;
 
-    private ShiftService() {}
+    private ShiftService() {
+        this.shiftDAO = ShiftDAO.getInstance();
+    }
+
+    public ShiftService(ShiftDAO shiftDAO) {
+        this.shiftDAO = shiftDAO;
+    }
 
     public static synchronized ShiftService getInstance() {
         if (instance == null) instance = new ShiftService();
