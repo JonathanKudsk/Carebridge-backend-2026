@@ -114,6 +114,9 @@ public class UserDAO implements IDAO<User, Long> {
                 existing.setEmail(updated.getEmail());
             if (updated.getRole() != null)
                 existing.setRole(updated.getRole());
+            if (updated.isEmployed() != existing.isEmployed()) {
+                existing.setIsEmployed(updated.isEmployed());
+            }
 
             em.getTransaction().commit();
             logger.info("User updated: id={}", id);
@@ -133,6 +136,10 @@ public class UserDAO implements IDAO<User, Long> {
             User u = em.find(User.class, id);
             if (u == null)
                 throw new ApiRuntimeException(404, "User not found");
+
+            // Deactivate chat rooms before deleting user making chat read only for the user
+            ChatRoomDAO.getInstance().deactivateChatRoomsForUser(id);
+
             em.remove(u);
             em.getTransaction().commit();
             logger.info("User deleted: id={}", id);

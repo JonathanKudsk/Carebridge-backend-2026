@@ -229,6 +229,18 @@ public class User implements ISecurityUser {
         this.internalPhone = internalPhone;
     }
 
+    // ========== BOOLEAN FOR IS EMPLOYED (for read-only chat) ==========
+
+    private boolean isEmployed = true;
+
+    public boolean isEmployed() {
+        return isEmployed;
+    }
+
+    public void setIsEmployed(boolean isEmployed)  {
+        this.isEmployed = isEmployed;
+    }
+
     // ========== NYE GETTERS & SETTERS FOR RELATIONER ==========
 
     /*public Resident getResidentProfile() {

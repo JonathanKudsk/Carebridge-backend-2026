@@ -2,6 +2,7 @@ package com.carebridge.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Setter;
 
 import java.sql.Timestamp;
@@ -24,10 +25,18 @@ public class Message {
     @Column(nullable = false, updatable = false)
     private Timestamp timestamp;
 
-    @Setter
+
     @NotNull
+    @Size(min = 1, max = 2000) // helps Hibernate validator with string when persist
     @Column(nullable = false)
     private String message;
+    // Manuel setter method for boundaries in msg string
+    public void setMessage(String message) {
+        if(message == null || message.trim().isEmpty() || message.length() > 2000) {
+            throw new IllegalArgumentException("Message must be between 1 and 2000 characters");
+        }
+        this.message = message;
+    }
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

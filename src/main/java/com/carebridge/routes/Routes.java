@@ -14,7 +14,7 @@ public class Routes {
     private final UserController controller = new UserController();
     private final JournalEntryRoutes journalEntryRoute = new JournalEntryRoutes();
     private final ResidentRoute residentRoute = new ResidentRoute();
-    private final ChatRoomRoute chatRoomRoute = new ChatRoomRoute();
+    private final ChatRoomRoutes chatRoomRoute = new ChatRoomRoutes();
     private final ChatRoomUserRoute chatRoomUserRoute = new ChatRoomUserRoute();
     private final MessageRoute messageRoute = new MessageRoute();
 
