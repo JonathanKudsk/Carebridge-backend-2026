@@ -9,11 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EditJournalEntryRequestDTO
-{
+public class CreateFieldDTO {
     private String title;
-    private String riskAssessment;
-    private String entryType;
-    private CreateJournalEntryAnswerRequestDTO[] answers;
-
+    private String fieldType; // TEXTFIELD, CHECKBOX, NUMBERFIELD
 }

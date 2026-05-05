@@ -204,14 +204,28 @@ Content-Type: application/json
 ### 14) Create journal entry with no files
 ### Note: authorUserId should correspond to an existing user in your test DB (hardcoded in controller)
 POST {{url}}/journals/1/journal-entries
-Authorization: Bearer {{user_jwt}}
+Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
 {
   "title": "Observation of morning routine",
-  "content": "Resident was calm and cooperative. Had breakfast at 8:30.",
   "riskAssessment": "LOW",
-  "entryType": "DAILY"
+  "entryType": "DAILY",
+  "templateId": 1,
+  "answers": [
+    {
+      "answer": "test",
+      "fieldId": 1
+    },
+    {
+      "answer": "true",
+      "fieldId": 2
+    },
+    {
+      "answer": "1234",
+      "fieldId": 3
+    }
+  ]
 }
 
 > {%
@@ -221,11 +235,28 @@ Content-Type: application/json
 %}
 
 ### 15) Edit a journal entry - where window is closed
-PUT {{url}}/journals/1/journal-entries/8
+PUT {{url}}/journals/2/journal-entries/1
+Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
 {
-  "content": "Updated observation: resident was alert and cooperative after breakfast. No incidents observed."
+  "title": "Updated observation",
+  "riskAssessment": "HIGH",
+  "entryType": "DAILY",
+  "answers": [
+    {
+      "fieldId": 1,
+      "answer": "updated text"
+    },
+    {
+      "fieldId": 2,
+      "answer": "false"
+    },
+    {
+      "fieldId": 3,
+      "answer": "9999"
+    }
+  ]
 }
 
 > {%
@@ -236,10 +267,27 @@ Content-Type: application/json
 
 ### 16) Edit a journal entry - where window is NOT closed
 PUT {{url}}/journals/1/journal-entries/1
+Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
 {
-  "content": "Updated observation: resident was alert and cooperative after breakfast. No incidents observed."
+  "title": "Updated observation",
+  "riskAssessment": "HIGH",
+  "entryType": "DAILY",
+  "answers": [
+    {
+      "fieldId": 1,
+      "answer": "updated text"
+    },
+    {
+      "fieldId": 2,
+      "answer": "false"
+    },
+    {
+      "fieldId": 3,
+      "answer": "9999"
+    }
+  ]
 }
 
 > {%
@@ -250,6 +298,8 @@ Content-Type: application/json
 
 ### 17) Get all journalEntry IDs for journal 1
 GET {{url}}/journals/1/journal-entries
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
 
 > {%
     client.test("List journal entries (journal 1)", function () {
@@ -259,6 +309,8 @@ GET {{url}}/journals/1/journal-entries
 
 ### 18) Get specific journal entry by ID
 GET {{url}}/journals/1/journal-entries/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
 
 > {%
     client.test("Get journal entry 8", function () {
@@ -277,6 +329,7 @@ Content-Type: application/json
   "cprNr": "010190-1234"
 }
 
+<<<<<<< HEAD
 ### ---- DOSAGE API (ADMIN only) ----
 
 ### 20) Create dosage for resident 1
@@ -308,10 +361,30 @@ Authorization: Bearer {{jwt_token}}
 
 ### 21) Add medication to chart
 POST {{url}}/medication-charts/{{chart_id}}/medications
+=======
+### 20) get all templates (admin)
+GET {{url}}/templates
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### 21) get specific template (admin)
+GET {{url}}/templates/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### 22) Delete specific template (admin)
+DELETE {{url}}/templates/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### 23) create template (admin)
+POST {{url}}/templates
+>>>>>>> TEAM-3
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
 {
+<<<<<<< HEAD
   "name": "Paracetamol",
   "dosage": "500 mg",
   "frequency": "Twice a day",
@@ -332,10 +405,29 @@ Content-Type: application/json
 
 ### 22) Add a second medication (to test list)
 POST {{url}}/medication-charts/{{chart_id}}/medications
+=======
+  "title": "test",
+  "fields": [
+    {
+      "title": "test",
+      "fieldType": "TEXTFIELD"
+    },
+    {
+      "title": "test",
+      "fieldType": "CHECKBOX"
+    }
+  ]
+}
+
+
+### 23) Create template (ADMIN) NEED TO ATTACH A JOURNAL ENTRY LATER
+POST {{url}}/templates
+>>>>>>> TEAM-3
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
 {
+<<<<<<< HEAD
   "name": "Ibuprofen",
   "dosage": "400 mg",
   "frequency": "Once a day",
@@ -501,3 +593,21 @@ Authorization: Bearer {{jwt_token}}
         client.assert(response.body.medications.length === 1, "Expected 1 medication, got " + response.body.medications.length);
     });
 %}
+=======
+  "title": "HTTP Test Template",
+  "fields": [
+    {
+      "title": "true",
+      "fieldType": "CHECKBOX"
+    },
+    {
+      "title": "96767",
+      "fieldType": "NUMBERFIELD"
+    },
+    {
+      "title": "Hello",
+      "fieldType": "TEXTFIELD"
+    }
+  ]
+}
+>>>>>>> TEAM-3

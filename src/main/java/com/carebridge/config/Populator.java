@@ -1,7 +1,6 @@
 package com.carebridge.config;
 
 import com.carebridge.entities.EventType;
-import com.carebridge.entities.Journal;
 import com.carebridge.entities.User;
 import com.carebridge.entities.enums.Role;
 import jakarta.persistence.EntityManager;
@@ -44,11 +43,12 @@ public class Populator {
                 alice.setEmail("alice@carebridge.io");
                 alice.setPassword("password123");
                 alice.setRole(Role.CAREWORKER);
-                alice.setDisplayName("Alice User");
+                alice.setDisplayName("Alice");
                 alice.setDisplayEmail("alice@carebridge.io");
-                alice.setDisplayPhone("222-2222-2222");
+                alice.setDisplayPhone("111-1111-1111");
                 alice.setInternalEmail("alice.internal@carebridge.io");
-                alice.setInternalPhone("333-3333-3333");
+                alice.setInternalPhone("222-2222-2222");
+
                 em.persist(alice);
             }
 
@@ -69,7 +69,7 @@ public class Populator {
             }
 
             tx.commit();
-            logger.info("Database populated successfully (users + event types + journal).");
+            logger.info("Database populated successfully.");
         } catch (RuntimeException ex) {
             if (tx.isActive()) tx.rollback();
             logger.error("Population failed", ex);
