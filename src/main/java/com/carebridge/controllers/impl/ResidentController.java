@@ -106,7 +106,8 @@ public class ResidentController implements IController<Resident, Long> {
 
     public void getAllSorted(Context ctx) {
         try {
-            List<ResidentResponseDTO> residents = residentService.getAllSorted();
+            User currentUser = getAuthenticatedUser(ctx);
+            List<ResidentResponseDTO> residents = residentService.getAllSorted(currentUser);
             ctx.status(200).json(residents);
         }catch (IllegalArgumentException e){
             ctx.status(400).result(e.getMessage());
@@ -118,4 +119,28 @@ public class ResidentController implements IController<Resident, Long> {
 
     @Override
     public void update(Context ctx) { throw new UnsupportedOperationException(); }
+
+    private User getAuthenticatedUser(Context ctx) {
+        var tokenUser = ctx.attribute("user");
+        String email = null;
+
+        if (tokenUser instanceof com.carebridge.dtos.JwtUserDTO ju) {
+            email = ju.getUsername();
+        } else if (tokenUser instanceof com.carebridge.dtos.UserDTO du) {
+            email = du.getEmail();
+        } else if (tokenUser != null) {
+            email = tokenUser.toString();
+        }
+
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Authenticated user is required");
+        }
+
+        User user = userDAO.readByEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException("Authenticated user not found");
+        }
+
+        return user;
+    }
 }

@@ -120,4 +120,22 @@ public class ResidentDAO implements IDAO<Resident, Long> {
             throw new RuntimeException("Error retrieving residents sorted from db.", e);
         }
     }
+
+    public List<Resident> getAllSortedForGuardian(Long guardianId) {
+        if (guardianId == null) {
+            throw new ApiRuntimeException(400, "Guardian id is required");
+        }
+
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT DISTINCT r FROM User u JOIN u.residents r " +
+                                    "WHERE u.id = :guardianId ORDER BY r.firstName",
+                            Resident.class)
+                    .setParameter("guardianId", guardianId)
+                    .getResultList();
+        } catch (Exception e) {
+            logger.error("Error retrieving residents for guardian {}", guardianId, e);
+            throw new RuntimeException("Error retrieving residents for guardian.", e);
+        }
+    }
 }

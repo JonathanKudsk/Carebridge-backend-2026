@@ -201,8 +201,7 @@ public class UserController implements IController<User, Long> {
             }
 
             // Tilknyt residents til guardian
-            guardian.getResidents().addAll(residentsToLink);
-            userDAO.update(guardianId, guardian);
+            userDAO.linkResidents(guardianId, residentsToLink);
 
             ctx.status(200).json(Map.of("msg", "Beboere tilknyttet", "count", residentsToLink.size()));
 

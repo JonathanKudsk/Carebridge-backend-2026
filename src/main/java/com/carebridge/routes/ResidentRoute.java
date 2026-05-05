@@ -15,7 +15,7 @@ public class ResidentRoute {
         return () -> {
             post("/create", controller::create, Role.ADMIN);
             // Define resident-related routes here
-            get("/sorted", controller::getAllSorted, Role.ADMIN, Role.CAREWORKER);
+            get("/sorted", controller::getAllSorted, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
         };
     }
 }
