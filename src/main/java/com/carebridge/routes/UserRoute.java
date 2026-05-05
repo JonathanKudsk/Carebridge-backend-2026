@@ -22,6 +22,7 @@ public class UserRoute {
             put("/{id}", controller::update, Role.ADMIN);
             delete("/{id}", controller::delete, Role.ADMIN);
             post("/{id}/link-residents", controller::linkResidents, Role.ADMIN);
+            get("/by-email/{email}",controller::readByEmail, Role.ADMIN);
         };
     }
 }
