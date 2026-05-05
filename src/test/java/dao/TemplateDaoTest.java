@@ -7,7 +7,6 @@ import com.carebridge.entities.Template;
 import com.carebridge.enums.FieldType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.NoResultException;
 import org.junit.jupiter.api.*;
 import populator.TemplatePopulator;
 
@@ -15,7 +14,9 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Tag("IntegrationTest")
@@ -29,7 +30,6 @@ class TemplateDaoTest {
         HibernateConfig.setTest(true);
         emf = HibernateConfig.getEntityManagerFactory();
         dao = TemplateDAO.getInstance();
-        TemplatePopulator.setEMF(emf);
     }
 
     @BeforeEach
@@ -61,6 +61,7 @@ class TemplateDaoTest {
         //get objects with the same id
         Template expected = TemplatePopulator.fetch().get(1);
         Template actual = dao.read(1L);
+        System.out.println(expected.getFields().equals(actual.getFields()));
         assertEquals(expected, actual);
     }
 

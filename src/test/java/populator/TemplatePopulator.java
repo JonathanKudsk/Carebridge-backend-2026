@@ -11,18 +11,12 @@ import java.util.List;
 
 public class TemplatePopulator {
 
-    private static EntityManagerFactory EMF;
-    private static TemplateDAO templateDAO;
-
     // store created test data
     private static final List<Template> data = new ArrayList<>();
 
-    public static void setEMF(EntityManagerFactory emf) {
-        EMF = emf;
-        templateDAO = TemplateDAO.getInstance();
-    }
-
     public static void populate() {
+
+        TemplateDAO templateDAO = TemplateDAO.getInstance();
 
         data.clear(); // avoid duplicates between tests
 
@@ -30,17 +24,20 @@ public class TemplatePopulator {
         Template t1 = new Template();
         t1.setTitle("Template One");
 
-        Field f1 = new Field();
-        f1.setTitle("Name");
-        f1.setFieldType(FieldType.TEXTFIELD);
-        f1.setTemplate(t1);
+        t1.addField(
+                Field.builder().
+                        title("Name").
+                        fieldType(FieldType.TEXTFIELD)
+                        .build()
+        );
 
-        Field f2 = new Field();
-        f2.setTitle("Age");
-        f2.setFieldType(FieldType.NUMBERFIELD);
-        f2.setTemplate(t1);
+        t1.addField(
+            Field.builder().
+                    title("Age").
+                    fieldType(FieldType.NUMBERFIELD)
+                    .build()
+        );
 
-        t1.setFields(List.of(f1, f2));
 
         // template 2
         Template t2 = new Template();

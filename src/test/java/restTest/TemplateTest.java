@@ -1,5 +1,11 @@
 package restTest;
 
+import com.carebridge.config.Populator;
+import com.carebridge.dtos.TemplateDetailedResponseDTO;
+import com.carebridge.dtos.TemplateResponseDTO;
+import com.carebridge.entities.Field;
+import com.carebridge.entities.Template;
+import com.carebridge.enums.FieldType;
 import populator.TemplatePopulator;
 import com.carebridge.config.ApplicationConfig;
 import com.carebridge.config.HibernateConfig;
@@ -11,26 +17,48 @@ import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
 import populator.TemplatePopulator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Tag("IntegrationTest")
 class TemplateTest {
     private static Javalin app;
     static private EntityManagerFactory emf;
+    private static String authToken;
+    private static String adminAuthToken;
 
     @BeforeAll
     static void setupOnce() {
-        emf = HibernateConfig.getEntityManagerFactoryForTest();
-        TemplatePopulator.setEMF(emf);
-        //ExampleController.setEmf(emf);
 
+        HibernateConfig.setTest(true);
+        emf = HibernateConfig.getEntityManagerFactory();
         app = ApplicationConfig.startServer(7007);
-        RestAssured.baseURI = "http://localhost:7007/api/templates";
+        Populator.populate(emf);
+
+        RestAssured.baseURI = "http://localhost:7007/api";
+
+        authToken = given()
+                .contentType(io.javalin.http.ContentType.JSON)
+                .body("{\"email\":\"alice@carebridge.io\", \"password\":\"password123\"}")
+                .post("/auth/login")
+                .then()
+                .statusCode(200)
+                .extract().path("token");
+
+        adminAuthToken = given()
+                .contentType(io.javalin.http.ContentType.JSON)
+                .body("{\"email\":\"admin@carebridge.io\", \"password\":\"admin123\"}")
+                .post("/auth/login")
+                .then()
+                .statusCode(200)
+                .extract().path("token");
     }
 
     @BeforeEach
@@ -45,7 +73,7 @@ class TemplateTest {
 
         em.getTransaction().begin();
         //delete everything, replace star with tables
-        em.createNativeQuery("TRUNCATE TABLE * RESTART IDENTITY CASCADE")
+        em.createNativeQuery("TRUNCATE TABLE templates, fields RESTART IDENTITY CASCADE")
                 .executeUpdate();
         em.getTransaction().commit();
 
@@ -61,121 +89,104 @@ class TemplateTest {
 
     @Test
     void read() {
-        Object expected = new Object();
+        TemplateDetailedResponseDTO expected = new TemplateDetailedResponseDTO(TemplatePopulator.fetch().get(0));
 
-        Object actual = given().
+        TemplateDetailedResponseDTO actual = given().
                 when()
-                .get("/1")
+                .get("/templates/1")
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .extract().body().jsonPath().getObject("$", Object.class);
+                .extract().body().jsonPath().getObject("$", TemplateDetailedResponseDTO.class);
 
-        assertThat(actual, equalTo(expected));
+        assertEquals(actual, expected);
     }
 
     @Test
     void readAll() {
-        Object[] expected = new Object[]{};
+        List<TemplateResponseDTO> expected = TemplatePopulator.fetch().stream().map(TemplateResponseDTO::new).toList();
 
-        List<Object> actual = given().
+        List<TemplateResponseDTO> actual = given().
                 when()
-                .get("/")
+                .get("/templates/")
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .extract().body().jsonPath().getList("$", Object.class);
+                .extract().body().jsonPath().getList("$", TemplateResponseDTO.class);
 
-        assertThat(actual, containsInAnyOrder(expected));
+        assertEquals(actual.size(), expected.size());
+        assertTrue(actual.containsAll(expected));
     }
 
     @Test
-    void create() {
+    void create() { //idk why it doesn't work //todo: fix
+        Template test = Template
+                .builder()
+                .title("test")
+                .build();
+        test.addField(Field.builder().fieldType(FieldType.TEXTFIELD).title("test").build());
+        test.addField(Field.builder().fieldType(FieldType.CHECKBOX).title("test").build());
 
-        Object expected = new Object();
+        TemplateDetailedResponseDTO expected = new TemplateDetailedResponseDTO(test);
 
         String body =
-                "json structured after input DTO";
+                "{\n" +
+                        "  \"title\": \"test\",\n" +
+                        "  \"fields\": [\n" +
+                        "    {\n" +
+                        "      \"title\": \"test\",\n" +
+                        "      \"fieldType\": \"TEXTFIELD\"\n" +
+                        "    },\n" +
+                        "    {\n" +
+                        "      \"title\": \"test\",\n" +
+                        "      \"fieldType\": \"CHECKBOX\"\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}";
 
-        Object added = given()
+        TemplateDetailedResponseDTO added = given()
+                .header("Authorization", "Bearer " + adminAuthToken) // Admin role allows Admin token
                 .header("Content-type", "application/json")
                 .and()
                 .body(body)
                 .when()
-                .post("/")
+                .post("/templates/")
                 .then()
                 .statusCode(201)
                 .contentType(ContentType.JSON)
-                .extract().body().jsonPath().getObject("$", Object.class);
+                .extract().body().jsonPath().getObject("$", TemplateDetailedResponseDTO.class);
 
-        assertThat(added,equalTo(expected));
+        assertEquals(added, expected);
 
-        Object actual = given().
+        TemplateDetailedResponseDTO actual = (TemplateDetailedResponseDTO) given().
                 when()
-                .get("/4")
+                .get("/templates/3")
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .extract().body().jsonPath().getObject("$", Object.class);
+                .extract().body().jsonPath().getObject("$", TemplateDetailedResponseDTO.class);
 
-        assertThat(actual, equalTo(expected));
-    }
-
-    @Test
-    void update() {
-        Object expected = new Object();
-
-        String body =
-                "json structured after input DTO";
-
-        Object added = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(body)
-                .when()
-                .put("/1")
-                .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .extract().body().jsonPath().getObject("$", Object.class);
-
-        assertThat(added,equalTo(expected));
-
-        Object actual = given().
-                when()
-                .get("/1")
-                .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .extract().body().jsonPath().getObject("$", Object.class);
-
-        assertThat(actual, equalTo(expected));
+        assertEquals(actual, expected);
     }
 
     @Test
     void delete() {
 
-        Object deleted = new Object();
+        TemplateDetailedResponseDTO deleted = new TemplateDetailedResponseDTO(TemplatePopulator.fetch().get(1));
 
-        given().
-                when()
-                .delete("/1")
+        given()
+                .header("Authorization", "Bearer " + adminAuthToken) // Admin role allows Admin token
+                .when()
+                .delete("/templates/1")
                 .then()
-                .statusCode(204);
+                .statusCode(200);
 
-        Object[] expected = new Object[]{};
-
-        List<Object> actual = given().
-                when()
-                .get("/")
+        given()
+                .header("Authorization", "Bearer " + authToken) // ANYONE role allows USER token
+                .when()
+                .get("/templates/1")
                 .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .extract().body().jsonPath().getList("$", Object.class);
-
-        assertThat(actual, containsInAnyOrder(expected));
-
-        assertThat(actual, everyItem(not((deleted))));
+                .statusCode(404);
     }
 }
 

@@ -14,7 +14,6 @@ import java.util.Objects;
 @Setter
 @Entity
 @Builder
-@EqualsAndHashCode
 
 @Table(name = "templates")
 public class Template {
@@ -44,5 +43,18 @@ public class Template {
         if(f.getTemplate() != this){
             f.setTemplate(this);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Template template = (Template) o;
+        return isUsable == template.isUsable && Objects.equals(fields, template.fields) && Objects.equals(title, template.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fields, title, isUsable);
     }
 }

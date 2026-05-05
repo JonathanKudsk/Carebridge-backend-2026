@@ -1,5 +1,6 @@
 package com.carebridge.routes;
 
+import com.carebridge.config.Populator;
 import com.carebridge.controllers.impl.JournalEntryController;
 import com.carebridge.controllers.impl.TemplateController;
 import com.carebridge.entities.Template;
@@ -15,9 +16,9 @@ public class TemplateRoute {
     public EndpointGroup getRoutes() {
         return () ->
         {
-            get("/", controller::readAll, Role.ADMIN);
+            get("/", controller::readAll, Role.ANYONE);
             post("/", controller::create, Role.ADMIN);
-            get("/{id}", controller::read, Role.ADMIN);
+            get("/{id}", controller::read, Role.ANYONE);
             delete("/{id}", controller::delete, Role.ADMIN);
         };
     }

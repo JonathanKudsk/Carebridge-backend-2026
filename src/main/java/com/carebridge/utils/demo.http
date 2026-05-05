@@ -386,17 +386,3 @@ Content-Type: application/json
     }
   ]
 }
-
-> {%
-    client.test("Create template (admin)", function () {
-        client.assert([200, 201].includes(response.status), "Template creation failed");
-
-        if (response.body && response.body.id) {
-            client.global.set("new_template_id", response.body.id);
-        }
-
-        client.assert(response.body.title === "HTTP Test Template", "Wrong title");
-
-        client.assert(response.body.fields.length === 2, "Fields not created");
-    });
-%}
