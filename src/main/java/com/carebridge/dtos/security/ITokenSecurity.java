@@ -14,5 +14,8 @@ public interface ITokenSecurity {
     int timeToExpire(String token) throws ParseException;
 
     String createToken(JwtUserDTO user, String issuer, String expireMillis, String secret) throws TokenCreationException;
-}
 
+    String createTempToken(String email, String preAuthType, String issuer, String secret) throws TokenCreationException;
+
+    String validateTempToken(String token, String expectedPreAuthType, String secret) throws ParseException;
+}

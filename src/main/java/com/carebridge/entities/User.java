@@ -10,8 +10,10 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(
@@ -48,6 +50,15 @@ public class User implements ISecurityUser {
     @Column(nullable = false)
     private Instant updated_at;
 
+    @Column(name = "totp_secret")
+    private String totpSecret;
+
+    @Column(name = "totp_enabled", nullable = false)
+    private boolean totpEnabled = false;
+
+    @Column(name = "totp_grace_period_end")
+    private Instant totpGracePeriodEnd;
+
     @Size(max = 255)
     private String displayName;
 
@@ -70,6 +81,9 @@ public class User implements ISecurityUser {
     // Hvis brugeren er en RESIDENT - link til deres Resident profil
     /*@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Resident residentProfile;*/
+
+    @ManyToMany(mappedBy = "usersWithAccess")
+    private Set<Event> accessibleEvents = new HashSet<>();
 
     // Hvis brugeren er en GUARDIAN - deres tilknyttede beboere
     @ManyToMany
@@ -221,6 +235,31 @@ public class User implements ISecurityUser {
         this.internalEmail = internalEmail;
     }
 
+    public String getTotpSecret() {
+        return totpSecret;
+    }
+
+    public void setTotpSecret(String totpSecret) {
+        this.totpSecret = totpSecret;
+    }
+
+    public boolean isTotpEnabled() {
+        return totpEnabled;
+    }
+
+    public void setTotpEnabled(boolean totpEnabled) {
+        this.totpEnabled = totpEnabled;
+    }
+
+    public Instant getTotpGracePeriodEnd() {
+        return totpGracePeriodEnd;
+    }
+
+    public void setTotpGracePeriodEnd(Instant totpGracePeriodEnd) {
+        this.totpGracePeriodEnd = totpGracePeriodEnd;
+    }
+
+
     public String getInternalPhone() {
         return internalPhone;
     }
@@ -238,6 +277,14 @@ public class User implements ISecurityUser {
     public void setResidentProfile(Resident residentProfile) {
         this.residentProfile = residentProfile;
     }*/
+
+    public Set<Event> getAccessibleEvents() {
+        return accessibleEvents;
+    }
+
+    public void setAccessibleEvents(Set<Event> events) {
+        this.accessibleEvents = events;
+    }
 
     public List<Resident> getResidents() {
         return residents;
