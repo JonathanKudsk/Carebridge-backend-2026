@@ -43,6 +43,7 @@ public class EventTest {
                 .post("/auth/login")
                 .then()
                 .log().ifValidationFails()
+<<<<<<< HEAD
                 .statusCode(200)
                 .extract().path("tempToken");
 
@@ -53,6 +54,8 @@ public class EventTest {
                 .post("/auth/2fa/verify")
                 .then()
                 .log().ifValidationFails()
+=======
+>>>>>>> a68a6f2151ffb6985196ca484373aa86e86c4f12
                 .statusCode(200)
                 .extract().path("token");
 
