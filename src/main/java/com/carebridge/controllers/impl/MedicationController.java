@@ -1,13 +1,19 @@
 package com.carebridge.controllers.impl;
 
 import com.carebridge.controllers.IController;
+import com.carebridge.dao.impl.AuditLogDAO;
 import com.carebridge.dao.impl.MedicationChartDAO;
 import com.carebridge.dao.impl.MedicationDAO;
+import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dtos.CreateMedicationRequestDTO;
+import com.carebridge.dtos.JwtUserDTO;
 import com.carebridge.dtos.MedicationChartResponseDTO;
 import com.carebridge.dtos.MedicationResponseDTO;
+import com.carebridge.dtos.UserDTO;
+import com.carebridge.entities.AuditLog;
 import com.carebridge.entities.Medication;
 import com.carebridge.entities.MedicationChart;
+import com.carebridge.entities.User;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +26,8 @@ public class MedicationController implements IController<Medication, Long> {
     private static final Logger logger = LoggerFactory.getLogger(MedicationController.class);
     private final MedicationChartDAO medicationChartDAO = MedicationChartDAO.getInstance();
     private final MedicationDAO medicationDAO = MedicationDAO.getInstance();
+    private final AuditLogDAO auditLogDAO = AuditLogDAO.getInstance();
+    private final UserDAO userDAO = UserDAO.getInstance();
 
     // GET /medication-charts/{chartId}
     @Override
@@ -111,6 +119,12 @@ public class MedicationController implements IController<Medication, Long> {
             if (req.getActive() != null) existing.setActive(req.getActive());
 
             Medication updated = medicationDAO.update(medicationId, existing);
+
+            Long doctorId = extractDoctorId(ctx);
+            auditLogDAO.create(new AuditLog(doctorId, medicationId, chartId,
+                    "UPDATE_MEDICATION",
+                    "Medication '" + updated.getName() + "' updated on chart " + chartId));
+
             ctx.status(200).json(toResponseDTO(updated));
         } catch (IllegalArgumentException e) {
             ctx.status(400).result(e.getMessage());
@@ -118,6 +132,22 @@ public class MedicationController implements IController<Medication, Long> {
             logger.error("Failed to update medication", e);
             ctx.status(500).result("Internal server error");
         }
+    }
+
+    private Long extractDoctorId(Context ctx) {
+        try {
+            var tokenUser = ctx.attribute("user");
+            String email = null;
+            if (tokenUser instanceof JwtUserDTO ju) email = ju.getUsername();
+            else if (tokenUser instanceof UserDTO du) email = du.getEmail();
+            if (email != null) {
+                User user = userDAO.readByEmail(email);
+                if (user != null) return user.getId();
+            }
+        } catch (Exception e) {
+            logger.warn("Could not extract doctor ID for audit log", e);
+        }
+        return null;
     }
 
     // DELETE /medication-charts/{chartId}/medications/{medicationId}

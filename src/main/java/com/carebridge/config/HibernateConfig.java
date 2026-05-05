@@ -51,6 +51,7 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(Dosage.class);
         configuration.addAnnotatedClass(Medication.class);
         configuration.addAnnotatedClass(MedicationChart.class);
+        configuration.addAnnotatedClass(AuditLog.class);
     }
 
     private static EntityManagerFactory createEMF(boolean forTest) {

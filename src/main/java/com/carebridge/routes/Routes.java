@@ -15,6 +15,7 @@ public class Routes {
     private final ResidentRoute residentRoute = new ResidentRoute();
     private final DosageRoute dosageRoute = new DosageRoute();
     private final MedicationRoute medicationRoute = new MedicationRoute();
+    private final AuditLogRoute auditLogRoute = new AuditLogRoute();
 
     public EndpointGroup getRoutes() {
         return () -> {
@@ -25,6 +26,7 @@ public class Routes {
             path("/journals", journalEntryRoute.getRoutes());
             path("/dosages", dosageRoute.getRoutes());
             path("/medication-charts", medicationRoute.getRoutes());
+            path("/audit-logs", auditLogRoute.getRoutes());
 
             get("/populate", controller::populate, Role.ANYONE);
             post("/populate", controller::populate, Role.ANYONE);
