@@ -10,10 +10,13 @@ public class ResidentRoute {
 
     private final ResidentController controller = new ResidentController();
 
+
     public EndpointGroup getRoutes() {
         return () -> {
+            get("/", controller::readAll, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
             post("/create", controller::create, Role.ADMIN);
             // Define resident-related routes here
+            get("/sorted", controller::getAllSorted, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
         };
     }
 }
