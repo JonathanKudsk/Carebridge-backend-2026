@@ -36,6 +36,7 @@ public class EventDAO implements IDAO<Event, Long> {
         var list = em.createQuery(
                         "SELECT DISTINCT e FROM Event e " +
                                 "LEFT JOIN FETCH e.seenByUsers " +
+                                "LEFT JOIN FETCH e.usersWithAccess " +
                                 "LEFT JOIN FETCH e.createdBy " +
                                 "LEFT JOIN FETCH e.eventType " +
                                 "WHERE e.id = :id",
@@ -62,6 +63,9 @@ public class EventDAO implements IDAO<Event, Long> {
             return em.createQuery(
                     "SELECT DISTINCT e FROM Event e " +
                             "LEFT JOIN FETCH e.seenByUsers " +
+                            "LEFT JOIN FETCH e.usersWithAccess " +
+                            "LEFT JOIN FETCH e.createdBy " +
+                            "LEFT JOIN FETCH e.eventType " +
                             "ORDER BY e.startAt",
                     Event.class
             ).getResultList();
@@ -223,6 +227,9 @@ public class EventDAO implements IDAO<Event, Long> {
             return em.createQuery(
                             "SELECT DISTINCT e FROM Event e " +
                                     "LEFT JOIN FETCH e.seenByUsers " +
+                                    "LEFT JOIN FETCH e.usersWithAccess " +
+                                    "LEFT JOIN FETCH e.createdBy " +
+                                    "LEFT JOIN FETCH e.eventType " +
                                     "WHERE e.startAt >= :from AND e.startAt < :to " +
                                     "ORDER BY e.startAt ASC",
                             Event.class
