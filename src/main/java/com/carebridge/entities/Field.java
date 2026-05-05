@@ -10,9 +10,8 @@ import lombok.*;
 @Data
 @Builder
 @Entity
-@Builder
 
-@Table(name = "field")
+@Table(name = "fields")
 public class Field {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

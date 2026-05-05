@@ -2,13 +2,11 @@ package com.carebridge.entities;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,7 +16,7 @@ import java.util.List;
 @Builder
 @EqualsAndHashCode
 
-@Table(name = "template")
+@Table(name = "templates")
 public class Template {
 
     @Id
@@ -28,10 +26,12 @@ public class Template {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "template", cascade = CascadeType.ALL)
     @JsonManagedReference
+    @Builder.Default
     private List<Field> fields = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "template")
-    private List<JournalEntry> journalEntries;
+    @Builder.Default
+    private List<JournalEntry> journalEntries = new ArrayList<>();
 
     @Column(name="title")
     private String title;
@@ -45,5 +45,4 @@ public class Template {
             f.setTemplate(this);
         }
     }
-
 }

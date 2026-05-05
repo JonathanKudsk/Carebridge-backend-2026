@@ -29,6 +29,7 @@ class TemplateDaoTest {
         HibernateConfig.setTest(true);
         emf = HibernateConfig.getEntityManagerFactory();
         dao = TemplateDAO.getInstance();
+        TemplatePopulator.setEMF(emf);
     }
 
     @BeforeEach
@@ -43,7 +44,7 @@ class TemplateDaoTest {
 
         em.getTransaction().begin();
         //delete everything
-        em.createNativeQuery("TRUNCATE TABLE * RESTART IDENTITY CASCADE")
+        em.createNativeQuery("TRUNCATE TABLE templates, fields RESTART IDENTITY CASCADE")
                 .executeUpdate();
         em.getTransaction().commit();
 
@@ -58,8 +59,8 @@ class TemplateDaoTest {
     @Test
     void read() {
         //get objects with the same id
-        Object expected = TemplatePopulator.fetch().get(1);
-        Object actual = dao.read(1L);
+        Template expected = TemplatePopulator.fetch().get(1);
+        Template actual = dao.read(1L);
         assertEquals(expected, actual);
     }
 
@@ -67,7 +68,7 @@ class TemplateDaoTest {
     void readAll() {
         List<Template> expected = TemplatePopulator.fetch();
         List<Template> actual = dao.readAll();
-        assertThat( actual, containsInAnyOrder(expected.toArray()));
+        assertThat(actual, containsInAnyOrder(expected.toArray()));
     }
 
     @Test
@@ -83,7 +84,7 @@ class TemplateDaoTest {
     @Test
     void update() { //it shall not do anything
         long id = 1;
-        Object Actual = dao.update(id, new Template());
+        Template Actual = dao.update(id, new Template());
         assertNull(Actual);
     }
 
@@ -91,6 +92,6 @@ class TemplateDaoTest {
     void delete() { //sunny day test
         long id = 1;
         dao.delete(id);
-        assertThrows(NoResultException.class, () -> dao.read(id));
+        assertNull(dao.read(id));
     }
 }

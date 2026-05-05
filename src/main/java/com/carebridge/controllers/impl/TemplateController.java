@@ -2,10 +2,7 @@ package com.carebridge.controllers.impl;
 
 import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.TemplateDAO;
-import com.carebridge.dtos.CreateFieldDTO;
-import com.carebridge.dtos.CreateTemplateRequestDTO;
-import com.carebridge.dtos.TemplateDetailedResponseDTO;
-import com.carebridge.dtos.TemplateResponseDTO;
+import com.carebridge.dtos.*;
 import com.carebridge.entities.Field;
 import com.carebridge.entities.Template;
 import com.carebridge.enums.FieldType;
@@ -13,6 +10,8 @@ import com.carebridge.exceptions.ApiRuntimeException;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 import java.util.List;
 
 public class TemplateController implements IController<Template, Long> {
