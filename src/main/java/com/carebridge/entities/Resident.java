@@ -1,13 +1,20 @@
 package com.carebridge.entities;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+@Getter
+@Setter
+
 @Entity
-public class Resident
-{
+public class Resident {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,12 +22,17 @@ public class Resident
     private String firstName;
     private String lastName;
     private String cprNr;
+    private Integer age;
+    private String gender;
 
     @Column(nullable = false)
     private boolean isActive = true;
 
     @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL)
     private Journal journal;
+
+    @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL)
+    private MedicationChart medicationChart;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -30,11 +42,12 @@ public class Resident
     )
     private Set<User> users = new HashSet<>();
 
-    public Resident()
-    {
-    }
-    public Resident(String firstName, String lastName, String cprNr, Journal journal, User guardian)
-    {
+    @OneToMany(mappedBy = "resident", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Dosage> dosages = new ArrayList<>();
+
+    public Resident() {}
+
+    public Resident(String firstName, String lastName, String cprNr, Journal journal, User guardian) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.cprNr = cprNr;
@@ -104,5 +117,21 @@ public class Resident
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public List<Dosage> getDosages() {
+        return dosages;
+    }
+
+    public void setDosages(List<Dosage> dosages) {
+        this.dosages = dosages;
+    }
+
+    public MedicationChart getMedicationChart() {
+        return medicationChart;
+    }
+
+    public void setMedicationChart(MedicationChart medicationChart) {
+        this.medicationChart = medicationChart;
     }
 }

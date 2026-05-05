@@ -26,6 +26,7 @@ import io.javalin.security.RouteRole;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.carebridge.dtos.ChangeRoleRequestDTO;
 
 import java.text.ParseException;
 import java.util.Set;
@@ -191,6 +192,37 @@ public class SecurityController implements ISecurityController {
 
     public @NotNull Handler addRole() {
         return ctx -> ctx.status(501).json("{\"msg\":\"Not implemented in enum-role model\"}");
+    }
+
+    public Handler changeRole() {
+        return ctx -> {
+            ObjectNode out = objectMapper.createObjectNode();
+
+            try {
+                Long userId = Long.parseLong(ctx.pathParam("id"));
+                ChangeRoleRequestDTO dto = ctx.bodyAsClass(ChangeRoleRequestDTO.class);
+
+                if (dto == null || dto.getRole() == null) {
+                    throw new ApiRuntimeException(400, "Role is required");
+                }
+
+                User updatedUser = securityDAO.changeRole(userId, dto.getRole());
+                UserDTO safeUser = UserMapper.toDTO(updatedUser);
+
+                ctx.status(200).json(out
+                        .put("email", safeUser.getEmail())
+                        .put("role", safeUser.getRole().name())
+                );
+
+            } catch (NumberFormatException e) {
+                ctx.status(400).json(out.put("msg", "Invalid user id"));
+            } catch (ApiRuntimeException e) {
+                ctx.status(e.getErrorCode()).json(out.put("msg", e.getMessage()));
+            } catch (Exception e) {
+                logger.error("changeRole failed", e);
+                ctx.status(500).json(out.put("msg", "Internal error"));
+            }
+        };
     }
 
     public void healthCheck(@NotNull Context ctx) {
