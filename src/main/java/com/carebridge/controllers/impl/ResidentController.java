@@ -250,7 +250,8 @@ public class ResidentController implements IController<Resident, Long> {
                 resident.getAge(),
                 resident.getGender(),
                 journalId,
-                medicationChartId
+                medicationChartId,
+                resident.isActive()
         );
     }
 }

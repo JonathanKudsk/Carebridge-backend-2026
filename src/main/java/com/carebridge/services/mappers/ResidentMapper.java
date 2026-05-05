@@ -38,7 +38,8 @@ public class ResidentMapper {
                 resident.getAge(),
                 resident.getGender(),
                 journalId,
-                medicationChartId
+                medicationChartId,
+                resident.isActive()
         );
     }
 

@@ -29,7 +29,8 @@ public class ResidentResponseDTO {
             Integer age,
             String gender,
             Long journalId,
-            Long medicationChartId
+            Long medicationChartId,
+            boolean isActive
     ) {
         this.id = id;
         this.firstName = firstName;
@@ -39,6 +40,7 @@ public class ResidentResponseDTO {
         this.cprNr = cprNr;
         this.age = age;
         this.gender = gender;
+        this.isActive = isActive;
     }
 
     public ResidentResponseDTO(Long id, String firstName, String lastName, Long journalId) {
