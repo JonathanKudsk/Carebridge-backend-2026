@@ -109,11 +109,12 @@ public class UserController implements IController<User, Long> {
     public void readByEmail(Context ctx) {
         try {
             String email = ctx.pathParam("email");
-            if (!validatePrimaryKey(email)) {
-                throw new ApiRuntimeException(400, "Invalid email");
+            if(email == null || email.isEmpty() || !email.contains("@")){
+                throw new ApiRuntimeException(400, "Invalid email address");
             }
             User user = userDAO.readByEmail(email);
-            ctx.status(200).json(user);
+            UserDTO userDTO = UserMapper.toDTO(user);
+            ctx.status(200).json(userDTO);
         } catch (ApiRuntimeException e) {
             ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
         } catch (Exception e) {
