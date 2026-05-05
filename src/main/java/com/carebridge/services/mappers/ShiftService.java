@@ -19,15 +19,6 @@ public class ShiftService {
         return instance;
     }
 
-    /**
-     * Validates that a new shift does not overlap with any existing shifts for the given user.
-     * Overlap rule: A.startShift < B.endShift AND A.endShift > B.startShift
-     *
-     * @param userId     the ID of the employee being scheduled
-     * @param startShift the proposed shift start time
-     * @param endShift   the proposed shift end time
-     * @throws ScheduleConflictException if an overlapping shift is found
-     */
     public void validateNoOverlap(Long userId, LocalDateTime startShift, LocalDateTime endShift) {
         List<Shift> existingShifts = shiftDAO.findByAssignedUserId(userId);
 
@@ -42,17 +33,6 @@ public class ShiftService {
         }
     }
 
-    /**
-     * Validates that updating an existing shift does not cause overlap with other shifts for the given user.
-     * Excludes the shift being updated (by shiftId) from the overlap check.
-     * Overlap rule: A.startShift < B.endShift AND A.endShift > B.startShift
-     *
-     * @param shiftId    the ID of the shift being updated (excluded from check)
-     * @param userId     the ID of the employee being scheduled
-     * @param startShift the proposed new shift start time
-     * @param endShift   the proposed new shift end time
-     * @throws ScheduleConflictException if an overlapping shift is found
-     */
     public void validateNoOverlapOnUpdate(Long shiftId, Long userId, LocalDateTime startShift, LocalDateTime endShift) {
         List<Shift> existingShifts = shiftDAO.findByAssignedUserId(userId);
 
