@@ -135,6 +135,10 @@ public class ChatRoomDAO implements IDAO<ChatRoom, Long> {
 				existing.setChatRoomUser(newMembers);
 			}
 
+            if (updated.isActive() != existing.isActive()) {
+                existing.setIsActive(updated.isActive());
+            }
+
 			em.getTransaction().commit();
 			logger.info("Chat room updated: id={}", id);
 			return existing;
@@ -175,4 +179,22 @@ public class ChatRoomDAO implements IDAO<ChatRoom, Long> {
 			throw new ApiRuntimeException(400, "Each chat room member must reference an existing user id");
 		}
 	}
+
+    public void deactivateChatRoomsForUser(Long userId)  {
+        try (var em = em())  {
+            em.getTransaction().begin();
+            List<ChatRoom> chatRooms = em.createQuery(
+                    "SELECT cr FROM ChatRoom cr JOIN cr.chatRoomUser cru WHERE cru.user.id = :userId",
+                    ChatRoom.class
+            ).setParameter("userId", userId).getResultList();
+
+            for (ChatRoom cr : chatRooms) {
+                cr.setIsActive(false);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e)  {
+            logger.error("Error deactivating chatrooms", e);
+            throw new ApiRuntimeException(500, "Error deactivating chat rooms");
+        }
+    }
 }
