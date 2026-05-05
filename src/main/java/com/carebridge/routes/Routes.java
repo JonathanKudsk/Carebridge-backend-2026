@@ -13,6 +13,7 @@ public class Routes {
     private final UserController controller = new UserController();
     private final JournalEntryRoutes journalEntryRoute = new JournalEntryRoutes();
     private final ResidentRoute residentRoute = new ResidentRoute();
+    private final DosageRoute dosageRoute = new DosageRoute();
     private final MedicationRoute medicationRoute = new MedicationRoute();
 
     public EndpointGroup getRoutes() {
@@ -22,6 +23,7 @@ public class Routes {
             path("/events", eventRoute.getRoutes());
             path("/residents", residentRoute.getRoutes());
             path("/journals", journalEntryRoute.getRoutes());
+            path("/dosages", dosageRoute.getRoutes());
             path("/medication-charts", medicationRoute.getRoutes());
 
             get("/populate", controller::populate, Role.ANYONE);

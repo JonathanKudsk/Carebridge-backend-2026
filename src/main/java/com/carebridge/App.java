@@ -1,6 +1,7 @@
 package com.carebridge;
 
 import com.carebridge.config.ApplicationConfig;
+import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dao.impl.ResidentDAO;
 import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.entities.Journal;

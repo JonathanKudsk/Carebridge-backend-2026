@@ -277,6 +277,10 @@ Content-Type: application/json
   "cprNr": "010190-1234"
 }
 
+### ---- DOSAGE API (ADMIN only) ----
+
+### 20) Create dosage for resident 1
+POST {{url}}/dosages/
 > {%
     client.test("Create resident (admin)", function () {
         client.assert(response.status === 201, "Resident creation failed: " + response.status);
@@ -376,6 +380,26 @@ Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
 {
+  "medicineName": "Paracetamol",
+  "dosage": "2 tabletter",
+  "frequency": "Morgen og aften",
+  "startDate": "2026-04-29",
+  "endDate": null,
+  "note": "Tages med mad",
+  "residentId": 1
+}
+
+> {%
+    client.test("Create dosage (admin)", function () {
+        client.assert([201, 200].includes(response.status), "Failed to create dosage");
+        if (response.body && response.body.id) {
+            client.global.set("dosage_id", response.body.id);
+        }
+    });
+%}
+
+### 21) Update dosage
+PUT {{url}}/dosages/{{dosage_id}}
   "dosage": "1000 mg",
   "active": false
 }
@@ -407,6 +431,37 @@ Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
 {
+  "medicineName": "Paracetamol",
+  "dosage": "1 tablet",
+  "frequency": "Kun om morgenen",
+  "startDate": "2026-04-29",
+  "endDate": null,
+  "note": "Reduceret dosis"
+}
+
+> {%
+    client.test("Update dosage (admin)", function () {
+        client.assert([200, 204].includes(response.status), "Failed to update dosage");
+    });
+%}
+
+### 22) Get all dosages for resident 1
+GET {{url}}/dosages/1/dosages
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Get dosages for resident 1", function () {
+        client.assert(response.status === 200, "Failed to get dosages");
+    });
+%}
+
+### 23) Delete dosage
+DELETE {{url}}/dosages/{{dosage_id}}
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Delete dosage (admin)", function () {
+        client.assert([200, 204].includes(response.status), "Failed to delete dosage");
   "dosage": "100 mg"
 }
 
