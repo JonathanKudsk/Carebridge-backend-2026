@@ -10,6 +10,7 @@ import lombok.*;
 @Data
 @Builder
 @Entity
+@Builder
 
 @Table(name = "field")
 public class Field {

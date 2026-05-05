@@ -2,7 +2,10 @@ package com.carebridge.entities;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +36,14 @@ public class Template {
     @Column(name="title")
     private String title;
 
+    @Column(name="is_usable", nullable = false)
+    private boolean isUsable = true;
+
     public void addField(Field f) {
         fields.add(f);
         if(f.getTemplate() != this){
             f.setTemplate(this);
         }
     }
+
 }

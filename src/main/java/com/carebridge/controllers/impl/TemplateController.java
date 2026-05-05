@@ -13,13 +13,11 @@ import com.carebridge.exceptions.ApiRuntimeException;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class TemplateController implements IController<Template, Long> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ResidentController.class);
+    private static final Logger logger = LoggerFactory.getLogger(TemplateController.class);
     private final TemplateDAO templateDAO = TemplateDAO.getInstance();
 
     @Override
@@ -64,47 +62,57 @@ public class TemplateController implements IController<Template, Long> {
     public void create(Context ctx) {
         try {
             CreateTemplateRequestDTO dto = ctx.bodyAsClass(CreateTemplateRequestDTO.class);
-
-            Template template = new Template();
-            template.setTitle(dto.getTitle());
-
-            List<Field> fields = new ArrayList<>();
-
-            for (CreateFieldDTO fieldDTO : dto.getFields()) {
-                Field field = new Field();
-                field.setTitle(fieldDTO.getTitle());
-
-                // Convert string to enum
-                field.setFieldType(FieldType.valueOf(fieldDTO.getFieldType().toUpperCase()));
-
-                field.setTemplate(template);
-                fields.add(field);
+            if (dto.getTitle() == null || dto.getTitle().isBlank())
+                throw new ApiRuntimeException(400, "title required");
+            if (dto.getFields() == null || dto.getFields().length == 0)
+                throw new ApiRuntimeException(400, "fields required");
+            for (CreateFieldRequestDTO fieldDTO : dto.getFields()){
+                if (fieldDTO.getTitle() == null || fieldDTO.getTitle().isBlank())
+                    throw new ApiRuntimeException(400, "field title required");
+                if (fieldDTO.getFieldType() == null)
+                    throw new ApiRuntimeException(400, "field title required");
             }
 
-            template.setFields(fields);
-
-            templateDAO.create(template);
-
-            ctx.status(201).json(template);
-
+            Template t = Template.builder()
+                    .title(dto.getTitle())
+                    .build();
+            t.setFields(
+                    (Arrays.stream(dto.getFields())
+                    .map(f -> Field.builder()
+                            .fieldType(f.getFieldType())
+                            .title(f.getTitle())
+                            .template(t)
+                            .build())
+                    .toList())
+            );
+            Template created = templateDAO.create(t);
+            ctx.status(201).json(new TemplateDetailedResponseDTO(created));
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
         } catch (Exception e) {
-            e.printStackTrace();
-            ctx.status(400).result("Error creating template");
+            logger.error("create template failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
         }
     }
 
     @Override
     public void update(Context ctx) {
-        //todo: implement
-        ctx.status(501);
-        ctx.json("not yet implemented feature");
+        //as templates can't get changed without it effecting journal entries it might be best to leave empty to avoid issues
     }
 
     @Override
     public void delete(Context ctx) {
-        //todo: implement
-        ctx.status(501);
-        ctx.json("not yet implemented feature");
+        try {
+            Long id = parseId(ctx);
+            templateDAO.delete(id);
+            ctx.status(200);
+            ctx.json("Template successfully deleted");
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("Delete Template failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
     }
 
     @Override

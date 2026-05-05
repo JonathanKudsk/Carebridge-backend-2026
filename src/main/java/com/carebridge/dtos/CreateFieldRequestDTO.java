@@ -1,4 +1,6 @@
 package com.carebridge.dtos;
+
+import com.carebridge.enums.FieldType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -6,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateTemplateRequestDTO {
-    private String title;
-    private CreateFieldRequestDTO[] Fields;
+public class CreateFieldRequestDTO {
+    String title;
+    FieldType fieldType;
 }
