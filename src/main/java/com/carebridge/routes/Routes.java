@@ -1,6 +1,5 @@
 package com.carebridge.routes;
 
-import com.carebridge.controllers.impl.JournalEntryController;
 import com.carebridge.controllers.impl.UserController;
 import com.carebridge.entities.enums.Role;
 import io.javalin.apibuilder.EndpointGroup;
@@ -14,7 +13,10 @@ public class Routes {
     private final UserController controller = new UserController();
     private final JournalEntryRoutes journalEntryRoute = new JournalEntryRoutes();
     private final ResidentRoute residentRoute = new ResidentRoute();
-    private final ChatRoomRoute chatRoomRoute = new ChatRoomRoute();
+    private final DosageRoute dosageRoute = new DosageRoute();
+    private final MedicationRoute medicationRoute = new MedicationRoute();
+    private final AuditLogRoute auditLogRoute = new AuditLogRoute();
+    private final ChatRoomRoutes chatRoomRoute = new ChatRoomRoutes();
     private final ChatRoomUserRoute chatRoomUserRoute = new ChatRoomUserRoute();
     private final MessageRoute messageRoute = new MessageRoute();
     private final ShiftRoute shiftRoute = new ShiftRoute();
@@ -26,6 +28,9 @@ public class Routes {
             path("/events", eventRoute.getRoutes());
             path("/residents", residentRoute.getRoutes());
             path("/journals", journalEntryRoute.getRoutes());
+            path("/dosages", dosageRoute.getRoutes());
+            path("/medication-charts", medicationRoute.getRoutes());
+            path("/audit-logs", auditLogRoute.getRoutes());
             path("/chatrooms", chatRoomRoute.getRoutes());
             path("/chatroom-users", chatRoomUserRoute.getRoutes());
             path("/messages", messageRoute.getRoutes());

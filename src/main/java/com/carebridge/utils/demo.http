@@ -266,8 +266,8 @@ GET {{url}}/journals/1/journal-entries/1
     });
 %}
 
-### 19) Create new resident
-POST http://localhost:7070/api/residents/create
+### 19) Create new resident (captures journalId + medicationChartId)
+POST {{url}}/residents/create
 Authorization: Bearer {{jwt_token}}
 Content-Type: application/json
 
@@ -276,3 +276,228 @@ Content-Type: application/json
   "lastName": "Resident",
   "cprNr": "010190-1234"
 }
+
+### ---- DOSAGE API (ADMIN only) ----
+
+### 20) Create dosage for resident 1
+POST {{url}}/dosages/
+> {%
+    client.test("Create resident (admin)", function () {
+        client.assert(response.status === 201, "Resident creation failed: " + response.status);
+        client.assert(response.body.id, "No resident id returned");
+        client.assert(response.body.medicationChartId, "No medicationChartId returned");
+        client.global.set("resident_id", response.body.id);
+        client.global.set("chart_id", response.body.medicationChartId);
+        client.global.set("journal_id", response.body.journalId);
+    });
+%}
+
+### ---- MEDICATION CHART API ----
+
+### 20) Get medication chart (empty after resident creation)
+GET {{url}}/medication-charts/{{chart_id}}
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Get medication chart", function () {
+        client.assert(response.status === 200, "Failed to get chart: " + response.status);
+        client.assert(response.body.id, "No chart id in response");
+        client.assert(Array.isArray(response.body.medications), "medications is not an array");
+    });
+%}
+
+### 21) Add medication to chart
+POST {{url}}/medication-charts/{{chart_id}}/medications
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "name": "Paracetamol",
+  "dosage": "500 mg",
+  "frequency": "Twice a day",
+  "startDate": "2026-04-28",
+  "prescribingDoctor": "Dr. Nielsen",
+  "notes": "Take with water",
+  "active": true
+}
+
+> {%
+    client.test("Add medication to chart", function () {
+        client.assert(response.status === 201, "Failed to add medication: " + response.status);
+        client.assert(response.body.id, "No medication id returned");
+        client.assert(response.body.name === "Paracetamol", "Wrong medication name");
+        client.global.set("medication_id", response.body.id);
+    });
+%}
+
+### 22) Add a second medication (to test list)
+POST {{url}}/medication-charts/{{chart_id}}/medications
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "name": "Ibuprofen",
+  "dosage": "400 mg",
+  "frequency": "Once a day",
+  "startDate": "2026-04-28",
+  "endDate": "2026-05-28",
+  "prescribingDoctor": "Dr. Hansen",
+  "active": true
+}
+
+> {%
+    client.test("Add second medication", function () {
+        client.assert(response.status === 201, "Failed to add second medication: " + response.status);
+    });
+%}
+
+### 23) Get chart again (should now have 2 medications)
+GET {{url}}/medication-charts/{{chart_id}}
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Get chart with medications", function () {
+        client.assert(response.status === 200, "Failed to get chart: " + response.status);
+        client.assert(response.body.medications.length === 2, "Expected 2 medications, got " + response.body.medications.length);
+    });
+%}
+
+### 24) Get single medication by id
+GET {{url}}/medication-charts/{{chart_id}}/medications/{{medication_id}}
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Get single medication", function () {
+        client.assert(response.status === 200, "Failed to get medication: " + response.status);
+        client.assert(response.body.id == client.global.get("medication_id"), "Wrong medication returned");
+        client.assert(response.body.name === "Paracetamol", "Wrong medication name");
+    });
+%}
+
+### 25) Update medication (partial — only dosage and active)
+PUT {{url}}/medication-charts/{{chart_id}}/medications/{{medication_id}}
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "medicineName": "Paracetamol",
+  "dosage": "2 tabletter",
+  "frequency": "Morgen og aften",
+  "startDate": "2026-04-29",
+  "endDate": null,
+  "note": "Tages med mad",
+  "residentId": 1
+}
+
+> {%
+    client.test("Create dosage (admin)", function () {
+        client.assert([201, 200].includes(response.status), "Failed to create dosage");
+        if (response.body && response.body.id) {
+            client.global.set("dosage_id", response.body.id);
+        }
+    });
+%}
+
+### 21) Update dosage
+PUT {{url}}/dosages/{{dosage_id}}
+  "dosage": "1000 mg",
+  "active": false
+}
+
+> {%
+    client.test("Update medication", function () {
+        client.assert(response.status === 200, "Failed to update medication: " + response.status);
+        client.assert(response.body.dosage === "1000 mg", "Dosage not updated");
+        client.assert(response.body.active === false, "active should be false");
+        client.assert(response.body.name === "Paracetamol", "name should be unchanged");
+    });
+%}
+
+### 26) Get medication again to confirm update persisted
+GET {{url}}/medication-charts/{{chart_id}}/medications/{{medication_id}}
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Confirm medication update persisted", function () {
+        client.assert(response.status === 200, "Failed to get medication: " + response.status);
+        client.assert(response.body.dosage === "1000 mg", "Dosage not persisted");
+        client.assert(response.body.active === false, "active not persisted");
+    });
+%}
+
+### 27) Try adding medication with missing name (should return 400)
+POST {{url}}/medication-charts/{{chart_id}}/medications
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "medicineName": "Paracetamol",
+  "dosage": "1 tablet",
+  "frequency": "Kun om morgenen",
+  "startDate": "2026-04-29",
+  "endDate": null,
+  "note": "Reduceret dosis"
+}
+
+> {%
+    client.test("Update dosage (admin)", function () {
+        client.assert([200, 204].includes(response.status), "Failed to update dosage");
+    });
+%}
+
+### 22) Get all dosages for resident 1
+GET {{url}}/dosages/1/dosages
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Get dosages for resident 1", function () {
+        client.assert(response.status === 200, "Failed to get dosages");
+    });
+%}
+
+### 23) Delete dosage
+DELETE {{url}}/dosages/{{dosage_id}}
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Delete dosage (admin)", function () {
+        client.assert([200, 204].includes(response.status), "Failed to delete dosage");
+  "dosage": "100 mg"
+}
+
+> {%
+    client.test("Add medication without name returns 400", function () {
+        client.assert(response.status === 400, "Expected 400 but got: " + response.status);
+    });
+%}
+
+### 28) Try getting medication from wrong chart (should return 400)
+GET {{url}}/medication-charts/99999/medications/{{medication_id}}
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Wrong chart id returns 400 or 500", function () {
+        client.assert([400, 500].includes(response.status), "Expected error but got: " + response.status);
+    });
+%}
+
+### 29) Delete medication
+DELETE {{url}}/medication-charts/{{chart_id}}/medications/{{medication_id}}
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Delete medication", function () {
+        client.assert(response.status === 204, "Failed to delete medication: " + response.status);
+    });
+%}
+
+### 30) Confirm medication is gone (chart should now have 1 medication)
+GET {{url}}/medication-charts/{{chart_id}}
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Chart has 1 medication after delete", function () {
+        client.assert(response.status === 200, "Failed to get chart: " + response.status);
+        client.assert(response.body.medications.length === 1, "Expected 1 medication, got " + response.body.medications.length);
+    });
+%}

@@ -12,6 +12,7 @@ public class ResidentRoute {
 
     public EndpointGroup getRoutes() {
         return () -> {
+            get("/", controller::readAll, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
             post("/create", controller::create, Role.ADMIN);
             // Define resident-related routes here
         };

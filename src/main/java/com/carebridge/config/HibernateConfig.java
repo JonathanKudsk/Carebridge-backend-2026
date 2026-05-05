@@ -49,6 +49,10 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(JournalEntry.class);
         configuration.addAnnotatedClass(Journal.class);
         configuration.addAnnotatedClass(Resident.class);
+        configuration.addAnnotatedClass(Dosage.class);
+        configuration.addAnnotatedClass(Medication.class);
+        configuration.addAnnotatedClass(MedicationChart.class);
+        configuration.addAnnotatedClass(AuditLog.class);
         configuration.addAnnotatedClass(ChatRoom.class);
         configuration.addAnnotatedClass(ChatRoomUser.class);
         configuration.addAnnotatedClass(Message.class);

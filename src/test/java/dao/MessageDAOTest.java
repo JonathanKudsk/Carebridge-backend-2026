@@ -8,6 +8,8 @@ import com.carebridge.entities.ChatRoom;
 import com.carebridge.entities.Message;
 import com.carebridge.entities.User;
 import com.carebridge.entities.enums.Role;
+import com.carebridge.exceptions.ApiRuntimeException;
+import org.junit.Assert;
 import org.junit.jupiter.api.*;
 
 import java.sql.Timestamp;
@@ -62,17 +64,20 @@ public class MessageDAOTest {
         if (testMessage != null) {
             try {
                 messageDAO.delete(testMessage.getId());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         if (testChatRoom != null) {
             try {
                 chatRoomDAO.delete(testChatRoom.getId());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         if (testUser != null) {
             try {
                 userDAO.delete(testUser.getId());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -137,6 +142,25 @@ public class MessageDAOTest {
         Message created = messageDAO.create(message);
         messageDAO.delete(created.getId());
         assertNull(messageDAO.read(created.getId()));
+    }
+
+    @Test
+    public void testMessageCreationOnDeactivatedChatRoom()  {
+        // Deactivate the test chat room
+        testChatRoom.setIsActive(false);
+        chatRoomDAO.update(testChatRoom.getId(), testChatRoom);
+
+        // Try to create a message
+        Message message = new Message();
+        message.setUser(testUser);
+        message.setChatRoom(testChatRoom);
+        message.setMessage("Should fail or be marked read-only");
+        message.setTimestamp(Timestamp.from(Instant.now()));
+
+        // Assert that creation fails with appropriate exception.
+        assertThrows(ApiRuntimeException.class, () -> {
+            messageDAO.create(message);
+        });
     }
 }
 
