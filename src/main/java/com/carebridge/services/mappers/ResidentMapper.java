@@ -1,5 +1,6 @@
 package com.carebridge.services.mappers;
 
+import com.carebridge.dtos.CreateResidentRequestDTO;
 import com.carebridge.dtos.ResidentResponseDTO;
 import com.carebridge.entities.Resident;
 
@@ -8,23 +9,44 @@ import java.util.stream.Collectors;
 
 public class ResidentMapper {
 
-    public static ResidentResponseDTO toDTO(Resident r) {
-        if (r == null) return null;
+    public static Resident toEntity(CreateResidentRequestDTO dto) {
+        if (dto == null) {
+            return null;
+        }
 
-        Long journalId = (r.getJournal() != null) ? r.getJournal().getId() : null;
+        Resident resident = new Resident();
+        resident.setFirstName(dto.getFirstName());
+        resident.setLastName(dto.getLastName());
+        resident.setCprNr(dto.getCprNr());
+
+        return resident;
+    }
+
+    public static ResidentResponseDTO toDTO(Resident resident) {
+        if (resident == null) {
+            return null;
+        }
+
+        Long journalId = resident.getJournal() != null ? resident.getJournal().getId() : null;
+        Long medicationChartId = resident.getMedicationChart() != null ? resident.getMedicationChart().getId() : null;
 
         return new ResidentResponseDTO(
-                r.getId(),
-                r.getFirstName(),
-                r.getLastName(),
+                resident.getId(),
+                resident.getFirstName(),
+                resident.getLastName(),
+                resident.getCprNr(),
+                resident.getAge(),
+                resident.getGender(),
                 journalId,
-                r.getCprNr(),
-                r.isActive()
+                medicationChartId
         );
     }
 
     public static List<ResidentResponseDTO> toDTOList(List<Resident> residents) {
-        if (residents == null) return null;
+        if (residents == null) {
+            return null;
+        }
+
         return residents.stream()
                 .map(ResidentMapper::toDTO)
                 .collect(Collectors.toList());
