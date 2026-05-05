@@ -25,10 +25,45 @@ public class JournalEntryController implements IController<JournalEntry, Long>
     private final JournalDAO journalDAO = JournalDAO.getInstance();
     private final UserDAO userDAO = UserDAO.getInstance();
 
+    // Checks whether the authenticated user can access the requested journal.
+    // Admins and careworkers can access all journals, while guardians can only
+    // access journals belonging to residents they are linked to.
+    private boolean canAccessJournal(Context ctx, Long journalId) {
+        var tokenUser = ctx.attribute("user");
+
+        if (!(tokenUser instanceof JwtUserDTO jwtUser)) {
+            ctx.status(401).json("{\"msg\":\"Unauthorized\"}");
+            return false;
+        }
+
+        boolean isAdminOrCareworker = jwtUser.getRoles().stream()
+                .map(String::toUpperCase)
+                .anyMatch(role -> role.equals("ADMIN") || role.equals("CAREWORKER"));
+
+        if (isAdminOrCareworker) {
+            return true;
+        }
+
+        boolean isGuardian = jwtUser.getRoles().stream()
+                .map(String::toUpperCase)
+                .anyMatch(role -> role.equals("GUARDIAN"));
+
+        if (isGuardian && journalDAO.guardianHasAccessToJournal(jwtUser.getUsername(), journalId)) {
+            return true;
+        }
+
+        ctx.status(403).json("{\"msg\":\"Forbidden\"}");
+        return false;
+    }
+
+
     // Finding all entries by a journal ID
     public void findAllEntriesByJournal(Context ctx) {
         try {
             Long journalId = Long.parseLong(ctx.pathParam("journalId"));
+
+            if (!canAccessJournal(ctx, journalId)) return;
+
             List<Long> ids = journalEntryDAO.getEntryIdsByJournalId(journalId);
             ctx.json(ids);
         } catch (IllegalArgumentException e) {
@@ -209,11 +244,19 @@ public class JournalEntryController implements IController<JournalEntry, Long>
     public void read(Context ctx) {
         try {
 
+            Long journalId = Long.parseLong(ctx.pathParam("journalId"));
             Long entryId = Long.parseLong(ctx.pathParam("entryId"));
+
+            if (!canAccessJournal(ctx, journalId)) return;
+
             JournalEntry entry = journalEntryDAO.read(entryId);
 
             if (entry == null) {
                 throw new IllegalArgumentException("Journal entry with ID " + entryId + " not found");
+            }
+            if (entry.getJournal() == null || !entry.getJournal().getId().equals(journalId)) {
+                ctx.status(404).json("{\"msg\":\"Journal entry not found in this journal\"}");
+                return;
             }
 
             JournalEntryResponseDTO dto = new JournalEntryResponseDTO(
