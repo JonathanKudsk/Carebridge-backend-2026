@@ -15,10 +15,11 @@ import java.util.List;
 public class ShiftDAO implements IDAO<Shift, Long> {
 
 	private static final Logger logger = LoggerFactory.getLogger(ShiftDAO.class);
-	private static final EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
+	private static final EntityManagerFactory emf;
 	private static ShiftDAO instance;
 
 	private ShiftDAO() {
+		this.emf = HibernateConfig.getEntityManagerFactory();
 	}
 
 	public static synchronized ShiftDAO getInstance() {
