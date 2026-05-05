@@ -73,6 +73,14 @@ public class Event {
     )
     private Set<User> seenByUsers = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "event_users_with_access",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> usersWithAccess = new HashSet<>();
+
     public Event() {
     }
 
@@ -190,6 +198,14 @@ public class Event {
 
     public void setSeenByUsers(Set<User> seenByUsers) {
         this.seenByUsers = seenByUsers;
+    }
+
+    public Set<User> getUsersWithAccess() {
+        return usersWithAccess;
+    }
+
+    public void setUsersWithAccess(Set<User> users) {
+        this.usersWithAccess = users;
     }
 
     @Override
