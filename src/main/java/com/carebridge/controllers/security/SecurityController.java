@@ -65,7 +65,8 @@ public class SecurityController implements ISecurityController {
 
                 ctx.status(200).json(out.put("token", token)
                         .put("email", safeUser.getEmail())
-                        .put("role", safeUser.getRole().name()));
+                        .put("role", safeUser.getRole().name())
+                        .put("isEmployed", safeUser.isEmployed()));
             } catch (ValidationException e) {
                 ctx.status(401).json(out.put("msg", e.getMessage()));
             } catch (Exception e) {
