@@ -22,6 +22,7 @@ public final class UserMapper {
                 .displayPhone(u.getDisplayPhone())
                 .internalEmail(u.getInternalEmail())
                 .internalPhone(u.getInternalPhone())
+                .isEmployed(u.isEmployed())
                 .build();
     }
 
@@ -36,6 +37,7 @@ public final class UserMapper {
         u.setDisplayPhone(dto.getDisplayPhone());
         u.setInternalEmail(dto.getInternalEmail());
         u.setInternalPhone(dto.getInternalPhone());
+        u.setIsEmployed(dto.isEmployed());
         return u;
     }
 
