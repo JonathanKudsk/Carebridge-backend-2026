@@ -38,3 +38,5 @@ public class JournalEntryDAOTest {
                 + " totalt i databasen.");
     }
 }
+
+
