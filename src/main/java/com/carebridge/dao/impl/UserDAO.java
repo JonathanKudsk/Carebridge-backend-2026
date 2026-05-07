@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 public class UserDAO implements IDAO<User, Long> {
 
@@ -123,6 +124,32 @@ public class UserDAO implements IDAO<User, Long> {
         } catch (Exception e) {
             logger.error("Error updating user {}", id, e);
             throw new ApiRuntimeException(500, "Error updating user: " + e.getMessage());
+        }
+    }
+
+    public List<Long> findUserIdsByRole(Role role) {
+        try (var em = em()) {
+            return em.createQuery("SELECT u.id FROM User u WHERE u.role = :role", Long.class)
+                    .setParameter("role", role)
+                    .getResultList();
+        } catch (Exception e) {
+            logger.error("Error fetching user IDs for role {}", role, e);
+            throw new ApiRuntimeException(500, "Error fetching users by role: " + e.getMessage());
+        }
+    }
+
+    // Returns the ID of the first guardian linked to the given resident, or empty if none.
+    public Optional<Long> findGuardianIdByResidentId(Long residentId) {
+        try (var em = em()) {
+            List<Long> results = em.createQuery(
+                    "SELECT u.id FROM User u JOIN u.residents r WHERE r.id = :residentId", Long.class)
+                    .setParameter("residentId", residentId)
+                    .setMaxResults(1)
+                    .getResultList();
+            return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+        } catch (Exception e) {
+            logger.error("Error fetching guardian for resident {}", residentId, e);
+            throw new ApiRuntimeException(500, "Error fetching guardian: " + e.getMessage());
         }
     }
 
