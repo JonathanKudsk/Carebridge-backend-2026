@@ -70,7 +70,7 @@ public class SecurityController implements ISecurityController {
                     ctx.status(200).json(out.put("token", token)
                             .put("email", verified.getEmail())
                             .put("role", verified.getRole().name())
-                        .put("isEmployed", safeUser.isEmployed()));
+                            .put("isEmployed", verified.isEmployed()));
                 } else {
                     // Returning user with 2FA active — must verify TOTP code
                     String tempToken = createTempToken(verified.getEmail(), "VERIFY");
