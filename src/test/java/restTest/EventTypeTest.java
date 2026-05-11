@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.is;
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     public class EventTypeTest {
 
+        private static final int TEST_PORT = 7008;
         private static String authToken;
         private static String adminAuthToken;
         private Javalin app;
@@ -24,17 +25,18 @@ import static org.hamcrest.Matchers.is;
         public void setup() throws Exception {
             HibernateConfig.setTest(true);
 
-            app = ApplicationConfig.startServer(7070);
+            app = ApplicationConfig.startServer(TEST_PORT);
 
             Populator.populate(HibernateConfig.getEntityManagerFactoryForTest());
 
-            RestAssured.baseURI = "http://localhost:7070/api";
+            RestAssured.baseURI = "http://localhost:" + TEST_PORT + "/api";
 
             authToken = given()
                     .contentType(ContentType.JSON)
                     .body("{\"email\":\"alice@carebridge.io\", \"password\":\"password123\"}")
                     .post("/auth/login")
                     .then()
+                    .log().ifValidationFails()
                     .statusCode(200)
                     .extract().path("token");
 
@@ -43,6 +45,7 @@ import static org.hamcrest.Matchers.is;
                     .body("{\"email\":\"admin@carebridge.io\", \"password\":\"admin123\"}")
                     .post("/auth/login")
                     .then()
+                    .log().ifValidationFails()
                     .statusCode(200)
                     .extract().path("token");
         }
