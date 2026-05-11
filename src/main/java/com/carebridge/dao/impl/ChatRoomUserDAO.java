@@ -121,6 +121,9 @@ public class ChatRoomUserDAO implements IDAO<ChatRoomUser, Long> {
 
             em.persist(entity);
             em.getTransaction().commit();
+
+            ChatRoomDAO.getInstance().evaluateAndUpdateChatRoomStatus(entity.getChatRoom().getId());
+
             return entity;
         } catch (ApiRuntimeException e) {
             throw e;

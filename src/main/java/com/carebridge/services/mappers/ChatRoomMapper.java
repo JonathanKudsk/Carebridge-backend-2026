@@ -24,6 +24,7 @@ public final class ChatRoomMapper {
         return ChatRoomDTO.builder()
                 .id(entity.getId())
                 .members(members)
+                .isActive(entity.isActive())
                 .build();
     }
 
