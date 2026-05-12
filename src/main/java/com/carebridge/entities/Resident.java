@@ -34,6 +34,10 @@ public class Resident {
     @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL)
     private MedicationChart medicationChart;
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "resident_user",
@@ -133,5 +137,12 @@ public class Resident {
 
     public void setMedicationChart(MedicationChart medicationChart) {
         this.medicationChart = medicationChart;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+        if (user != null && user.getResidentProfile() != this) {
+            user.setResidentProfile(this);
+        }
     }
 }
