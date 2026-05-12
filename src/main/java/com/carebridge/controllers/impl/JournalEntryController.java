@@ -24,6 +24,8 @@ import com.carebridge.exceptions.ApiRuntimeException;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.carebridge.dtos.PageResponseDTO;
+import java.time.format.DateTimeParseException;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -100,8 +102,7 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                     entry.getEditCloseTime(),
                     entry.getJournalEntryAnswers().stream()
                             .map(JournalEntryAnswerResponseDTO::new)
-                            .toArray(JournalEntryAnswerResponseDTO[]::new)
-            );
+                            .toArray(JournalEntryAnswerResponseDTO[]::new));
 
             ctx.json(dto);
         } catch (IllegalArgumentException e) {
@@ -109,6 +110,66 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             ctx.status(500).result("Internal server error");
+        }
+    }
+
+    public void search(Context ctx) {
+        try {
+            // 1. Hent og valider paginering (default er side 1 med 10 resultater)
+            int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1);
+            int pageSize = ctx.queryParamAsClass("pageSize", Integer.class).getOrDefault(10);
+
+            if (page < 1)
+                throw new IllegalArgumentException("Page skal være 1 eller større.");
+            if (pageSize < 1 || pageSize > 100)
+                throw new IllegalArgumentException("PageSize skal være mellem 1 og 100.");
+
+            // 2. Hent rå filtre som strings
+            String dateFromStr = ctx.queryParam("date_from");
+            String dateToStr = ctx.queryParam("date_to");
+            String employeeIdStr = ctx.queryParam("employee_id");
+            String riskLevelStr = ctx.queryParam("risk_level");
+            String keyword = ctx.queryParam("keyword");
+
+            // 3. Konverter typerne sikkert
+            LocalDateTime dateFrom = dateFromStr != null ? LocalDateTime.parse(dateFromStr) : null;
+            LocalDateTime dateTo = dateToStr != null ? LocalDateTime.parse(dateToStr) : null;
+            Long employeeId = employeeIdStr != null ? Long.parseLong(employeeIdStr) : null;
+            RiskAssessment riskLevel = riskLevelStr != null ? RiskAssessment.valueOf(riskLevelStr.toUpperCase()) : null;
+
+            // 4. Kald databasen (DAO)
+            Object[] searchResult = journalEntryDAO.search(dateFrom, dateTo, employeeId, riskLevel, keyword, page,
+                    pageSize);
+
+            @SuppressWarnings("unchecked")
+            List<JournalEntry> entries = (List<JournalEntry>) searchResult[0];
+            Long total = (Long) searchResult[1];
+
+            // 5. Omdan de rå database-entiteter til rene Response DTO'er
+            List<JournalEntryResponseDTO> dtos = entries.stream().map(entry -> new JournalEntryResponseDTO(
+                    entry.getId(),
+                    entry.getJournal() != null ? entry.getJournal().getId() : null,
+                    entry.getAuthor() != null ? entry.getAuthor().getId() : null,
+                    entry.getTitle(),
+                    entry.getEntryType(),
+                    entry.getRiskAssessment(),
+                    entry.getCreatedAt(),
+                    entry.getUpdatedAt(),
+                    entry.getEditCloseTime())).toList();
+
+            // 6. Pak ind i vores paginerings-objekt og send til klienten med kode 200 OK
+            PageResponseDTO<JournalEntryResponseDTO> response = new PageResponseDTO<>(dtos, total, page, pageSize);
+            ctx.status(200).json(response);
+
+        } catch (DateTimeParseException e) {
+            // Fanger hvis frontenden sender en dato i et mærkeligt format
+            ctx.status(400).json("{\"msg\":\"Ugyldigt datoformat. Brug ISO-8601 (f.eks. 2026-05-05T10:00:00).\"}");
+        } catch (IllegalArgumentException e) {
+            // Fanger forkerte enums (f.eks. risk_level=SUPERHIGH) eller dårlig paginering
+            ctx.status(400).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("Kritisk fejl under søgning", e);
+            ctx.status(500).json("{\"msg\":\"Internal server error\"}");
         }
     }
 
@@ -200,8 +261,7 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                     requestDTO.getTitle(),
                     requestDTO.getRiskAssessment(),
                     requestDTO.getEntryType(),
-                    template
-            );
+                    template);
 
             List<JournalEntryAnswer> journalEntryAnswers = Arrays.stream(requestDTO.getAnswers())
                     .map(answer -> {
@@ -232,8 +292,7 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                     entry.getEditCloseTime(),
                     entry.getJournalEntryAnswers().stream()
                             .map(JournalEntryAnswerResponseDTO::new)
-                            .toArray(JournalEntryAnswerResponseDTO[]::new)
-            );
+                            .toArray(JournalEntryAnswerResponseDTO[]::new));
 
             ctx.status(201).json(responseDTO);
 
@@ -323,8 +382,7 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                     entry.getEditCloseTime(),
                     entry.getJournalEntryAnswers().stream()
                             .map(JournalEntryAnswerResponseDTO::new)
-                            .toArray(JournalEntryAnswerResponseDTO[]::new)
-            );
+                            .toArray(JournalEntryAnswerResponseDTO[]::new));
 
             ctx.status(200).json(responseDTO);
         } catch (IllegalArgumentException e) {
@@ -368,8 +426,7 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
                             entry.getRiskAssessment(),
                             entry.getCreatedAt(),
                             entry.getUpdatedAt(),
-                            entry.getEditCloseTime()
-                    ))
+                            entry.getEditCloseTime()))
                     .toList();
             ctx.json(dtos);
         } catch (IllegalArgumentException e) {
