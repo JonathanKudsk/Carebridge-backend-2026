@@ -501,3 +501,105 @@ Authorization: Bearer {{jwt_token}}
         client.assert(response.body.medications.length === 1, "Expected 1 medication, got " + response.body.medications.length);
     });
 %}
+
+### ---- US-3C: SESSION TIMEOUT ----
+
+### 31) Login og bekræft at expiresAt og warningAt returneres
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{admin_email}}",
+  "password": "{{admin_password}}"
+}
+
+> {%
+    client.test("Login returnerer expiresAt og warningAt", function () {
+        client.assert(response.status === 200, "Login fejlede: " + response.status);
+        client.assert(response.body.token, "Ingen token returneret");
+        client.assert(response.body.expiresAt, "Ingen expiresAt returneret");
+        client.assert(response.body.warningAt, "Ingen warningAt returneret");
+        client.assert(response.body.warningAt === response.body.expiresAt - 30000, "warningAt skal være 30 sek. før expiresAt");
+        client.global.set("jwt_token", response.body.token);
+        client.global.set("expires_at", response.body.expiresAt);
+    });
+%}
+
+### 32) GET /auth/session — tjek resterende token-tid
+GET {{url}}/auth/session
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Session info returnerer korrekte felter", function () {
+        client.assert(response.status === 200, "Session info fejlede: " + response.status);
+        client.assert(response.body.timeToExpireMs > 0, "timeToExpireMs skal være positiv");
+        client.assert(response.body.expiresAt > Date.now(), "expiresAt skal være i fremtiden");
+        client.assert(response.body.warningAt === response.body.expiresAt - 30000, "warningAt skal være 30 sek. før expiresAt");
+    });
+%}
+
+### 33) POST /auth/refresh — forny token og invalider det gamle
+POST {{url}}/auth/refresh
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Token refresh udsteder nyt token", function () {
+        client.assert(response.status === 200, "Refresh fejlede: " + response.status);
+        client.assert(response.body.token, "Intet nyt token returneret");
+        client.assert(response.body.token !== client.global.get("jwt_token"), "Nyt token skal være anderledes end det gamle");
+        client.assert(response.body.expiresAt > Date.now(), "expiresAt skal være i fremtiden");
+        client.assert(response.body.warningAt === response.body.expiresAt - 30000, "warningAt skal være 30 sek. før expiresAt");
+        client.global.set("new_jwt_token", response.body.token);
+    });
+%}
+
+### 34) Bekræft at det gamle token er blacklistet efter refresh
+GET {{url}}/auth/session
+Authorization: Bearer {{jwt_token}}
+
+> {%
+    client.test("Gammelt token afvises efter refresh (401)", function () {
+        client.assert(response.status === 401, "Gammelt token burde returnere 401, fik: " + response.status);
+    });
+%}
+
+### 35) Det nye token virker stadig
+GET {{url}}/auth/session
+Authorization: Bearer {{new_jwt_token}}
+
+> {%
+    client.test("Nyt token er gyldigt efter refresh", function () {
+        client.assert(response.status === 200, "Nyt token burde virke, fik: " + response.status);
+        client.assert(response.body.timeToExpireMs > 0, "Nyt token skal have positiv levetid");
+    });
+%}
+
+### 36) POST /auth/logout — invalider token
+POST {{url}}/auth/logout
+Authorization: Bearer {{new_jwt_token}}
+
+> {%
+    client.test("Logout returnerer 200", function () {
+        client.assert(response.status === 200, "Logout fejlede: " + response.status);
+    });
+%}
+
+### 37) Bekræft at token er ugyldigt efter logout
+GET {{url}}/auth/session
+Authorization: Bearer {{new_jwt_token}}
+
+> {%
+    client.test("Token afvises efter logout (401)", function () {
+        client.assert(response.status === 401, "Token burde være invalideret efter logout, fik: " + response.status);
+    });
+%}
+
+### 38) Prøv refresh med et allerede invalideret token
+POST {{url}}/auth/refresh
+Authorization: Bearer {{new_jwt_token}}
+
+> {%
+    client.test("Refresh med invalideret token returnerer 401", function () {
+        client.assert(response.status === 401, "Burde returnere 401 for invalideret token, fik: " + response.status);
+    });
+%}
