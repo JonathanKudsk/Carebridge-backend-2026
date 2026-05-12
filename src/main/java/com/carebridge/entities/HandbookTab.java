@@ -1,5 +1,6 @@
 package com.carebridge.entities;
 
+import com.carebridge.entities.enums.Role;
 import jakarta.persistence.*;
 
 @Entity
@@ -28,7 +29,7 @@ public class HandbookTab
     private int orderIndex;
 
     @Column(name = "required_role", nullable = false, length = 100)
-    private String requiredRole;
+    private Role requiredRole;
 
 
 
@@ -37,7 +38,7 @@ public class HandbookTab
             String title,
             String content,
             int orderIndex,
-            String requiredRole
+            Role requiredRole
     )
     {
         this.title = title;
@@ -105,7 +106,7 @@ public class HandbookTab
     }
 
 
-    public void setRequiredRole(String requiredRole)
+    public void setRequiredRole(Role requiredRole)
     {
         this.requiredRole = requiredRole;
     }
