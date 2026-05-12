@@ -18,6 +18,11 @@ public class SecurityRoutes {
                 post("/user/addrole", security.addRole(), Role.ADMIN);
                 put("/{id}/role", security.changeRole(), Role.ADMIN);
                 put("/role/{id}", security.changeRole(), Role.ADMIN);
+                path("/2fa", () -> {
+                    get("/setup",    security.totpSetup(),   Role.ANYONE);
+                    post("/confirm", security.totpConfirm(), Role.ANYONE);
+                    post("/verify",  security.totpVerify(),  Role.ANYONE);
+                });
             });
         };
     }
