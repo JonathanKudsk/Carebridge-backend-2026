@@ -21,4 +21,5 @@ public class UserDTO {
     private String displayPhone;
     private String internalEmail;
     private String internalPhone;
+    private boolean isEmployed;
 }
