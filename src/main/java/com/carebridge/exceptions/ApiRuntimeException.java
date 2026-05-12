@@ -13,5 +13,7 @@ public class ApiRuntimeException extends RuntimeException {
         return errorCode;
     }
 
-
+    public int getStatusCode() {
+        return errorCode;
+    }
 }
