@@ -28,7 +28,8 @@ public class HandbookTab
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
 
-    @Column(name = "required_role", nullable = false, length = 100)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "required_role", nullable = false)
     private Role requiredRole;
 
 
