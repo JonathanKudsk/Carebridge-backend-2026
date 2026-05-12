@@ -19,6 +19,13 @@ public class SecurityRoutes {
                 post("/refresh", security.refresh(), Role.ANYONE);
                 post("/logout", security.logout(), Role.ANYONE);
                 get("/session", security.sessionInfo(), Role.ANYONE);
+                put("/{id}/role", security.changeRole(), Role.ADMIN);
+                put("/role/{id}", security.changeRole(), Role.ADMIN);
+                path("/2fa", () -> {
+                    get("/setup",    security.totpSetup(),   Role.ANYONE);
+                    post("/confirm", security.totpConfirm(), Role.ANYONE);
+                    post("/verify",  security.totpVerify(),  Role.ANYONE);
+                });
             });
         };
     }

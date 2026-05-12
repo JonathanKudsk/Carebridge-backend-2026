@@ -25,6 +25,9 @@ public class Resident {
     private Integer age;
     private String gender;
 
+    @Column(nullable = false)
+    private boolean isActive = true;
+
     @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL)
     private Journal journal;
 
@@ -106,6 +109,14 @@ public class Resident {
 
     public void removeUser(User user) {
         this.users.remove(user);
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public List<Dosage> getDosages() {

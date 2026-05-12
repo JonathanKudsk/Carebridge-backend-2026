@@ -1,0 +1,110 @@
+@startuml
+
+class PlanPeriod {
+    +Long id
+    +LocalDate startDate
+    +LocalDate endDate
+    +PlanStatus status
+    +Long createdBy
+    +Instant createdAt
+    +create(PlanPeriod) : PlanPeriod
+    +read(Long) : PlanPeriod
+    +readAll() : List<PlanPeriod>
+    +publish(Long) : void
+}
+
+class ShiftAssignment {
+    +Long id
+    +Long shiftId
+    +Long userId
+    +Instant assignedAt
+    +Long assignedBy
+    +create(ShiftAssignment) : ShiftAssignment
+    +readByUser(Long) : List<ShiftAssignment>
+    +readByShift(Long) : ShiftAssignment
+    +delete(Long) : void
+}
+
+class Shift {
+    +Long id
+    +LocalDateTime startTime
+    +LocalDateTime endTime
+    +ShiftType shiftType
+    +ShiftStatus status
+    +Long planPeriodId
+    +Long locationId
+    +Long createdBy
+    +Instant createdAt
+    +create(Shift) : Shift
+    +read(Long) : Shift
+    +readByPeriod(Long) : List<Shift>
+    +readByUser(Long) : List<Shift>
+    +update(Long, Shift) : Shift
+    +delete(Long) : void
+}
+
+class User {
+    +Long id
+    +String name
+    +String email
+    -String passwordHash
+    +Role role
+    +Instant createdAt
+    +create(User) : User
+    +read(Long) : User
+    +update(Long, User) : User
+    +delete(Long) : void
+}
+
+class Location {
+    +Long id
+    +String name
+    +String description
+    +create(Location) : Location
+    +read(Long) : Location
+    +readAll() : List<Location>
+}
+
+class ShiftService <<service>> {
+    +validateNoOverlap(Long userId, LocalDateTime start, LocalDateTime end) : void
+    +validateNoOverlapOnUpdate(Long shiftId, Long userId, LocalDateTime start, LocalDateTime end) : void
+}
+
+enum PlanStatus {
+    DRAFT
+    PUBLISHED
+}
+
+enum ShiftType {
+    DAY
+    EVENING
+    NIGHT
+    ON_CALL
+}
+
+enum ShiftStatus {
+    OPEN
+    ASSIGNED
+    CANCELLED
+}
+
+enum Role {
+    ANYONE
+    USER
+    ADMIN
+    CAREWORKER
+    GUARDIAN
+    PLANNER
+}
+
+ShiftService ..> ShiftAssignment : validates before
+PlanPeriod "1" --> "0..*" Shift : contains
+PlanPeriod "1" --> "1" PlanStatus : has status
+ShiftAssignment "0..*" --> "1" Shift : assigns to
+ShiftAssignment "0..*" --> "1" User : assigns
+Shift "1" --> "1" ShiftType : categorised by
+Shift "1" --> "1" ShiftStatus : has status
+Shift "0..*" --> "1" Location : located at
+User "1" --> "1" Role : has role
+
+@enduml
