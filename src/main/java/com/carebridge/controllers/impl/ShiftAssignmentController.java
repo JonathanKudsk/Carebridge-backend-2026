@@ -6,6 +6,7 @@ import com.carebridge.entities.Shift;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.ScheduleConflictException;
 import com.carebridge.exceptions.ValidationException;
+import com.carebridge.utils.toon.ToonObjectMapper;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,17 +18,18 @@ public class ShiftAssignmentController {
 
     private static final Logger logger = LoggerFactory.getLogger(ShiftAssignmentController.class);
     private final ShiftDAO shiftDAO = ShiftDAO.getInstance();
+    private final ToonObjectMapper toonObjectMapper = new ToonObjectMapper();
 
     public void create(Context ctx) {
         try {
-            ShiftAssignmentDTO dto = ctx.bodyAsClass(ShiftAssignmentDTO.class);
+            ShiftAssignmentDTO dto = toonObjectMapper.readValue(ctx.body(), ShiftAssignmentDTO.class);
 
             if (dto.getShiftId() == null) throw new ValidationException("shiftId is required");
             if (dto.getUserId() == null) throw new ValidationException("userId is required");
 
             Shift shift = shiftDAO.read(dto.getShiftId());
             if (shift == null) {
-                ctx.status(404).json("{\"msg\":\"Shift not found\"}");
+                toonObjectMapper.writeMessage(ctx, 404, "Shift not found");
                 return;
             }
 
@@ -41,16 +43,16 @@ public class ShiftAssignmentController {
             patch.setAssignedUserId(dto.getUserId());
             shiftDAO.update(dto.getShiftId(), patch);
 
-            ctx.status(201).json(createdAssignment);
+            toonObjectMapper.write(ctx, 201, createdAssignment);
         } catch (ValidationException e) {
-            ctx.status(400).json("{\"msg\":\"" + e.getMessage() + "\"}");
+            toonObjectMapper.writeMessage(ctx, 400, e.getMessage());
         } catch (ScheduleConflictException e) {
-            ctx.status(409).json("{\"msg\":\"" + e.getMessage() + "\"}");
+            toonObjectMapper.writeMessage(ctx, 409, e.getMessage());
         } catch (ApiRuntimeException e) {
-            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+            toonObjectMapper.writeMessage(ctx, e.getErrorCode(), e.getMessage());
         } catch (Exception e) {
             logger.error("Error creating shift assignment", e);
-            ctx.status(500).json("{\"msg\":\"Internal server error\"}");
+            toonObjectMapper.writeMessage(ctx, 500, "Internal server error");
         }
     }
 
@@ -97,5 +99,5 @@ public class ShiftAssignmentController {
             throw new IllegalStateException("ShiftAssignmentDAO/ShiftAssignment entity is not available", e);
         }
     }
-}
 
+}

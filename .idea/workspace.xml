@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="Created ShiftStatus and ShiftType enums">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/Routes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/Routes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/ShiftAssignmentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/ShiftAssignmentController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,6 +34,10 @@
     &quot;accountId&quot;: &quot;0640aa20-5e9b-422a-bde1-006afebac647&quot;
   }
 }</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -43,9 +49,13 @@
   "keyToString": {
     "Application.App.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "TEAM-6--Create-POST-/shift-assignments-endpoint",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
@@ -63,17 +73,6 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <option name="filePath" />
-      <method v="2" />
-    </configuration>
-  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -94,6 +93,7 @@
       <workItem from="1776861979124" duration="716000" />
       <workItem from="1777366033497" duration="1113000" />
       <workItem from="1777367176687" duration="2677000" />
+      <workItem from="1778702052799" duration="972000" />
     </task>
     <task id="LOCAL-00001" summary="Created ShiftStatus and ShiftType enums">
       <option name="closed" value="true" />

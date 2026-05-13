@@ -108,6 +108,13 @@
             <version>0.4</version>
         </dependency>
 
+        <!-- TOON -->
+        <dependency>
+            <groupId>dev.toonformat</groupId>
+            <artifactId>jtoon</artifactId>
+            <version>1.0.9</version>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
