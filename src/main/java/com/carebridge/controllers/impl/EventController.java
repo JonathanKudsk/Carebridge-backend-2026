@@ -215,7 +215,7 @@ public class EventController implements IController<Event, Long> {
             event.setRiskLevel(riskLevel);
             event.setAccessLevel(accessLevel);
             event.setUsersWithAccess(usersWithAccess);
-            event.setResident(resident);
+            event.setResidentId(resident.getId());
 
             var created = eventDAO.create(event);
             ctx.status(201).json(EventMapper.toDTO(created, creator.getId()));

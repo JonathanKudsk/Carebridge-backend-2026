@@ -1,5 +1,6 @@
 package com.carebridge.entities;
 
+import com.carebridge.enums.EventAccessLevel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
@@ -93,8 +94,9 @@ public class Event {
     @Column(name = "risk_description")
     private String riskDescription;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "access_level", length = 50)
-    private String accessLevel;
+    private EventAccessLevel accessLevel;
 
     public Event() {
     }
@@ -231,11 +233,11 @@ public class Event {
         this.usersWithAccess = users;
     }
 
-    public String getAccessLevel() {
+    public EventAccessLevel getAccessLevel() {
         return accessLevel;
     }
 
-    public void setAccessLevel(String accessLevel) {
+    public void setAccessLevel(EventAccessLevel accessLevel) {
         this.accessLevel = accessLevel;
     }
 

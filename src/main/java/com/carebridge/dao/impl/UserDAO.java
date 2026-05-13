@@ -2,6 +2,7 @@ package com.carebridge.dao.impl;
 
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.IDAO;
+import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 import com.carebridge.entities.enums.Role;
 import com.carebridge.exceptions.ApiRuntimeException;
@@ -135,6 +136,47 @@ public class UserDAO implements IDAO<User, Long> {
         } catch (Exception e) {
             logger.error("Error fetching user IDs for role {}", role, e);
             throw new ApiRuntimeException(500, "Error fetching users by role: " + e.getMessage());
+        }
+    }
+
+    /** Removes all guardian–resident links for this user (guardian_residents join table). */
+    public void clearResidents(Long guardianId) {
+        try (var em = em()) {
+            em.getTransaction().begin();
+            User guardian = em.find(User.class, guardianId);
+            if (guardian != null) {
+                guardian.getResidents().clear();
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("Error clearing residents for guardian {}", guardianId, e);
+            throw new ApiRuntimeException(500, "Error clearing residents: " + e.getMessage());
+        }
+    }
+
+    /** Adds residents to the guardian's {@code guardian_residents} association (idempotent per resident). */
+    public void linkResidents(Long guardianId, List<Resident> residentsToLink) {
+        if (residentsToLink == null || residentsToLink.isEmpty())
+            return;
+        try (var em = em()) {
+            em.getTransaction().begin();
+            User guardian = em.find(User.class, guardianId);
+            if (guardian == null)
+                throw new ApiRuntimeException(404, "User not found");
+            for (Resident r : residentsToLink) {
+                if (r == null || r.getId() == null)
+                    continue;
+                Resident attached = em.find(Resident.class, r.getId());
+                if (attached != null && !guardian.getResidents().contains(attached)) {
+                    guardian.getResidents().add(attached);
+                }
+            }
+            em.getTransaction().commit();
+        } catch (ApiRuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error linking residents to guardian {}", guardianId, e);
+            throw new ApiRuntimeException(500, "Error linking residents: " + e.getMessage());
         }
     }
 

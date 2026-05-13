@@ -72,7 +72,7 @@ public class ResidentDAOTest {
         unlinkedResident.setCprNr("333333-3333");
         unlinkedResident = residentDAO.create(unlinkedResident);
 
-        guardian = userDAO.linkResidents(guardian.getId(), List.of(linkedResident));
+        userDAO.linkResidents(guardian.getId(), List.of(linkedResident));
     }
 
     @AfterEach
@@ -157,7 +157,7 @@ public class ResidentDAOTest {
         anotherLinkedResident.setCprNr("555555-5555");
         anotherLinkedResident = residentDAO.create(anotherLinkedResident);
 
-        guardian = userDAO.linkResidents(guardian.getId(), List.of(linkedResident, anotherLinkedResident));
+        userDAO.linkResidents(guardian.getId(), List.of(linkedResident, anotherLinkedResident));
 
         List<Resident> residents = residentDAO.getAllSortedForGuardian(guardian.getId());
 
