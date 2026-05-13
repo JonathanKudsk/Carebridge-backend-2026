@@ -14,6 +14,7 @@ import com.carebridge.entities.AuditLog;
 import com.carebridge.entities.Medication;
 import com.carebridge.entities.MedicationChart;
 import com.carebridge.entities.User;
+import com.carebridge.exceptions.ConflictException;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +110,14 @@ public class MedicationController implements IController<Medication, Long> {
                         "Medication " + medicationId + " does not belong to chart " + chartId);
             }
 
+            if (req.getVersion() != null && !req.getVersion().equals(existing.getVersion())) {
+                ctx.status(409).json(java.util.Map.of(
+                        "msg", "Conflict: medication has been updated by another user",
+                        "currentVersion", existing.getVersion()
+                ));
+                return;
+            }
+
             if (req.getName() != null && !req.getName().isBlank()) existing.setName(req.getName());
             if (req.getDosage() != null) existing.setDosage(req.getDosage());
             if (req.getFrequency() != null) existing.setFrequency(req.getFrequency());
@@ -126,6 +135,10 @@ public class MedicationController implements IController<Medication, Long> {
                     "Medication '" + updated.getName() + "' updated on chart " + chartId));
 
             ctx.status(200).json(toResponseDTO(updated));
+        } catch (ConflictException e) {
+            ctx.status(409).json(java.util.Map.of(
+                    "msg", "Conflict: medication was modified by another user"
+            ));
         } catch (IllegalArgumentException e) {
             ctx.status(400).result(e.getMessage());
         } catch (Exception e) {
@@ -175,7 +188,7 @@ public class MedicationController implements IController<Medication, Long> {
     private MedicationResponseDTO toResponseDTO(Medication m) {
         Long chartId = m.getMedicationChart() != null ? m.getMedicationChart().getId() : null;
         return new MedicationResponseDTO(
-                m.getId(), chartId, m.getName(), m.getDosage(), m.getFrequency(),
+                m.getId(), chartId, m.getVersion(), m.getName(), m.getDosage(), m.getFrequency(),
                 m.getStartDate(), m.getEndDate(), m.getPrescribingDoctor(), m.getNotes(), m.isActive());
     }
 
