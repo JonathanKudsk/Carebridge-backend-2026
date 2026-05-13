@@ -24,7 +24,7 @@ class HandbookDAOTest
     @BeforeAll
     static void setupClass()
     {
-        emf = HibernateConfig.getEntityManagerFactory();
+        emf = HibernateConfig.getEntityManagerFactoryForTest();
     }
 
 

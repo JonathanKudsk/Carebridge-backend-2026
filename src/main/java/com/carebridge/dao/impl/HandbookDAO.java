@@ -6,6 +6,7 @@ import com.carebridge.dao.IDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.NoResultException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,33 +58,25 @@ public class HandbookDAO implements IDAO<Handbook, Long>
     {
         try (EntityManager em = emf.createEntityManager())
         {
-            Handbook handbook =
-                    em.createQuery(
-                                    """
-                                    SELECT h
-                                    FROM Handbook h
-                                    LEFT JOIN FETCH h.handbookTabs
-                                    WHERE h.id = :id
-                                    """,
-                                    Handbook.class
-                            )
-                            .setParameter("id", id)
-                            .getSingleResult();
-
-            if (handbook == null)
-            {
-                throw new EntityNotFoundException(
-                        "Handbook not found with ID: " + id
-                );
-            }
-
-            return handbook;
+            return em.createQuery(
+                            """
+                            SELECT h
+                            FROM Handbook h
+                            LEFT JOIN FETCH h.handbookTabs
+                            WHERE h.id = :id
+                            """,
+                            Handbook.class
+                    )
+                    .setParameter("id", id)
+                    .getSingleResult();
         }
-        catch (EntityNotFoundException e)
+        catch (NoResultException e)
         {
             logger.error("Handbook not found", e);
 
-            throw e;
+            throw new EntityNotFoundException(
+                    "Handbook not found with ID: " + id
+            );
         }
         catch (Exception e)
         {
@@ -95,7 +88,6 @@ public class HandbookDAO implements IDAO<Handbook, Long>
             );
         }
     }
-
 
     //Retrieves all handbooks including related tabs. Mainly useful for system-wide administration.
     @Override
