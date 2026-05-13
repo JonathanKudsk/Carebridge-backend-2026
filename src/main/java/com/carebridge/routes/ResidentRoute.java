@@ -13,14 +13,14 @@ public class ResidentRoute {
 
     public EndpointGroup getRoutes() {
         return () -> {
-            get("/", controller::readAll, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
+            get("/", controller::readAll, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN, Role.SUBSTITUTE);
             post("/create", controller::create, Role.ADMIN);
             put("/{id}", controller::update, Role.ADMIN);
             delete("/{id}", controller::delete, Role.ADMIN);
             get("/{id}", controller::read, Role.ADMIN);
             put("/deactivate/{id}", controller::deactivate, Role.ADMIN);
             // Define resident-related routes here
-            get("/sorted", controller::getAllSorted, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
+            get("/sorted", controller::getAllSorted, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN, Role.SUBSTITUTE);
         };
     }
 }
