@@ -67,10 +67,13 @@ public class SecurityController implements ISecurityController {
                 } else if (isWithinGracePeriod(verified)) {
                     // Freshly enrolled — grace period active, skip 2FA challenge
                     String token = createToken(buildJwtUser(verified));
+                    long expiresAt = resolveExpiresAt();
                     ctx.status(200).json(out.put("token", token)
                             .put("email", verified.getEmail())
                             .put("role", verified.getRole().name())
-                            .put("isEmployed", verified.isEmployed()));
+                            .put("isEmployed", verified.isEmployed())
+                            .put("expiresAt", expiresAt)
+                            .put("warningAt", expiresAt - 30_000));
                 } else {
                     // Returning user with 2FA active — must verify TOTP code
                     String tempToken = createTempToken(verified.getEmail(), "VERIFY");
@@ -118,13 +121,17 @@ public class SecurityController implements ISecurityController {
                     return;
                 }
 
+                securityDAO.enableTotp(email);
+                securityDAO.renewGracePeriod(email);
+
+                String token = createToken(buildJwtUser(user));
                 long expiresAt = resolveExpiresAt();
                 ctx.status(200).json(out.put("token", token)
-                        .put("email", safeUser.getEmail())
-                        .put("role", safeUser.getRole().name())
+                        .put("email", email)
+                        .put("role", user.getRole().name())
                         .put("expiresAt", expiresAt)
                         .put("warningAt", expiresAt - 30_000));
-            } catch (ValidationException e) {
+            } catch (TokenVerificationException e) {
                 ctx.status(401).json(out.put("msg", e.getMessage()));
             } catch (Exception e) {
                 logger.error("totpConfirm failed", e);
@@ -150,9 +157,12 @@ public class SecurityController implements ISecurityController {
                 securityDAO.renewGracePeriod(email);
 
                 String token = createToken(buildJwtUser(user));
+                long expiresAt = resolveExpiresAt();
                 ctx.status(200).json(out.put("token", token)
                         .put("email", email)
-                        .put("role", user.getRole().name()));
+                        .put("role", user.getRole().name())
+                        .put("expiresAt", expiresAt)
+                        .put("warningAt", expiresAt - 30_000));
             } catch (TokenVerificationException e) {
                 ctx.status(401).json(out.put("msg", e.getMessage()));
             } catch (Exception e) {
