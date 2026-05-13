@@ -2,6 +2,7 @@ package com.carebridge.services.mappers;
 
 import com.carebridge.dtos.EventDTO;
 import com.carebridge.entities.Event;
+import com.carebridge.enums.EventAccessLevel;
 import com.carebridge.entities.EventType;
 import com.carebridge.entities.User;
 
@@ -56,7 +57,7 @@ public class EventMapper {
         dto.setRiskLevel(event.getRiskLevel());
         dto.setRiskColor(event.getRiskColor());
         dto.setRiskDescription(event.getRiskDescription());
-        dto.setAccessLevel(event.getAccessLevel());
+        dto.setAccessLevel(event.getAccessLevel() != null ? event.getAccessLevel().name() : null);
 
         dto.setIsPrivate(null);
 
@@ -112,7 +113,14 @@ public class EventMapper {
     }
 
 
-    private static String resolveAccessLevel(String accessLevel) {
-        return (accessLevel != null && !accessLevel.isBlank()) ? accessLevel : "1";
+    private static EventAccessLevel resolveAccessLevel(String accessLevel) {
+        if (accessLevel != null && !accessLevel.isBlank()) {
+            try {
+                return EventAccessLevel.valueOf(accessLevel.trim());
+            } catch (IllegalArgumentException ignored) {
+                return EventAccessLevel.ROLE_BASED;
+            }
+        }
+        return EventAccessLevel.ROLE_BASED;
     }
 }

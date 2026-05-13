@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 public class UserDAO implements IDAO<User, Long> {
 
@@ -115,9 +116,6 @@ public class UserDAO implements IDAO<User, Long> {
                 existing.setEmail(updated.getEmail());
             if (updated.getRole() != null)
                 existing.setRole(updated.getRole());
-            if (updated.isEmployed() != existing.isEmployed()) {
-                existing.setIsEmployed(updated.isEmployed());
-            }
 
             em.getTransaction().commit();
             logger.info("User updated: id={}", id);
@@ -130,34 +128,50 @@ public class UserDAO implements IDAO<User, Long> {
         }
     }
 
-    public User linkResidents(Long guardianId, List<Resident> residents) {
-        if (guardianId == null) {
-            throw new ApiRuntimeException(400, "Guardian id is required");
+    public List<Long> findUserIdsByRole(Role role) {
+        try (var em = em()) {
+            return em.createQuery("SELECT u.id FROM User u WHERE u.role = :role", Long.class)
+                    .setParameter("role", role)
+                    .getResultList();
+        } catch (Exception e) {
+            logger.error("Error fetching user IDs for role {}", role, e);
+            throw new ApiRuntimeException(500, "Error fetching users by role: " + e.getMessage());
         }
-        if (residents == null) {
-            throw new ApiRuntimeException(400, "Residents are required");
-        }
+    }
 
+    /** Removes all guardian–resident links for this user (guardian_residents join table). */
+    public void clearResidents(Long guardianId) {
         try (var em = em()) {
             em.getTransaction().begin();
-
             User guardian = em.find(User.class, guardianId);
-            if (guardian == null) {
-                throw new ApiRuntimeException(404, "Guardian not found");
+            if (guardian != null) {
+                guardian.getResidents().clear();
             }
-            if (guardian.getRole() != Role.GUARDIAN) {
-                throw new ApiRuntimeException(400, "User is not a guardian");
-            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            logger.error("Error clearing residents for guardian {}", guardianId, e);
+            throw new ApiRuntimeException(500, "Error clearing residents: " + e.getMessage());
+        }
+    }
 
-            for (Resident resident : residents) {
-                if (resident != null && resident.getId() != null) {
-                    guardian.addResident(em.getReference(Resident.class, resident.getId()));
+    /** Adds residents to the guardian's {@code guardian_residents} association (idempotent per resident). */
+    public void linkResidents(Long guardianId, List<Resident> residentsToLink) {
+        if (residentsToLink == null || residentsToLink.isEmpty())
+            return;
+        try (var em = em()) {
+            em.getTransaction().begin();
+            User guardian = em.find(User.class, guardianId);
+            if (guardian == null)
+                throw new ApiRuntimeException(404, "User not found");
+            for (Resident r : residentsToLink) {
+                if (r == null || r.getId() == null)
+                    continue;
+                Resident attached = em.find(Resident.class, r.getId());
+                if (attached != null && !guardian.getResidents().contains(attached)) {
+                    guardian.getResidents().add(attached);
                 }
             }
-
-            em.merge(guardian);
             em.getTransaction().commit();
-            return guardian;
         } catch (ApiRuntimeException e) {
             throw e;
         } catch (Exception e) {
@@ -166,28 +180,18 @@ public class UserDAO implements IDAO<User, Long> {
         }
     }
 
-    public User clearResidents(Long guardianId) {
-        if (guardianId == null) {
-            throw new ApiRuntimeException(400, "Guardian id is required");
-        }
-
+    // Returns the ID of the first guardian linked to the given resident, or empty if none.
+    public Optional<Long> findGuardianIdByResidentId(Long residentId) {
         try (var em = em()) {
-            em.getTransaction().begin();
-
-            User guardian = em.find(User.class, guardianId);
-            if (guardian == null) {
-                throw new ApiRuntimeException(404, "Guardian not found");
-            }
-
-            guardian.getResidents().clear();
-            em.merge(guardian);
-            em.getTransaction().commit();
-            return guardian;
-        } catch (ApiRuntimeException e) {
-            throw e;
+            List<Long> results = em.createQuery(
+                    "SELECT u.id FROM User u JOIN u.residents r WHERE r.id = :residentId", Long.class)
+                    .setParameter("residentId", residentId)
+                    .setMaxResults(1)
+                    .getResultList();
+            return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
         } catch (Exception e) {
-            logger.error("Error clearing residents for guardian {}", guardianId, e);
-            throw new ApiRuntimeException(500, "Error clearing residents: " + e.getMessage());
+            logger.error("Error fetching guardian for resident {}", residentId, e);
+            throw new ApiRuntimeException(500, "Error fetching guardian: " + e.getMessage());
         }
     }
 
@@ -198,10 +202,6 @@ public class UserDAO implements IDAO<User, Long> {
             User u = em.find(User.class, id);
             if (u == null)
                 throw new ApiRuntimeException(404, "User not found");
-
-            // Deactivate chat rooms before deleting user making chat read only for the user
-            ChatRoomDAO.getInstance().deactivateChatRoomsForUser(id);
-
             em.remove(u);
             em.getTransaction().commit();
             logger.info("User deleted: id={}", id);
