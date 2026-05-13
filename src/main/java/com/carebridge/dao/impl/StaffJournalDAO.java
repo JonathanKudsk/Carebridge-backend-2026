@@ -30,4 +30,27 @@ public class StaffJournalDAO {
             throw new RuntimeException("Error persisting StaffJournal", e);
         }
     }
+
+    public StaffJournal read(Long id) {
+        try (var em = emf.createEntityManager()) {
+            return em.find(StaffJournal.class, id);
+        } catch (Exception e) {
+            logger.error("Error reading StaffJournal {}", id, e);
+            throw new RuntimeException("Error reading StaffJournal", e);
+        }
+    }
+
+    public StaffJournal readByUserId(Long userId) {
+        try (var em = emf.createEntityManager()) {
+            var results = em.createQuery(
+                "SELECT s FROM StaffJournal s WHERE s.user.id = :userId",
+                StaffJournal.class
+            ).setParameter("userId", userId).getResultList();
+            return results.isEmpty() ? null : results.get(0);
+        } catch (Exception e) {
+            logger.error("Error reading StaffJournal for user {}", userId, e);
+            throw new RuntimeException("Error reading StaffJournal by userId", e);
+        }
+    }
+
 }
