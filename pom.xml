@@ -113,6 +113,11 @@
             <groupId>dev.toonformat</groupId>
             <artifactId>jtoon</artifactId>
             <version>1.0.9</version>
+        <!-- TOTP (Time-based One-Time Password) -->
+        <dependency>
+            <groupId>dev.samstevens.totp</groupId>
+            <artifactId>totp</artifactId>
+            <version>1.5.1</version>
         </dependency>
 
         <!-- Testing -->

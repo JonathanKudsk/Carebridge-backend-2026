@@ -1,5 +1,6 @@
 package com.carebridge.config;
 
+import com.carebridge.controllers.impl.ChatRoomWebSocketController;
 import com.carebridge.controllers.security.AccessController;
 import com.carebridge.exceptions.ApiException;
 import com.carebridge.routes.Routes;
@@ -32,6 +33,11 @@ public class ApplicationConfig {
 
     public static Javalin startServer(int port) {
         Javalin app = Javalin.create(ApplicationConfig::configuration);
+
+        app.ws("/ws/chatrooms/{id}", ws -> {
+            ws.onConnect(ChatRoomWebSocketController::onConnect);
+            ws.onClose(ChatRoomWebSocketController::onClose);
+        });
 
         app.beforeMatched(accessController::accessHandler);
 
