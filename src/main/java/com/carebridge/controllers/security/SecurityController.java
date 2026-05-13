@@ -63,6 +63,18 @@ public class SecurityController implements ISecurityController {
                 AuthRequest req = ctx.bodyAsClass(AuthRequest.class);
                 User verified = securityDAO.getVerifiedUser(req.getEmail(), req.getPassword());
 
+                //Skip 2FA if run local (except for the tests)
+                //workflow.yml sets DEPLOYED to a non-null value, which means the 2FA is active when deployed.
+                boolean DEPLOYED = System.getenv("DEPLOYED") != null;
+                if (!DEPLOYED && !HibernateConfig.getTest()) {
+                    String token = createToken(buildJwtUser(verified));
+                    ctx.status(200).json(out.put("token", token)
+                            .put("email", verified.getEmail())
+                            .put("role", verified.getRole().name())
+                            .put("isEmployed", verified.isEmployed()));
+                    return;
+                }
+
                 if (!verified.isTotpEnabled()) {
                     // First login or abandoned setup — must complete TOTP setup before getting a full JWT
                     String tempToken = createTempToken(verified.getEmail(), "SETUP");
