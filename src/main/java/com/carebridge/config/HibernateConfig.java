@@ -65,6 +65,7 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(ChatRoomUser.class);
         configuration.addAnnotatedClass(Message.class);
         configuration.addAnnotatedClass(ShiftAssignment.class);
+        configuration.addAnnotatedClass(StaffJournal.class);
     }
 
     private static EntityManagerFactory createEMF(boolean forTest) {
