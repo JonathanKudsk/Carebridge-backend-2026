@@ -13,67 +13,68 @@ import java.util.Map;
 
 public class ToonObjectMapper {
 
-    public static final String CONTENT_TYPE = "application/toon";
+  public static final String CONTENT_TYPE = "application/toon";
 
-    private final ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
-    public ToonObjectMapper() {
-        this.objectMapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .registerModule(new JavaTimeModule());
+  public ToonObjectMapper() {
+    this.objectMapper = new ObjectMapper()
+      .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+      .registerModule(new JavaTimeModule());
+  }
+
+  public <T> T readValue(String body, Class<T> targetType) throws ValidationException {
+    if (body == null || body.isBlank()) {
+      throw new ValidationException("TOON body is required");
     }
 
-    public <T> T readValue(String body, Class<T> targetType) {
-        if (body == null || body.isBlank()) {
-            throw new ValidationException("TOON body is required");
-        }
-
-        Object decoded;
-        try {
-            decoded = JToon.decode(body);
-        } catch (RuntimeException e) {
-            throw new ValidationException("Invalid TOON payload");
-        }
-
-        if (!(decoded instanceof Map<?, ?> decodedMap)) {
-            throw new ValidationException("TOON payload must be an object");
-        }
-
-        Map<String, Object> normalized = new LinkedHashMap<>();
-        for (Map.Entry<?, ?> entry : decodedMap.entrySet()) {
-            if (entry.getKey() == null) {
-                continue;
-            }
-            normalized.put(String.valueOf(entry.getKey()), entry.getValue());
-        }
-
-        return objectMapper.convertValue(normalized, targetType);
+    Object decoded;
+    try {
+      decoded = JToon.decode(body);
+    } catch (RuntimeException e) {
+      throw new ValidationException("Invalid TOON payload");
     }
 
-    public String writeValueAsString(Object value) {
-        if (value == null) {
-            return message("No content");
-        }
-
-        Map<String, Object> serialized = objectMapper.convertValue(value, new TypeReference<>() {});
-        return JToon.encode(serialized);
+    if (!(decoded instanceof Map<?, ?> decodedMap)) {
+      throw new ValidationException("TOON payload must be an object");
     }
 
-    public String message(String message) {
-        Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("msg", message == null ? "" : message);
-        return JToon.encode(payload);
+    Map<String, Object> normalized = new LinkedHashMap<>();
+    for (Map.Entry<?, ?> entry : decodedMap.entrySet()) {
+      if (entry.getKey() == null) {
+        continue;
+      }
+      normalized.put(String.valueOf(entry.getKey()), entry.getValue());
     }
 
-    public void write(Context ctx, int status, Object value) {
-        ctx.status(status);
-        ctx.contentType(CONTENT_TYPE);
-        ctx.result(writeValueAsString(value));
+    return objectMapper.convertValue(normalized, targetType);
+  }
+
+  public String writeValueAsString(Object value) {
+    if (value == null) {
+      return message("No content");
     }
 
-    public void writeMessage(Context ctx, int status, String message) {
-        ctx.status(status);
-        ctx.contentType(CONTENT_TYPE);
-        ctx.result(message(message));
-    }
+    Map<String, Object> serialized = objectMapper.convertValue(value, new TypeReference<>() {
+    });
+    return JToon.encode(serialized);
+  }
+
+  public String message(String message) {
+    Map<String, Object> payload = new LinkedHashMap<>();
+    payload.put("msg", message == null ? "" : message);
+    return JToon.encode(payload);
+  }
+
+  public void write(Context ctx, int status, Object value) {
+    ctx.status(status);
+    ctx.contentType(CONTENT_TYPE);
+    ctx.result(writeValueAsString(value));
+  }
+
+  public void writeMessage(Context ctx, int status, String message) {
+    ctx.status(status);
+    ctx.contentType(CONTENT_TYPE);
+    ctx.result(message(message));
+  }
 }
