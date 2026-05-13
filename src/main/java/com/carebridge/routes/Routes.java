@@ -22,6 +22,7 @@ public class Routes {
     private final MessageRoute messageRoute = new MessageRoute();
     private final ShiftRoute shiftRoute = new ShiftRoute();
     private final ShiftAssignmentRoute shiftAssignmentRoute = new ShiftAssignmentRoute();
+    private final PlanPeriodRoute planPeriodRoute = new PlanPeriodRoute();
 
     public EndpointGroup getRoutes() {
         return () -> {
@@ -39,6 +40,7 @@ public class Routes {
             path("/messages", messageRoute.getRoutes());
             path("/shifts", shiftRoute.getRoutes());
             path("/shift-assignments", shiftAssignmentRoute.getRoutes());
+            path("/plan-periods", planPeriodRoute.getRoutes());
 
             get("/populate", controller::populate, Role.ANYONE);
             post("/populate", controller::populate, Role.ANYONE);
