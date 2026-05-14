@@ -1,18 +1,14 @@
 package com.carebridge;
 
 import com.carebridge.config.ApplicationConfig;
-
-import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dao.impl.ResidentDAO;
 import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.entities.Journal;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 import com.carebridge.entities.enums.Role;
-
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.config.Populator;
-
 import io.javalin.Javalin;
 
 public class App {

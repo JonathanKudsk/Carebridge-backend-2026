@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ChatRoomController implements IController<ChatRoom, Long> {
 
@@ -41,6 +42,13 @@ public class ChatRoomController implements IController<ChatRoom, Long> {
     @Override
     public void readAll(Context ctx) {
         try {
+            // Re-evaluate all chat rooms before returning them
+            List<ChatRoom> allRooms = chatRoomDAO.readAll();
+
+            for (ChatRoom room: allRooms)  {
+                chatRoomDAO.evaluateAndUpdateChatRoomStatus(room.getId());
+            }
+
             // Return rooms as DTOs so the frontend gets member ids instead of entities.
             var list = chatRoomDAO.readAll().stream().map(ChatRoomMapper::toDTO).toList();
             ctx.json(list);

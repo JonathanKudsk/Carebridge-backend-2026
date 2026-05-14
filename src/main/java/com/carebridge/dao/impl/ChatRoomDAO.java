@@ -197,4 +197,71 @@ public class ChatRoomDAO implements IDAO<ChatRoom, Long> {
             throw new ApiRuntimeException(500, "Error deactivating chat rooms");
         }
     }
+
+    public void evaluateAndUpdateChatRoomStatus(Long chatRoomId)  {
+        try (var em = em())  {
+            em.getTransaction().begin();
+
+            ChatRoom chatRoom = em.find(ChatRoom.class, chatRoomId);
+            if (chatRoom == null) {
+                throw new ApiRuntimeException(404, "Chat room not found");
+            }
+
+            // Counts members with isEmployed
+            Long employedCount = (Long) em.createQuery(
+                    "SELECT COUNT(cru) FROM ChatRoomUser cru " +
+                            "WHERE cru.chatRoom.id = :chatRoomId " +
+                            "AND cru.user.isEmployed = true"
+            )
+                    .setParameter("chatRoomId", chatRoomId)
+                    .getSingleResult();
+
+            // Get total members count
+            Long totalMembers = (Long) em.createQuery(
+                    "SELECT COUNT(cru) FROM ChatRoomUser cru " +
+                            "WHERE cru.chatRoom.id = :chatRoomId"
+            )
+                    .setParameter("chatRoomId", chatRoomId)
+                    .getSingleResult();
+
+            // DEBUG: Log the counts
+            logger.info("Chat room {} - employedCount: {}, totalMembers: {}", chatRoomId, employedCount, totalMembers);
+
+
+            // If only one person with employed status true, deactivate the room
+            boolean shouldBeActive = !(employedCount == 1 && totalMembers > 1);
+
+            if (chatRoom.isActive() != shouldBeActive)  {
+                chatRoom.setIsActive(shouldBeActive);
+                logger.info("Chat room {} status updated to isActive={}", chatRoomId, shouldBeActive);
+            }
+
+            em.getTransaction().commit();
+        } catch (ApiRuntimeException e)  {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error evaluating chat room status {}", chatRoomId, e);
+            throw new ApiRuntimeException(500, "Error evaluating chat room status: " + e.getMessage());
+        }
+    }
+
+    public void reevaluateChatRoomsForUser(Long userId)  {
+        try (var em = em())  {
+            // Get all chat rooms containing this user
+            List<ChatRoom> chatRooms = em.createQuery(
+                    "SELECT DISTINCT cr FROM ChatRoom cr " +
+                            "JOIN cr.chatRoomUser cru " +
+                            "WHERE cru.user.id = :userId",
+                    ChatRoom.class
+            ).setParameter("userId", userId).getResultList();
+
+            // Re-evaluate each room
+            for (ChatRoom chatRoom : chatRooms)  {
+                evaluateAndUpdateChatRoomStatus(chatRoom.getId());
+            }
+        } catch (Exception e)  {
+            logger.error("Error re-evaluating chat rooms for user {}", userId, e);
+            throw new ApiRuntimeException(500, "Error re-evaluating chat rooms: " + e.getMessage());
+        }
+    }
 }

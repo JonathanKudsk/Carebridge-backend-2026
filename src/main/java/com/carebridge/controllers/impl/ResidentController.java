@@ -11,6 +11,7 @@ import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 import com.carebridge.services.ResidentService;
 import io.javalin.http.Context;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,6 @@ public class ResidentController implements IController<Resident, Long> {
     private final UserDAO userDAO = UserDAO.getInstance();
     private final ResidentService residentService = new ResidentService();
 
-    // Create resident (POST /api/residents)
     public void create(Context ctx) {
         try {
             CreateResidentRequestDTO req = ctx.bodyAsClass(CreateResidentRequestDTO.class);
@@ -43,53 +43,35 @@ public class ResidentController implements IController<Resident, Long> {
             resident.setLastName(req.getLastName());
             resident.setCprNr(req.getCprNr());
 
-            // create single linked journal
             Journal journal = new Journal();
             resident.setJournal(journal);
-            // Important: set the back-reference on the owning side
             journal.setResident(resident);
 
-            // create single linked medication chart
             MedicationChart medicationChart = new MedicationChart();
             medicationChart.setResident(resident);
             resident.setMedicationChart(medicationChart);
 
-            // --- Extract authenticated user and attach to resident/journal if desired ---
             var tokenUser = ctx.attribute("user");
             String email = null;
-            if (tokenUser instanceof com.carebridge.dtos.JwtUserDTO ju) email = ju.getUsername();
-            else if (tokenUser instanceof com.carebridge.dtos.UserDTO du) email = du.getEmail();
-            else if (tokenUser != null) email = tokenUser.toString();
+            if (tokenUser instanceof com.carebridge.dtos.JwtUserDTO ju) {
+                email = ju.getUsername();
+            } else if (tokenUser instanceof com.carebridge.dtos.UserDTO du) {
+                email = du.getEmail();
+            } else if (tokenUser != null) {
+                email = tokenUser.toString();
+            }
 
             if (email != null) {
                 User user = userDAO.readByEmail(email);
                 if (user != null) {
-                    // attach user to resident (many-to-many)
                     resident.addUser(user);
-                    // if you also want to mark journal creator, add a setter on Journal and set it
-                    // journal.setCreatedBy(user);
                 }
             }
-            // -----------------------------------------------------------------------
 
             Resident created = residentDAO.create(resident);
-
-            Long journalId = created.getJournal() != null ? created.getJournal().getId() : null;
-            Long chartId = created.getMedicationChart() != null ? created.getMedicationChart().getId() : null;
-            ResidentResponseDTO resp = new ResidentResponseDTO(
-                    created.getId(),
-                    created.getFirstName(),
-                    created.getLastName(),
-                    created.getCprNr(),
-                    created.getAge(),
-                    created.getGender(),
-                    journalId,
-                    chartId
-            );
-
             ctx.status(201);
             ctx.header("Location", "/api/residents/" + created.getId());
-            ctx.json(resp);
+            ctx.json(toResponseDTO(created));
 
         } catch (IllegalArgumentException e) {
             ctx.status(400).result(e.getMessage());
@@ -99,37 +81,66 @@ public class ResidentController implements IController<Resident, Long> {
         }
     }
 
-    // Unused interface methods kept minimal
     @Override
-    public void delete(Context ctx) { throw new UnsupportedOperationException(); }
+    public void delete(Context ctx) {
+        try {
+            Long id = Long.parseLong(ctx.pathParam("id"));
+
+            Resident resident = residentDAO.read(id);
+            if (resident == null) {
+                ctx.status(404).result("Resident not found with id: " + id);
+                return;
+            }
+
+            residentDAO.delete(id);
+            ctx.status(204);
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("Invalid ID format");
+        } catch (Exception e) {
+            logger.error("Failed to delete resident", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
 
     @Override
-    public boolean validatePrimaryKey(Long aLong) { return false; }
+    public boolean validatePrimaryKey(Long aLong) {
+        return false;
+    }
 
     @Override
-    public Resident validateEntity(Context ctx) { return null; }
+    public Resident validateEntity(Context ctx) {
+        return null;
+    }
 
     @Override
-    public void read(Context ctx) { throw new UnsupportedOperationException(); }
+    public void read(Context ctx) {
+        try {
+            Long id = Long.parseLong(ctx.pathParam("id"));
+            Resident resident = residentDAO.read(id);
+
+            if (resident == null) {
+                ctx.status(404).result("Resident not found with id: " + id);
+                return;
+            }
+
+            ctx.status(200).json(toResponseDTO(resident));
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("Invalid ID format");
+        } catch (Exception e) {
+            logger.error("Failed to read resident", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
 
     @Override
     public void readAll(Context ctx) {
         try {
-            var residents = residentDAO.readAll();
-
-            var response = residents.stream().map(r -> new ResidentResponseDTO(
-                    r.getId(),
-                    r.getFirstName(),
-                    r.getLastName(),
-                    r.getCprNr(),
-                    r.getAge(),
-                    r.getGender(),
-                    r.getJournal() != null ? r.getJournal().getId() : null,
-                    r.getMedicationChart() != null ? r.getMedicationChart().getId() : null
-            )).toList();
+            List<Resident> residents = residentDAO.readAll();
+            List<ResidentResponseDTO> response = residents.stream()
+                    .map(this::toResponseDTO)
+                    .toList();
 
             ctx.json(response);
-
         } catch (Exception e) {
             logger.error("Failed to get residents", e);
             ctx.status(500).result("Internal server error");
@@ -141,16 +152,67 @@ public class ResidentController implements IController<Resident, Long> {
             User currentUser = getAuthenticatedUser(ctx);
             List<ResidentResponseDTO> residents = residentService.getAllSorted(currentUser);
             ctx.status(200).json(residents);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             ctx.status(400).result(e.getMessage());
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Failed to fetch sorted residents", e);
             ctx.status(500).result("Internal server error");
         }
     }
 
     @Override
-    public void update(Context ctx) { throw new UnsupportedOperationException(); }
+    public void update(Context ctx) {
+        try {
+            Long id = Long.parseLong(ctx.pathParam("id"));
+            CreateResidentRequestDTO req = ctx.bodyAsClass(CreateResidentRequestDTO.class);
+
+            Resident existingResident = residentDAO.read(id);
+            if (existingResident == null) {
+                ctx.status(404).result("Resident not found with id: " + id);
+                return;
+            }
+
+            if (req.getFirstName() != null) {
+                existingResident.setFirstName(req.getFirstName());
+            }
+            if (req.getLastName() != null) {
+                existingResident.setLastName(req.getLastName());
+            }
+            if (req.getCprNr() != null) {
+                existingResident.setCprNr(req.getCprNr());
+            }
+
+            Resident updated = residentDAO.update(id, existingResident);
+            ctx.status(200).json(toResponseDTO(updated));
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("Invalid ID format");
+        } catch (Exception e) {
+            logger.error("Failed to update resident", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
+
+    public void deactivate(Context ctx) {
+        try {
+            Long id = Long.parseLong(ctx.pathParam("id"));
+
+            Resident resident = residentDAO.read(id);
+            if (resident == null) {
+                ctx.status(404).result("Resident not found with id: " + id);
+                return;
+            }
+
+            residentDAO.deactivate(id);
+            ctx.status(204);
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("Invalid ID format");
+        } catch (EntityNotFoundException e) {
+            ctx.status(404).result(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Failed to deactivate resident", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
 
     private User getAuthenticatedUser(Context ctx) {
         var tokenUser = ctx.attribute("user");
@@ -174,5 +236,22 @@ public class ResidentController implements IController<Resident, Long> {
         }
 
         return user;
+    }
+
+    private ResidentResponseDTO toResponseDTO(Resident resident) {
+        Long journalId = resident.getJournal() != null ? resident.getJournal().getId() : null;
+        Long medicationChartId = resident.getMedicationChart() != null ? resident.getMedicationChart().getId() : null;
+
+        return new ResidentResponseDTO(
+                resident.getId(),
+                resident.getFirstName(),
+                resident.getLastName(),
+                resident.getCprNr(),
+                resident.getAge(),
+                resident.getGender(),
+                journalId,
+                medicationChartId,
+                resident.isActive()
+        );
     }
 }

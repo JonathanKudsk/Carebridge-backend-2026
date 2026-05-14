@@ -14,5 +14,6 @@ import java.util.List;
 public class ChatRoomDTO {
     private Long id;
     private List<ChatRoomUserDTO> members;
+    private boolean isActive;
 }
 

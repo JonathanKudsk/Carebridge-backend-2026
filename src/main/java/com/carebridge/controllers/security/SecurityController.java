@@ -69,7 +69,8 @@ public class SecurityController implements ISecurityController {
                     String token = createToken(buildJwtUser(verified));
                     ctx.status(200).json(out.put("token", token)
                             .put("email", verified.getEmail())
-                            .put("role", verified.getRole().name()));
+                            .put("role", verified.getRole().name())
+                            .put("isEmployed", verified.isEmployed()));
                 } else {
                     // Returning user with 2FA active — must verify TOTP code
                     String tempToken = createTempToken(verified.getEmail(), "VERIFY");
