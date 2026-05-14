@@ -67,4 +67,36 @@ public class BudgetService {
                 resident.getId()
         );
     }
+
+    public BudgetResponseDTO getBudgetByResident(Long residentId) {
+
+        Resident resident = residentDAO.read(residentId);
+
+        if (resident == null) {
+            throw new ApiRuntimeException(
+                    404,
+                    "Resident not found"
+            );
+        }
+
+        Budget budget = resident.getBudget();
+
+        if (budget == null) {
+            throw new ApiRuntimeException(
+                    404,
+                    "Resident has no budget"
+            );
+        }
+
+        return new BudgetResponseDTO(
+                budget.getId(),
+                budget.getIncome(),
+                budget.getFixedExpenses(),
+                budget.getVariableExpenses(),
+                budget.getPocketMoneyAmount(),
+                budget.getSavingsAmount(),
+                budget.getNotes(),
+                resident.getId()
+        );
+    }
 }

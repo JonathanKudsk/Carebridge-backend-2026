@@ -1,6 +1,7 @@
 package com.carebridge.controllers.impl;
 
 import com.carebridge.dtos.CreateBudgetRequestDTO;
+import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.services.BudgetService;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
@@ -27,15 +28,44 @@ public class BudgetController {
 
             ctx.json(response);
 
-        } catch (IllegalArgumentException e) {
+        } catch (ApiRuntimeException e) {
 
-            ctx.status(400).result(e.getMessage());
+            ctx.status(e.getStatusCode())
+                    .result(e.getMessage());
 
         } catch (Exception e) {
 
             logger.error("Failed to create budget", e);
 
             ctx.status(500).result("Internal server error");
+        }
+    }
+
+    public void getByResident(Context ctx) {
+
+        try {
+
+            Long residentId =
+                    Long.parseLong(
+                            ctx.pathParam("residentId")
+                    );
+
+            var response =
+                    budgetService.getBudgetByResident(residentId);
+
+            ctx.json(response);
+
+        } catch (ApiRuntimeException e) {
+
+            ctx.status(e.getStatusCode())
+                    .result(e.getMessage());
+
+        } catch (Exception e) {
+
+            logger.error("Failed to get budget", e);
+
+            ctx.status(500)
+                    .result("Internal server error");
         }
     }
 }

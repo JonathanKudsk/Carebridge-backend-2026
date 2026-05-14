@@ -4,7 +4,7 @@ import com.carebridge.controllers.impl.BudgetController;
 import com.carebridge.entities.enums.Role;
 import io.javalin.apibuilder.EndpointGroup;
 
-import static io.javalin.apibuilder.ApiBuilder.post;
+import static io.javalin.apibuilder.ApiBuilder.*;
 
 public class BudgetRoute {
 
@@ -18,6 +18,13 @@ public class BudgetRoute {
             post(
                     "/create",
                     controller::create,
+                    Role.ADMIN,
+                    Role.CAREWORKER
+            );
+
+            get(
+                    "/resident/{residentId}",
+                    controller::getByResident,
                     Role.ADMIN,
                     Role.CAREWORKER
             );
