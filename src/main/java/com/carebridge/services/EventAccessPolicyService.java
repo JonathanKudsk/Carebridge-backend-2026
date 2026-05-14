@@ -38,13 +38,16 @@ public class EventAccessPolicyService {
     }
 
     public Integer resolveDefaultRiskLevel(Long eventTypeId) {
+        if (eventTypeId == null) {
+            throw new ApiRuntimeException(400, "eventTypeId is required");
+        }
         Integer riskLevel = EVENT_TYPE_RISK_MAP.get(eventTypeId);
         if (riskLevel != null) {
             return riskLevel;
         }
         // Event types are identity-generated; only IDs 1–10 are explicitly mapped. Tests use GET
         // /event-types → first row by name (e.g. "Holiday"), which may be id 4, 14, 24, … depending on DB state.
-        if (eventTypeId == null || eventTypeId < 1) {
+        if (eventTypeId < 1) {
             throw new ApiRuntimeException(400, "Unknown eventTypeId: " + eventTypeId);
         }
         return (int) (((eventTypeId - 1) % 5) + 1);
