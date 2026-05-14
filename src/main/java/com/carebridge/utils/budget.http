@@ -1,0 +1,100 @@
+@url = http://localhost:7070/api
+
+### Create resident
+POST {{url}}/residents/create
+Content-Type: application/json
+
+{
+  "firstName": "Budget",
+  "lastName": "Test",
+  "cprNr": "121212-1234"
+}
+
+> {%
+    client.test("Resident created", function () {
+
+        client.assert(
+            response.status === 201,
+            "Expected 201 but got " + response.status
+        );
+
+        client.global.set(
+            "resident_id",
+            response.body.id
+        );
+    });
+%}
+
+
+### Create budget
+POST {{url}}/budgets/create
+Content-Type: application/json
+
+{
+  "income": 15000,
+  "fixedExpenses": 6000,
+  "variableExpenses": 2500,
+  "pocketMoneyAmount": 1000,
+  "savingsAmount": 3000,
+  "notes": "Monthly budget",
+  "residentId": {{resident_id}}
+}
+
+> {%
+    client.test("Budget created", function () {
+
+        client.assert(
+            response.status === 201,
+            "Expected 201 but got " + response.status
+        );
+    });
+%}
+
+
+### Create duplicate budget (should fail)
+POST {{url}}/budgets/create
+Content-Type: application/json
+
+{
+  "income": 10000,
+  "fixedExpenses": 4000,
+  "variableExpenses": 1500,
+  "pocketMoneyAmount": 500,
+  "savingsAmount": 1000,
+  "notes": "Should fail",
+  "residentId": {{resident_id}}
+}
+
+> {%
+    client.test("Duplicate budget rejected", function () {
+
+        client.assert(
+            response.status === 400,
+            "Expected 400 but got " + response.status
+        );
+    });
+%}
+
+
+### Missing required field
+POST {{url}}/budgets/create
+Content-Type: application/json
+
+{
+  "income": null,
+  "fixedExpenses": 5000,
+  "variableExpenses": 2000,
+  "pocketMoneyAmount": 1000,
+  "savingsAmount": 1500,
+  "residentId": {{resident_id}}
+}
+
+> {%
+    client.test("Validation works", function () {
+
+        client.assert(
+            response.status === 400,
+            "Expected 400 but got " + response.status
+        );
+    });
+%}
