@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="Created ShiftStatus and ShiftType enums">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/ShiftController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/ShiftController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/ShiftRoute.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/ShiftRoute.java" afterDir="false" />
-    </list>
+    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="Created ShiftStatus and ShiftType enums" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,7 +13,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="developer-implementer-GET-plan-periods-endpoint" />
+        <entry key="$PROJECT_DIR$" value="developer-Wire-PlanPeriod-validation-into-ShiftController" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -55,7 +52,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "developer-Wire-PlanPeriod-validation-into-ShiftController",
+    "git-widget-placeholder": "developer-delete-endpoint",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
@@ -93,7 +90,7 @@
       <workItem from="1777366033497" duration="1113000" />
       <workItem from="1777367176687" duration="2677000" />
       <workItem from="1778702052799" duration="972000" />
-      <workItem from="1778716554404" duration="373000" />
+      <workItem from="1778716554404" duration="964000" />
     </task>
     <task id="LOCAL-00001" summary="Created ShiftStatus and ShiftType enums">
       <option name="closed" value="true" />
