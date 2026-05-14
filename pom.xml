@@ -83,6 +83,12 @@
             <version>0.4</version>
         </dependency>
 
+        <!-- TOON -->
+        <dependency>
+            <groupId>dev.toonformat</groupId>
+            <artifactId>jtoon</artifactId>
+            <version>1.0.9</version>
+        </dependency>
         <!-- TOTP (Time-based One-Time Password) -->
         <dependency>
             <groupId>dev.samstevens.totp</groupId>
