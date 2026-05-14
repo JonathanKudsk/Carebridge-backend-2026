@@ -106,7 +106,22 @@ public class UserController implements IController<User, Long> {
         }
     }
 
-
+    public void readByEmail(Context ctx) {
+        try {
+            String email = ctx.pathParam("email");
+            if(email == null || email.isEmpty() || !email.contains("@")){
+                throw new ApiRuntimeException(400, "Invalid email address");
+            }
+            User user = userDAO.readByEmail(email);
+            UserDTO userDTO = UserMapper.toDTO(user);
+            ctx.status(200).json(userDTO);
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("Reading email failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
 
 
     public void me(Context ctx) {
@@ -187,8 +202,7 @@ public class UserController implements IController<User, Long> {
             }
 
             // Tilknyt residents til guardian
-            guardian.getResidents().addAll(residentsToLink);
-            userDAO.update(guardianId, guardian);
+            userDAO.linkResidents(guardianId, residentsToLink);
 
             ctx.status(200).json(Map.of("msg", "Beboere tilknyttet", "count", residentsToLink.size()));
 

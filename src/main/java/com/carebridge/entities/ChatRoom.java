@@ -28,5 +28,15 @@ public class ChatRoom {
     public void setChatRoomUser(List<ChatRoomUser> chatRoomUsers) {
         this.chatRoomUser = chatRoomUsers;
     }
+
+    private boolean isActive = true;
+
+    public boolean isActive()  {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive)  {
+        this.isActive = isActive;
+    }
 }
 
