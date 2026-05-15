@@ -28,6 +28,10 @@ public class UserController implements IController<User, Long> {
     private final UserDAO userDAO = UserDAO.getInstance();
     private final ResidentDAO residentDAO = ResidentDAO.getInstance();
 
+    static boolean hasCareWorkerEquivalentRole(User user) {
+        return user != null && (user.getRole() == Role.CAREWORKER || user.getRole() == Role.SUBSTITUTE);
+    }
+
     @Override
     public void read(Context ctx) {
         try {
@@ -223,7 +227,7 @@ public class UserController implements IController<User, Long> {
         try {
             var list = userDAO.readAll()
                     .stream()
-                    .filter(u -> u.getRole() == Role.CAREWORKER)
+                    .filter(UserController::hasCareWorkerEquivalentRole)
                     .map(UserMapper::toDTO)
                     .collect(Collectors.toList());
             ctx.json(list);
