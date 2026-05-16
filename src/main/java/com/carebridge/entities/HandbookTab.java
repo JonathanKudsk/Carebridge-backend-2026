@@ -19,20 +19,12 @@ public class HandbookTab
     @Column(nullable = false, length = 255)
     private String title;
 
-    /**
-     * Stores HTML content from the Tiptap editor.
-     */
-    @Column(columnDefinition = "TEXT", nullable = false)
+    // Stores HTML content from the Tiptap editor.
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "required_role", nullable = false)
-    private Role requiredRole;
-
-
 
 
     public HandbookTab(
