@@ -9,8 +9,8 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "vikarer")
-public class Vikar {
+@Table(name = "substitutes")
+public class Substitute {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,9 +26,9 @@ public class Vikar {
 
     // ========== CONSTRUCTORS ==========
 
-    public Vikar() {}
+    public Substitute() {}
 
-    public Vikar(String navn) {
+    public Substitute(String navn) {
         this.navn = navn;
     }
 
@@ -37,7 +37,7 @@ public class Vikar {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Vikar other)) return false;
+        if (!(o instanceof Substitute other)) return false;
         return id != null && id.equals(other.id);
     }
 

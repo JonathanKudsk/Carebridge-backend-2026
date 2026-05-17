@@ -18,21 +18,21 @@ public class Location {
 
     @NotBlank
     @Size(max = 120)
-    @Column(name = "afdelingsnavn", nullable = false)
-    private String afdelingsnavn;
+    @Column(name = "localtion_name", nullable = false)
+    private String locantionName;
 
     @NotBlank
     @Size(max = 255)
-    @Column(name = "addresse", nullable = false)
-    private String addresse;
+    @Column(name = "address", nullable = false)
+    private String address;
 
     @ManyToMany
     @JoinTable(
-            name = "location_vikar",
-            joinColumns = @JoinColumn(name = "location_id", foreignKey = @ForeignKey(name = "fk_location_vikar_location")),
-            inverseJoinColumns = @JoinColumn(name = "vikar_id", foreignKey = @ForeignKey(name = "fk_location_vikar_vikar"))
+            name = "location_substitute",
+            joinColumns = @JoinColumn(name = "location_id", foreignKey = @ForeignKey(name = "fk_location_substitute_location")),
+            inverseJoinColumns = @JoinColumn(name = "substitute_id", foreignKey = @ForeignKey(name = "fk_location_substitute_substitute"))
     )
-    private Set<Vikar> vikarer = new HashSet<>();
+    private Set<Substitute> substitutes = new HashSet<>();
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<By> byer = new HashSet<>();
@@ -41,9 +41,9 @@ public class Location {
 
     public Location() {}
 
-    public Location(String afdelingsnavn, String addresse) {
-        this.afdelingsnavn = afdelingsnavn;
-        this.addresse = addresse;
+    public Location(String locationName, String address) {
+        this.locantionName = locationName;
+        this.address = address;
     }
 
     // ========== EQUALS & HASHCODE ==========
@@ -66,27 +66,27 @@ public class Location {
         return id;
     }
 
-    public String getAfdelingsnavn() {
-        return afdelingsnavn;
+    public String getLocationName() {
+        return locantionName;
     }
 
-    public void setAfdelingsnavn(String afdelingsnavn) {
-        this.afdelingsnavn = afdelingsnavn;
+    public void setLocationName(String locationName) {
+        this.locantionName = locationName;
     }
 
-    public String getAddresse() {
-        return addresse;
+    public String getAddress() {
+        return address;
     }
 
-    public void setAddresse(String addresse) {
-        this.addresse = addresse;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public Set<Vikar> getVikarer() {
+    public Set<Substitute> getVikarer() {
         return vikarer;
     }
 
-    public void setVikarer(Set<Vikar> vikarer) {
+    public void setVikarer(Set<Substitute> vikarer) {
         this.vikarer = vikarer;
     }
 
