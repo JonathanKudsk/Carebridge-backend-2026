@@ -7,23 +7,33 @@ import jakarta.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 
 @Entity
+@NoArgsConstructor
 @Table(name = "locations")
 public class Location {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
     private Long id;
 
     @NotBlank
     @Size(max = 120)
     @Column(name = "location_name", nullable = false)
+    @Getter
+    @Setter
     private String locationName;
 
     @NotBlank
     @Size(max = 255)
     @Column(name = "address", nullable = false)
+    @Getter
+    @Setter
     private String address;
 
     @ManyToMany
@@ -32,14 +42,17 @@ public class Location {
             joinColumns = @JoinColumn(name = "location_id", foreignKey = @ForeignKey(name = "fk_location_substitute_location")),
             inverseJoinColumns = @JoinColumn(name = "substitute_id", foreignKey = @ForeignKey(name = "fk_location_substitute_substitute"))
     )
+    @Getter
+    @Setter
     private Set<Substitute> substitutes = new HashSet<>();
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<By> byer = new HashSet<>();
+    @Getter
+    @Setter
+    private Set<City> cities = new HashSet<>();
 
     // ========== CONSTRUCTORS ==========
 
-    public Location() {}
 
     public Location(String locationName, String address) {
         this.locationName = locationName;
@@ -58,43 +71,5 @@ public class Location {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
-    }
-
-    // ========== GETTERS & SETTERS ==========
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getLocationName() {
-        return locationName;
-    }
-
-    public void setLocationName(String locationName) {
-        this.locationName = locationName;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Set<Substitute> getSubstitutes() {
-        return substitutes;
-    }
-
-    public void setSubstitutes(Set<Substitute> substitutes) {
-        this.substitutes = substitutes;
-    }
-
-    public Set<By> getByer() {
-        return byer;
-    }
-
-    public void setByer(Set<By> byer) {
-        this.byer = byer;
     }
 }
