@@ -35,7 +35,7 @@ public class Location {
     private Set<Substitute> substitutes = new HashSet<>();
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<By> byer = new HashSet<>();
+    private Set<City> byer = new HashSet<>();
 
     // ========== CONSTRUCTORS ==========
 
@@ -90,11 +90,11 @@ public class Location {
         this.substitutes = substitutes;
     }
 
-    public Set<By> getByer() {
+    public Set<City> getByer() {
         return byer;
     }
 
-    public void setByer(Set<By> byer) {
+    public void setByer(Set<City> byer) {
         this.byer = byer;
     }
 }
