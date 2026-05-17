@@ -22,3 +22,5 @@ Thumbs.db
 # ===== Temporary files =====
 *.tmp
 *.swp
+CODE_STANDARD.md
+target/classes/com/carebridge/dao/impl/ShiftAssignmentDAO.class
