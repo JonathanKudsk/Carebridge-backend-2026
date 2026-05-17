@@ -4,16 +4,42 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="Created ShiftStatus and ShiftType enums" />
+    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="created Crud with test for locations and cities">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/LocationController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/CityDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/LocationDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/CityResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/CreateCityRequestDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/CreateLocationRequestDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/LocationResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/LocationRoute.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/dao/CityDAOTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/dao/LocationDAOTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/populator/LocationPopulator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/restTest/LocationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/City.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/City.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/Location.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/Location.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/Routes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/Routes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="developer" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -30,9 +56,16 @@
     &quot;accountId&quot;: &quot;0640aa20-5e9b-422a-bde1-006afebac647&quot;
   }
 }</component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
@@ -44,6 +77,24 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.App.executor": "Run",
+    "HTTP Request.demo | ---- Location API ----.executor": "Run",
+    "HTTP Request.demo | 2) Populate database (POST; ANYONE).executor": "Run",
+    "HTTP Request.demo | 3) Login as seeded ADMIN (from Populator).executor": "Run",
+    "HTTP Request.demo | Create template#2.executor": "Run",
+    "HTTP Request.demo | Get specific template#2.executor": "Run",
+    "HTTP Request.demo | Update template.executor": "Run",
+    "JUnit.CityDAOTest.executor": "Run",
+    "JUnit.CityDaoTest.executor": "Run",
+    "JUnit.CityDaoTest.testDeleteCity.executor": "Run",
+    "JUnit.CityDaoTest.testReadCity.executor": "Run",
+    "JUnit.CityDaoTest.testUpdateEventType.executor": "Run",
+    "JUnit.LocationDAOTest.executor": "Run",
+    "JUnit.LocationDAOTest.testCreateCity.executor": "Run",
+    "JUnit.LocationDAOTest.testReadAllLocations.executor": "Run",
+    "JUnit.LocationTest.delete.executor": "Run",
+    "JUnit.LocationTest.read.executor": "Run",
+    "JUnit.LocationTest.readAll.executor": "Run",
+    "JUnit.TemplateTest.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -52,7 +103,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "#109 on TEAM-6--Create-POST-/shift-assign…point",
+    "git-widget-placeholder": "developer-basic-CRUD-for-Locations",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
@@ -69,14 +120,41 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager" selected="HTTP Request.demo | Update template">
+    <configuration name="demo | 2) Populate database (POST; ANYONE)" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" index="2" requestIdentifier="2) Populate database (POST; ANYONE)" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="demo | 3) Login as seeded ADMIN (from Populator)" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" index="3" requestIdentifier="3) Login as seeded ADMIN (from Populator)" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="demo | Create template#2" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" index="42" requestIdentifier="Create template#2" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="demo | Get specific template#2" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" index="40" requestIdentifier="Get specific template#2" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="demo | Update template" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" index="43" requestIdentifier="Update template" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="HTTP Request.demo | Update template" />
+        <item itemvalue="HTTP Request.demo | Get specific template#2" />
+        <item itemvalue="HTTP Request.demo | Create template#2" />
+        <item itemvalue="HTTP Request.demo | 3) Login as seeded ADMIN (from Populator)" />
+        <item itemvalue="HTTP Request.demo | 2) Populate database (POST; ANYONE)" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26199.169" />
-        <option value="bundled-js-predefined-d6986cc7102b-9c94529fcfe0-JavaScript-IU-252.26199.169" />
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23339.11" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23339.11" />
       </set>
     </attachedChunks>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="" />
@@ -90,6 +168,7 @@
       <workItem from="1777366033497" duration="1113000" />
       <workItem from="1777367176687" duration="2677000" />
       <workItem from="1778702052799" duration="972000" />
+      <workItem from="1779041149335" duration="17711000" />
     </task>
     <task id="LOCAL-00001" summary="Created ShiftStatus and ShiftType enums">
       <option name="closed" value="true" />
@@ -118,6 +197,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Created ShiftStatus and ShiftType enums" />
-    <option name="LAST_COMMIT_MESSAGE" value="Created ShiftStatus and ShiftType enums" />
+    <MESSAGE value="created Crud with test for locations and cities" />
+    <option name="LAST_COMMIT_MESSAGE" value="created Crud with test for locations and cities" />
   </component>
 </project>
