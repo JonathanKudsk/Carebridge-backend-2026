@@ -10,7 +10,8 @@
       "Bash(grep -r \"Location\" \"C:\\\\\\\\Users\\\\\\\\vase_\\\\\\\\Desktop\\\\\\\\CareBridge\\\\\\\\sys\\\\\\\\Carebridge-backend-2026\\\\\\\\src\\\\\\\\main\\\\\\\\java\\\\\\\\com\\\\\\\\carebridge\\\\\\\\entities\")",
       "Bash(find C:\\\\\\\\Users\\\\\\\\vase_\\\\\\\\Desktop\\\\\\\\CareBridge\\\\\\\\sys\\\\\\\\Carebridge-backend-2026 *)",
       "Bash(grep *)",
-      "Bash(ls *)"
+      "Bash(ls *)",
+      "PowerShell(git *)"
     ]
   }
 }

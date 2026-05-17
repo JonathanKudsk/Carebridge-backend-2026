@@ -18,8 +18,8 @@ public class Location {
 
     @NotBlank
     @Size(max = 120)
-    @Column(name = "localtion_name", nullable = false)
-    private String locantionName;
+    @Column(name = "location_name", nullable = false)
+    private String locationName;
 
     @NotBlank
     @Size(max = 255)
@@ -42,7 +42,7 @@ public class Location {
     public Location() {}
 
     public Location(String locationName, String address) {
-        this.locantionName = locationName;
+        this.locationName = locationName;
         this.address = address;
     }
 
@@ -67,11 +67,11 @@ public class Location {
     }
 
     public String getLocationName() {
-        return locantionName;
+        return locationName;
     }
 
     public void setLocationName(String locationName) {
-        this.locantionName = locationName;
+        this.locationName = locationName;
     }
 
     public String getAddress() {
@@ -82,12 +82,12 @@ public class Location {
         this.address = address;
     }
 
-    public Set<Substitute> getVikarer() {
-        return vikarer;
+    public Set<Substitute> getSubstitutes() {
+        return substitutes;
     }
 
-    public void setVikarer(Set<Substitute> vikarer) {
-        this.vikarer = vikarer;
+    public void setSubstitutes(Set<Substitute> substitutes) {
+        this.substitutes = substitutes;
     }
 
     public Set<By> getByer() {
