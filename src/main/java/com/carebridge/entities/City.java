@@ -4,12 +4,15 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.*;
 
 import java.util.Objects;
 
 @Entity
 @Table(name = "cities")
+@NoArgsConstructor
 public class City {
 
     @Id
@@ -39,8 +42,6 @@ public class City {
     private Location location;
 
     // ========== CONSTRUCTORS ==========
-
-    public City() {}
 
     public City(String cityname, int postalcode, Location location) {
         this.cityname = cityname;
