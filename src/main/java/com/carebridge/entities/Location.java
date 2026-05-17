@@ -53,7 +53,6 @@ public class Location {
 
     // ========== CONSTRUCTORS ==========
 
-
     public Location(String locationName, String address) {
         this.locationName = locationName;
         this.address = address;
