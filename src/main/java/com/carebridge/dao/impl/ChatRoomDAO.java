@@ -71,6 +71,42 @@ public class ChatRoomDAO implements IDAO<ChatRoom, Long> {
 		}
 	}
 
+	public List<ChatRoom> readAllPaged(int page, int size) {
+		try (var em = em()) {
+			// Step 1: paginate IDs — setMaxResults is safe on a scalar query.
+			List<Long> ids = em.createQuery("SELECT c.id FROM ChatRoom c ORDER BY c.id", Long.class)
+					.setFirstResult(page * size)
+					.setMaxResults(size)
+					.getResultList();
+
+			if (ids.isEmpty()) return List.of();
+
+			// Step 2: fetch full rooms with members for those IDs.
+			return em.createQuery(
+							"SELECT DISTINCT c FROM ChatRoom c " +
+									"LEFT JOIN FETCH c.chatRoomUser cru " +
+									"LEFT JOIN FETCH cru.user " +
+									"WHERE c.id IN :ids " +
+									"ORDER BY c.id",
+							ChatRoom.class
+					)
+					.setParameter("ids", ids)
+					.getResultList();
+		} catch (Exception e) {
+			logger.error("Error fetching paged chat rooms", e);
+			throw new ApiRuntimeException(500, "Error fetching chat rooms: " + e.getMessage());
+		}
+	}
+
+	public long count() {
+		try (var em = em()) {
+			return em.createQuery("SELECT COUNT(c) FROM ChatRoom c", Long.class).getSingleResult();
+		} catch (Exception e) {
+			logger.error("Error counting chat rooms", e);
+			throw new ApiRuntimeException(500, "Error counting chat rooms: " + e.getMessage());
+		}
+	}
+
 	@Override
 	public ChatRoom create(ChatRoom chatRoom) {
 		if (chatRoom == null) {
