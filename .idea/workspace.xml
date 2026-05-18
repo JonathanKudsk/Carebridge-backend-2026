@@ -4,20 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="added the ability to attach, detach and read a location to a user">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/UserWithLocationDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/restTest/UserTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/config/HibernateConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/config/HibernateConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/UserDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/Location.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/Location.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/Substitute.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/LocationRoute.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/LocationRoute.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/UserRoute.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/UserRoute.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/dao/UserDAOTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/dao/UserDAOTest.java" afterDir="false" />
-    </list>
+    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="added the ability to attach, detach and read a location to a user" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -233,7 +220,7 @@
       <workItem from="1777367176687" duration="2677000" />
       <workItem from="1778702052799" duration="972000" />
       <workItem from="1779041149335" duration="17876000" />
-      <workItem from="1779087694256" duration="4929000" />
+      <workItem from="1779087694256" duration="5304000" />
     </task>
     <task id="LOCAL-00001" summary="Created ShiftStatus and ShiftType enums">
       <option name="closed" value="true" />
@@ -259,7 +246,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779087795996</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="added the ability to attach, detach and read a location to a user">
+      <option name="closed" value="true" />
+      <created>1779093040560</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1779093040560</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
