@@ -20,7 +20,7 @@ public class City {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @NotBlank
     @Size(max = 120)
@@ -31,7 +31,7 @@ public class City {
     private int postalcode;
 
     @Builder.Default
-    @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "city", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Location> locations = new HashSet<>();
 
     // ========== CONSTRUCTORS ==========
