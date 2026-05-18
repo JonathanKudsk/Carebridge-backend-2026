@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="added the ability to attach, detach and read a location to a user">
+    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="fixed test broken by change in entity">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/UserDAO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/dao/UserDAOTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/dao/UserDAOTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -80,7 +80,7 @@
     "JUnit.LocationTest.read.executor": "Run",
     "JUnit.LocationTest.readAll.executor": "Run",
     "JUnit.TemplateTest.executor": "Run",
-    "JUnit.UserDAOTest.executor": "Run",
+    "JUnit.UserDAOTest.executor": "Debug",
     "JUnit.UserDAOTest.testAttachLocationToUser.executor": "Run",
     "JUnit.UserDAOTest.testDetachLocationToUser.executor": "Run",
     "JUnit.UserDAOTest.testReadUser.executor": "Run",
@@ -172,17 +172,17 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserTest.readWithLocation" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="UserDAOTest.testAttachLocationToUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="carebridge-backend" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="restTest.*" />
+          <option name="PATTERN" value="dao.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="restTest" />
-      <option name="MAIN_CLASS_NAME" value="restTest.UserTest" />
-      <option name="METHOD_NAME" value="readWithLocation" />
+      <option name="PACKAGE_NAME" value="dao" />
+      <option name="MAIN_CLASS_NAME" value="dao.UserDAOTest" />
+      <option name="METHOD_NAME" value="testAttachLocationToUser" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -191,10 +191,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.UserDAOTest" />
+        <item itemvalue="JUnit.UserDAOTest.testAttachLocationToUser" />
         <item itemvalue="JUnit.LocationTest" />
         <item itemvalue="JUnit.LocationDAOTest" />
         <item itemvalue="JUnit.CityDAOTest" />
-        <item itemvalue="JUnit.UserTest.readWithLocation" />
       </list>
     </recent_temporary>
   </component>
@@ -263,7 +263,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779093241946</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="fixed test broken by change in entity">
+      <option name="closed" value="true" />
+      <created>1779100432711</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1779100432711</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -284,14 +292,15 @@
     <MESSAGE value="Created ShiftStatus and ShiftType enums" />
     <MESSAGE value="created Crud with test for locations and cities" />
     <MESSAGE value="added the ability to attach, detach and read a location to a user" />
-    <option name="LAST_COMMIT_MESSAGE" value="added the ability to attach, detach and read a location to a user" />
+    <MESSAGE value="fixed test broken by change in entity" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed test broken by change in entity" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/test/java/dao/UserDAOTest.java</url>
-          <line>42</line>
+          <line>41</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

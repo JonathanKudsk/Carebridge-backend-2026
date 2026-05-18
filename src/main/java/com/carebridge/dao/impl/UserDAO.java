@@ -236,7 +236,7 @@ public class UserDAO implements IDAO<User, Long> {
 
             Location l = em.find(Location.class, locationId);
             if (l == null)
-                throw new ApiRuntimeException(404, "User not found");
+                throw new ApiRuntimeException(404, "Location not found");
 
             u.addLocation(l);
 
@@ -265,7 +265,7 @@ public class UserDAO implements IDAO<User, Long> {
 
             Location l = em.find(Location.class, locationId);
             if (l == null)
-                throw new ApiRuntimeException(404, "User not found");
+                throw new ApiRuntimeException(404, "Location not found");
 
             u.removeLocation(l);
 
