@@ -31,7 +31,7 @@ public class City {
     private int postalcode;
 
     @Builder.Default
-    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
     private Set<Location> locations = new HashSet<>();
 
     // ========== CONSTRUCTORS ==========
