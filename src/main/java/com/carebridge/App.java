@@ -3,7 +3,7 @@ package com.carebridge;
 import com.carebridge.config.ApplicationConfig;
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.config.Populator;
-import com.carebridge.utils.TestDataPopulator;
+//import com.carebridge.utils.TestDataPopulator;
 import io.javalin.Javalin;
 
 public class App {
