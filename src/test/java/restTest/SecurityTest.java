@@ -3,11 +3,19 @@ package restTest;
 import com.carebridge.config.ApplicationConfig;
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.config.TestPopulator;
+import com.carebridge.dtos.JwtUserDTO;
+import com.carebridge.dtos.security.TokenSecurity;
+import com.carebridge.entities.User;
+import com.carebridge.entities.enums.Role;
 import com.carebridge.services.TotpService;
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;
 import io.restassured.RestAssured;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
+
+import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -16,26 +24,35 @@ import static org.hamcrest.Matchers.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SecurityTest {
 
+    private static final String TEST_ISSUER = "carebridge-test";
+    private static final String TEST_TOKEN_EXPIRE_TIME = "3600000";
+    private static final String TEST_SECRET = "test-secret-key-that-is-long-enough-for-hmac-signing";
+
     private Javalin app;
+    private EntityManagerFactory emf;
     private final TotpService totpService = new TotpService();
 
     // State shared between ordered tests — mirrors the real browser session flow
     private String adminSetupTempToken;
     private String adminTotpSecret;
+    private String adminFullToken;
     private String aliceVerifyTempToken;
     private String aliceFullToken;
 
     @BeforeAll
     void setup() {
         HibernateConfig.setTest(true);
+        emf = HibernateConfig.getEntityManagerFactory();
         app = ApplicationConfig.startServer(7070);
-        TestPopulator.populate(HibernateConfig.getEntityManagerFactoryForTest());
+        TestPopulator.populate(emf);
         RestAssured.baseURI = "http://localhost:7070/api";
     }
 
     @AfterAll
     void teardown() {
-        ApplicationConfig.stopServer(app);
+        if (app != null) {
+            app.stop();
+        }
     }
 
     // AC1 — Fresh user (no TOTP secret) gets requiresTotpSetup and a temp token; no full JWT
@@ -102,7 +119,7 @@ public class SecurityTest {
     @Order(5)
     void totpConfirm_withCorrectCode_returnsFullToken() throws Exception {
         String code = totpService.generateCurrentCode(adminTotpSecret);
-        given()
+        adminFullToken = given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + adminSetupTempToken)
                 .body("{\"code\":\"" + code + "\"}")
@@ -110,7 +127,8 @@ public class SecurityTest {
                 .then()
                 .log().ifValidationFails()
                 .statusCode(200)
-                .body("token", notNullValue());
+                .body("token", notNullValue())
+                .extract().path("token");
     }
 
     // Bugfix: a user who has a secret saved but totp_enabled=false must get requiresTotpSetup,
@@ -203,5 +221,90 @@ public class SecurityTest {
                 .body("token", notNullValue())
                 .body("requiresTotpSetup", anyOf(nullValue(), equalTo(false)))
                 .body("requires2FA", anyOf(nullValue(), equalTo(false)));
+    }
+
+    @Test
+    @Order(12)
+    void adminCanChangeUserRoleSuccessfully() {
+        String adminToken = createTokenFor("admin@carebridge.io", Role.ADMIN);
+        Long userId = findUserIdByEmail("no2fa@carebridge.io");
+        setUserRole(userId, Role.USER);
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
+                .body("{\"role\":\"CAREWORKER\"}")
+                .put("/users/" + userId + "/role")
+                .then()
+                .log().ifValidationFails()
+                .statusCode(200)
+                .body("email", equalTo("no2fa@carebridge.io"))
+                .body("role", equalTo("CAREWORKER"));
+    }
+
+    @Test
+    @Order(13)
+    void nonAdminCannotChangeUserRole() {
+        String userToken = createTokenFor("alice@carebridge.io", Role.USER);
+        Long userId = findUserIdByEmail("no2fa@carebridge.io");
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .body("{\"role\":\"USER\"}")
+                .put("/users/" + userId + "/role")
+                .then()
+                .log().ifValidationFails()
+                .statusCode(401);
+    }
+
+    @Test
+    @Order(14)
+    void changeRoleMissingRoleReturnsClientError() {
+        String adminToken = createTokenFor("admin@carebridge.io", Role.ADMIN);
+        Long userId = findUserIdByEmail("no2fa@carebridge.io");
+        setUserRole(userId, Role.USER);
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
+                .body("{}")
+                .put("/users/" + userId + "/role")
+                .then()
+                .log().ifValidationFails()
+                .statusCode(400)
+                .body("msg", notNullValue());
+    }
+
+    private Long findUserIdByEmail(String email) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
+                    .setParameter("email", email)
+                    .getSingleResult()
+                    .getId();
+        }
+    }
+
+    private String createTokenFor(String email, Role role) {
+        JwtUserDTO jwtUser = JwtUserDTO.builder()
+                .username(email)
+                .roles(Set.of(role.name()))
+                .build();
+
+        return new TokenSecurity().createToken(
+                jwtUser,
+                TEST_ISSUER,
+                TEST_TOKEN_EXPIRE_TIME,
+                TEST_SECRET
+        );
+    }
+
+    private void setUserRole(Long userId, Role role) {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            User user = em.find(User.class, userId);
+            user.setRole(role);
+            em.getTransaction().commit();
+        }
     }
 }

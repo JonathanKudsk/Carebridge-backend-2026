@@ -1,6 +1,7 @@
 package com.carebridge.routes;
 
 import com.carebridge.controllers.impl.UserController;
+import com.carebridge.controllers.security.SecurityController;
 import com.carebridge.entities.enums.Role;
 import io.javalin.apibuilder.EndpointGroup;
 
@@ -8,6 +9,7 @@ import static io.javalin.apibuilder.ApiBuilder.*;
 
 public class UserRoute {
     private final UserController controller = new UserController();
+    private final SecurityController securityController = SecurityController.getInstance();
 
     public EndpointGroup getRoutes() {
         return () -> {
@@ -19,6 +21,7 @@ public class UserRoute {
 
 
             post("/", controller::create, Role.ADMIN);
+            put("/{id}/role", securityController.changeRole(), Role.ADMIN);
             put("/{id}", controller::update, Role.ADMIN);
             delete("/{id}", controller::delete, Role.ADMIN);
             post("/{id}/link-residents", controller::linkResidents, Role.ADMIN);
