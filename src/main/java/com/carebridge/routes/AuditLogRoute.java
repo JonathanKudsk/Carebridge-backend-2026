@@ -13,7 +13,7 @@ public class AuditLogRoute {
     public EndpointGroup getRoutes() {
         return () -> {
             get("/", controller::readAll, Role.ADMIN);
-            get("/medication/{medicationId}", controller::readByMedication, Role.ADMIN, Role.CAREWORKER);
+            get("/medication/{medicationId}", controller::readByMedication, Role.ADMIN, Role.CAREWORKER, Role.SUBSTITUTE);
         };
     }
 }

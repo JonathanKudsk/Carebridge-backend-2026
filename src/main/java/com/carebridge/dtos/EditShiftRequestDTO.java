@@ -1,11 +1,15 @@
 package com.carebridge.dtos;
 
+import com.carebridge.enums.ShiftStatus;
+import com.carebridge.enums.ShiftType;
+
 import java.time.LocalDateTime;
 
 public class EditShiftRequestDTO {
     private LocalDateTime startShift;
     private LocalDateTime endShift;
     private ShiftType shiftType;
+    private ShiftStatus status;
     private Long locationId;
     private Long assignedUserId;
 
@@ -36,6 +40,14 @@ public class EditShiftRequestDTO {
         this.shiftType = shiftType;
     }
 
+    public ShiftStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ShiftStatus status) {
+        this.status = status;
+    }
+
     public Long getLocationId() {
         return locationId;
     }
@@ -50,9 +62,6 @@ public class EditShiftRequestDTO {
 
     public void setAssignedUserId(Long assignedUserId) {
         this.assignedUserId = assignedUserId;
-    }
-
-    public enum ShiftType {
     }
 }
 

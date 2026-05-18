@@ -13,11 +13,11 @@ public class ChatRoomRoutes {
 
     public EndpointGroup getRoutes(){
         return () -> {
-            get("/", controller::readAll, Role.USER, Role.CAREWORKER, Role.ADMIN);
-            get("/{id}", controller::read, Role.USER, Role.CAREWORKER, Role.ADMIN);
-            post("/", controller::create, Role.USER, Role.CAREWORKER, Role.ADMIN);
-            put("/{id}", controller::update, Role.USER, Role.CAREWORKER, Role.ADMIN);
-            delete("/{id}", controller::delete, Role.USER, Role.CAREWORKER, Role.ADMIN);
+            get("/", controller::readAll, Role.USER, Role.CAREWORKER, Role.ADMIN, Role.SUBSTITUTE);
+            get("/{id}", controller::read, Role.USER, Role.CAREWORKER, Role.ADMIN, Role.SUBSTITUTE);
+            post("/", controller::create, Role.USER, Role.CAREWORKER, Role.ADMIN, Role.SUBSTITUTE);
+            put("/{id}", controller::update, Role.USER, Role.CAREWORKER, Role.ADMIN, Role.SUBSTITUTE);
+            delete("/{id}", controller::delete, Role.USER, Role.CAREWORKER, Role.ADMIN, Role.SUBSTITUTE);
         };
     }
 }

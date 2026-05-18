@@ -4,6 +4,7 @@ import com.carebridge.dao.impl.ShiftDAO;
 import com.carebridge.dtos.CreateShiftRequestDTO;
 import com.carebridge.dtos.EditShiftRequestDTO;
 import com.carebridge.entities.Shift;
+import com.carebridge.enums.ShiftStatus;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.PlanPeriodException;
 import com.carebridge.exceptions.ScheduleConflictException;
@@ -59,7 +60,7 @@ public class ShiftController {
             shift.setEndShift(dto.getEndShift());
             shift.setShiftType(dto.getShiftType().name());
             shift.setLocation(dto.getLocationId().toString());
-            shift.setStatus("OPEN");
+            shift.setStatus(ShiftStatus.OPEN);
             shift.setPlanPeriodId(dto.getPlanPeriodId());
             shift.setAssignedUserId(null);
             shift.setCreatedBy(createdBy);

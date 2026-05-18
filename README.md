@@ -10,7 +10,8 @@ Projektet benytter disse teknologier:
 - **Javalin 6.3.0**: Et lightweight framework til REST API'er
 - **Hibernate 6.4.4**: Håndterer databasekommunikationen for dig
 - **PostgreSQL 42.7.3**: Relationel database
-- **Jackson 2.15.0**: Konverterer mellem Java-objekter og JSON
+- **Jackson 2.15.0**: Standard serialisering/deserialisering mellem Java-objekter og JSON
+- **TOON / JTOON 1.0.9**: Kompakt serialisering afprøvet i projektets TOON pilot projekt
 - **JWT 10.5**: Sikkerhed via tokens
 - **BCrypt 0.4**: Sikker password-hashing
 - **Lombok 1.18.36**: Reducerer boilerplate-kode
@@ -260,6 +261,44 @@ For eksempel, hvis du vil opdatere Javalin:
 Projektet er indstillet til at lave Java 21 bytecode, så det virker på alle maskiner. Maven compiler plugin bruger `<release>21</release>`, hvilket betyder du får det samme output uanset hvilken JDK-version du har.
 
 Lombok bruger annotation processors under både main- og test-compilation, så boilerplate-kode bliver genereret automatisk.
+
+## Bæredygtighedsinitiativ: TOON-serialisering
+
+Som en del af et bæredygtighedsfokuseret optimeringsinitiativ har projektet eksperimenteret med at bruge **TOON (Token-Oriented Object Notation)** i stedet for JSON til udvalgte backend-payloads.
+
+Målet var at reducere:
+- Netværksoverførsel
+- Båndbreddeforbrug
+- Tokenforbrug
+- Energiforbrug ved dataoverførsel
+
+Der blev lavet en Proof of Concept (POC) med realistiske Carebridge DTO-payloads serialiseret med JTOON.
+
+### POC-resultat (5 DTO-payloads)
+
+| Format | Samlet antal tokens |
+|---|---:|
+| JSON | 211,763 |
+| TOON | 107,404 |
+
+**Samlet reduktion:** 49.28%
+
+Benchmarken viste også reduktioner mellem **35%-67%** afhængigt af payload-strukturen.
+
+Mindre payloads og lavere tokenforbrug kræver mindre dataoverførsel, hvilket over tid kan bidrage til lavere energiforbrug i infrastrukturen.
+
+En gruppe fungerede som pilotgruppe for at afprøve TOON i udvalgte dele af projektet med henblik på senere at kunne udbrede det til hele Carebridge-projektet.
+
+Selvom JSON stadig er branchestandarden, viste POC'en et lovende potentiale for:
+- Mere kompakte API-payloads
+- Bedre båndbreddeeffektivitet
+- Lavere tokenforbrug
+- Bæredygtighedsorienteret backend-optimering
+
+### Referencer
+
+- JTOON Maven Package: https://central.sonatype.com/artifact/dev.toonformat/jtoon
+- TOON Java GitHub Repository: https://github.com/toon-format/toon-java
 
 ## Bidrag til projektet
 

@@ -16,6 +16,9 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("USER")
 @Table(
         name = "users",
         uniqueConstraints = @UniqueConstraint(name = "uq_users_email", columnNames = "email")
