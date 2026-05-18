@@ -23,6 +23,11 @@ public class UserRoute {
             delete("/{id}", controller::delete, Role.ADMIN);
             post("/{id}/link-residents", controller::linkResidents, Role.ADMIN);
             get("/by-email/{email}",controller::readByEmail, Role.ADMIN);
+
+
+            get("/{id}/locations", controller::readWithLocation,Role.CAREWORKER, Role.SUBSTITUTE, Role.PLANNER, Role.ADMIN);
+            put("/{userId}/locations/{locationId}", controller::attachUserLocation, Role.ADMIN);
+            delete("/{userId}/locations/{locationId}", controller::detachUserLocation, Role.ADMIN);
         };
     }
 }

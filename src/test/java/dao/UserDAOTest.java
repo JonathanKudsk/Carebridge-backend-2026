@@ -6,6 +6,7 @@ import com.carebridge.entities.User;
 import com.carebridge.entities.enums.Role;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
+import populator.LocationPopulator;
 
 import java.util.List;
 
@@ -95,4 +96,36 @@ public class UserDAOTest {
         userDAO.delete(created.getId());
         assertNull(userDAO.read(created.getId()));
     }
+
+    @Test
+    public void testReadUserWithLocation() {
+        LocationPopulator.populate();
+        userDAO.attachLocationtoUser(testUser.getId(),1L);
+        User read = userDAO.readWithLocation(testUser.getId());
+        assertEquals(read.getLocations().size(), 1);
+        assertTrue(read.getLocations().contains(LocationPopulator.fetch().getFirst()));
+    }
+
+    @Test
+    public void testAttachLocationToUser() {
+        LocationPopulator.populate();
+
+        User u = userDAO.attachLocationtoUser(1L,1L);
+        assertEquals(u.getLocations().size(), 1);
+        assertTrue(u.getLocations().contains(LocationPopulator.fetch().getFirst()));
+    }
+
+    @Test
+    public void testDetachLocationToUser() {
+        LocationPopulator.populate();
+
+        User u = userDAO.attachLocationtoUser(1L,1L);
+        assertEquals(u.getLocations().size(), 1);
+        assertTrue(u.getLocations().contains(LocationPopulator.fetch().getFirst()));
+
+        u = userDAO.detachLocationtoUser(1L,1L);
+        assertEquals(u.getLocations().size(), 0);
+        assertFalse(u.getLocations().contains(LocationPopulator.fetch().getFirst()));
+    }
+
 }

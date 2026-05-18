@@ -588,3 +588,15 @@ Content-Type: application/json
       "postalCode": "1234"
     }
 }
+
+### 5) Read a user with location by id
+GET {{url}}/users/1/locations
+Authorization: Bearer {{jwt_token}}
+
+### 5) attach a location to user (admin)
+put {{url}}/users/1/locations/1
+Authorization: Bearer {{jwt_token}}
+
+### 5) detach a location to user (admin)
+put {{url}}/users/1/locations/1
+Authorization: Bearer {{jwt_token}}

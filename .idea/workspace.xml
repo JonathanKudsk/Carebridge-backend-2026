@@ -4,7 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="created Crud with test for locations and cities" />
+    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="added the ability to attach, detach and read a location to a user">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/UserWithLocationDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/restTest/UserTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/config/HibernateConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/config/HibernateConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/UserDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/Location.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/Location.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/Substitute.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/LocationRoute.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/LocationRoute.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/UserRoute.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/UserRoute.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/dao/UserDAOTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/dao/UserDAOTest.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -31,12 +44,12 @@
     &quot;assignee&quot;: &quot;Styrse&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/JonathanKudsk/Carebridge-backend-2026.git&quot;,
-    &quot;accountId&quot;: &quot;0640aa20-5e9b-422a-bde1-006afebac647&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/JonathanKudsk/Carebridge-backend-2026",
+    "accountId": "8d607f38-8e69-4fbd-9194-fc9926586584"
   }
-}</component>
+}]]></component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -55,75 +68,145 @@
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.App.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.demo | ---- Location API ----.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.demo | 2) Populate database (POST; ANYONE).executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.demo | 3) Login as seeded ADMIN (from Populator).executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.demo | Create template#2.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.demo | Get specific template#2.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.demo | Update template.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CityDAOTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CityDaoTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CityDaoTest.testDeleteCity.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CityDaoTest.testReadCity.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CityDaoTest.testUpdateEventType.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.LocationDAOTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.LocationDAOTest.testCreateCity.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.LocationDAOTest.testReadAllLocations.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.LocationTest.delete.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.LocationTest.read.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.LocationTest.readAll.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.TemplateTest.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;developer-basic-CRUD-for-Locations&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Carl Gullacksen/Desktop/GitHub/sem4/SYM/Carebridge-backend-2026&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.App.executor": "Run",
+    "HTTP Request.demo | ---- Location API ----.executor": "Run",
+    "HTTP Request.demo | 2) Populate database (POST; ANYONE).executor": "Run",
+    "HTTP Request.demo | 3) Login as seeded ADMIN (from Populator).executor": "Run",
+    "HTTP Request.demo | Create template#2.executor": "Run",
+    "HTTP Request.demo | Get specific template#2.executor": "Run",
+    "HTTP Request.demo | Update template.executor": "Run",
+    "JUnit.CityDAOTest.executor": "Run",
+    "JUnit.CityDaoTest.executor": "Run",
+    "JUnit.CityDaoTest.testDeleteCity.executor": "Run",
+    "JUnit.CityDaoTest.testReadCity.executor": "Run",
+    "JUnit.CityDaoTest.testUpdateEventType.executor": "Run",
+    "JUnit.LocationDAOTest.executor": "Run",
+    "JUnit.LocationDAOTest.testCreateCity.executor": "Run",
+    "JUnit.LocationDAOTest.testReadAllLocations.executor": "Run",
+    "JUnit.LocationTest.delete.executor": "Run",
+    "JUnit.LocationTest.read.executor": "Run",
+    "JUnit.LocationTest.readAll.executor": "Run",
+    "JUnit.TemplateTest.executor": "Run",
+    "JUnit.UserDAOTest.testAttachLocationToUser.executor": "Run",
+    "JUnit.UserDAOTest.testDetachLocationToUser.executor": "Run",
+    "JUnit.UserDAOTest.testReadUser.executor": "Run",
+    "JUnit.UserDAOTest.testReadUserWithLocation.executor": "Run",
+    "JUnit.UserTest.readWithLocation.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "developer-basic-CRUD-for-Locations",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Carl Gullacksen/Desktop/GitHub/sem4/SYM/Carebridge-backend-2026",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager" selected="HTTP Request.demo | Update template">
-    <configuration name="demo | 2) Populate database (POST; ANYONE)" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" index="2" requestIdentifier="2) Populate database (POST; ANYONE)" runType="Run single request">
-      <method v="2" />
+}]]></component>
+  <component name="RunManager" selected="JUnit.UserTest.readWithLocation">
+    <configuration name="UserDAOTest.testAttachLocationToUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="carebridge-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="dao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="dao" />
+      <option name="MAIN_CLASS_NAME" value="dao.UserDAOTest" />
+      <option name="METHOD_NAME" value="testAttachLocationToUser" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
-    <configuration name="demo | 3) Login as seeded ADMIN (from Populator)" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" index="3" requestIdentifier="3) Login as seeded ADMIN (from Populator)" runType="Run single request">
-      <method v="2" />
+    <configuration name="UserDAOTest.testDetachLocationToUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="carebridge-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="dao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="dao" />
+      <option name="MAIN_CLASS_NAME" value="dao.UserDAOTest" />
+      <option name="METHOD_NAME" value="testDetachLocationToUser" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
-    <configuration name="demo | Create template#2" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" index="42" requestIdentifier="Create template#2" runType="Run single request">
-      <method v="2" />
+    <configuration name="UserDAOTest.testReadUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="carebridge-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="dao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="dao" />
+      <option name="MAIN_CLASS_NAME" value="dao.UserDAOTest" />
+      <option name="METHOD_NAME" value="testReadUser" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
-    <configuration name="demo | Get specific template#2" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" index="40" requestIdentifier="Get specific template#2" runType="Run single request">
-      <method v="2" />
+    <configuration name="UserDAOTest.testReadUserWithLocation" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="carebridge-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="dao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="dao" />
+      <option name="MAIN_CLASS_NAME" value="dao.UserDAOTest" />
+      <option name="METHOD_NAME" value="testReadUserWithLocation" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
-    <configuration name="demo | Update template" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" index="43" requestIdentifier="Update template" runType="Run single request">
-      <method v="2" />
+    <configuration name="UserTest.readWithLocation" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="carebridge-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="restTest.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="restTest" />
+      <option name="MAIN_CLASS_NAME" value="restTest.UserTest" />
+      <option name="METHOD_NAME" value="readWithLocation" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="HTTP Request.demo | Update template" />
-        <item itemvalue="HTTP Request.demo | Get specific template#2" />
-        <item itemvalue="HTTP Request.demo | Create template#2" />
-        <item itemvalue="HTTP Request.demo | 3) Login as seeded ADMIN (from Populator)" />
-        <item itemvalue="HTTP Request.demo | 2) Populate database (POST; ANYONE)" />
+        <item itemvalue="JUnit.UserTest.readWithLocation" />
+        <item itemvalue="JUnit.UserDAOTest.testReadUserWithLocation" />
+        <item itemvalue="JUnit.UserDAOTest.testReadUser" />
+        <item itemvalue="JUnit.UserDAOTest.testDetachLocationToUser" />
+        <item itemvalue="JUnit.UserDAOTest.testAttachLocationToUser" />
       </list>
     </recent_temporary>
   </component>
@@ -150,6 +233,7 @@
       <workItem from="1777367176687" duration="2677000" />
       <workItem from="1778702052799" duration="972000" />
       <workItem from="1779041149335" duration="17876000" />
+      <workItem from="1779087694256" duration="4929000" />
     </task>
     <task id="LOCAL-00001" summary="Created ShiftStatus and ShiftType enums">
       <option name="closed" value="true" />
@@ -167,7 +251,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779059316234</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="created Crud with test for locations and cities">
+      <option name="closed" value="true" />
+      <created>1779087795996</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1779087795996</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -187,6 +279,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Created ShiftStatus and ShiftType enums" />
     <MESSAGE value="created Crud with test for locations and cities" />
-    <option name="LAST_COMMIT_MESSAGE" value="created Crud with test for locations and cities" />
+    <MESSAGE value="added the ability to attach, detach and read a location to a user" />
+    <option name="LAST_COMMIT_MESSAGE" value="added the ability to attach, detach and read a location to a user" />
   </component>
 </project>

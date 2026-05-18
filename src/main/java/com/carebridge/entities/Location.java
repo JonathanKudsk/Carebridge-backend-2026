@@ -37,11 +37,11 @@ public class Location {
     @ManyToMany
     @JoinTable(
             name = "location_substitute",
-            joinColumns = @JoinColumn(name = "location_id", foreignKey = @ForeignKey(name = "fk_location_substitute_location")),
-            inverseJoinColumns = @JoinColumn(name = "substitute_id", foreignKey = @ForeignKey(name = "fk_location_substitute_substitute"))
+            joinColumns = @JoinColumn(name = "location_id", foreignKey = @ForeignKey(name = "fk_location_user_location")),
+            inverseJoinColumns = @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_location_user_user"))
     )
     @Builder.Default
-    private Set<Substitute> substitutes = new HashSet<>();
+    private Set<User> users = new HashSet<>();
 
     @ManyToOne
     @Setter(AccessLevel.NONE)
@@ -59,6 +59,18 @@ public class Location {
         if (this.city != city){
             this.city = city;
             city.AddLocation(this);
+        }
+    }
+
+    public void addUser (User user){
+        if(users.add(user)){
+            user.addLocation(this);
+        }
+    }
+
+    public void removeUser (User user){
+        if(users.remove(user)){
+            user.removeLocation(this);
         }
     }
 

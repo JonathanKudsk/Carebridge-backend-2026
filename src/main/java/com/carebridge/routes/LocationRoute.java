@@ -15,7 +15,7 @@ public class LocationRoute {
             get("/", controller::readAll, Role.ANYONE);
             post("/", controller::create, Role.ADMIN);
             get("/{id}", controller::read, Role.ANYONE);
-            post("/{id}", controller::update, Role.ADMIN);
+            put("/{id}", controller::update, Role.ADMIN);
             delete("/{id}", controller::delete, Role.ADMIN);
         };
     }

@@ -1,7 +1,5 @@
 package com.carebridge.config;
 
-
-import com.carebridge.dtos.ChatRoomDTO;
 import com.carebridge.entities.*;
 import com.carebridge.entities.enums.Role;
 import com.carebridge.utils.Utils;
@@ -45,7 +43,6 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(Role.class);
         configuration.addAnnotatedClass(Resident.class);
-        configuration.addAnnotatedClass(Substitute.class);
 
         configuration.addAnnotatedClass(Event.class);
         configuration.addAnnotatedClass(EventType.class);
