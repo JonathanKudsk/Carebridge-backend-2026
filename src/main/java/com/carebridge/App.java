@@ -1,11 +1,10 @@
 package com.carebridge;
 
 import com.carebridge.config.ApplicationConfig;
+import com.carebridge.populators.HandbookPopulator;
 import com.carebridge.dao.impl.ResidentDAO;
 import com.carebridge.dao.impl.UserDAO;
-import com.carebridge.entities.Journal;
-import com.carebridge.entities.Resident;
-import com.carebridge.entities.User;
+import com.carebridge.entities.*;
 import com.carebridge.entities.enums.Role;
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.config.Populator;
@@ -17,6 +16,7 @@ public class App {
         Javalin app = ApplicationConfig.startServer(7070);
 
         Populator.populate(HibernateConfig.getEntityManagerFactory());
+        HandbookPopulator.populate();
 
         app.get("/", ctx -> ctx.result("Carebridge API is running"));
 

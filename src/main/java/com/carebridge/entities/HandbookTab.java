@@ -1,12 +1,16 @@
 package com.carebridge.entities;
 
-import com.carebridge.entities.enums.Role;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "handbook_tab")
-public class HandbookTab
-{
+@Getter
+@Setter
+@NoArgsConstructor
+public class HandbookTab {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,88 +23,16 @@ public class HandbookTab
     @Column(nullable = false, length = 255)
     private String title;
 
-    // Stores HTML content from the Tiptap editor.
-    @Column(columnDefinition = "TEXT")
+    // Stores HTML content from the Tiptap editor
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
 
-
-    public HandbookTab(
-            String title,
-            String content,
-            int orderIndex,
-            Role requiredRole
-    )
-    {
+    public HandbookTab(String title, int orderIndex) {
         this.title = title;
-        this.content = content;
+        this.content = "";
         this.orderIndex = orderIndex;
-        this.requiredRole = requiredRole;
-    }
-
-    public HandbookTab() {
-
-    }
-
-
-    public Long getId()
-    {
-        return id;
-    }
-
-
-    public Handbook getHandbook()
-    {
-        return handbook;
-    }
-
-
-    public void setHandbook(Handbook handbook)
-    {
-        this.handbook = handbook;
-    }
-
-
-    public String getTitle()
-    {
-        return title;
-    }
-
-
-    public void setTitle(String title)
-    {
-        this.title = title;
-    }
-
-
-    public String getContent()
-    {
-        return content;
-    }
-
-
-    public void setContent(String content)
-    {
-        this.content = content;
-    }
-
-
-    public int getOrderIndex()
-    {
-        return orderIndex;
-    }
-
-
-    public void setOrderIndex(int orderIndex)
-    {
-        this.orderIndex = orderIndex;
-    }
-
-
-    public void setRequiredRole(Role requiredRole)
-    {
-        this.requiredRole = requiredRole;
     }
 }
