@@ -99,7 +99,7 @@ public class User implements ISecurityUser {
     )
     private List<Resident> residents = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany (cascade = CascadeType.REMOVE)
     @Getter
     @Setter
     private Set<Location> locations = new HashSet<>();

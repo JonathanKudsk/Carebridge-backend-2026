@@ -41,7 +41,9 @@ public class UserDAOTest {
         if (testUser != null) {
             try {
                 userDAO.delete(testUser.getId());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                throw ignored;
+            }
         }
     }
 
@@ -110,7 +112,7 @@ public class UserDAOTest {
     public void testAttachLocationToUser() {
         LocationPopulator.populate();
 
-        User u = userDAO.attachLocationtoUser(1L,1L);
+        User u = userDAO.attachLocationtoUser(testUser.getId(),1L);
         assertEquals(u.getLocations().size(), 1);
         assertTrue(u.getLocations().contains(LocationPopulator.fetch().getFirst()));
     }
@@ -119,11 +121,11 @@ public class UserDAOTest {
     public void testDetachLocationToUser() {
         LocationPopulator.populate();
 
-        User u = userDAO.attachLocationtoUser(1L,1L);
+        User u = userDAO.attachLocationtoUser(testUser.getId(),1L);
         assertEquals(u.getLocations().size(), 1);
         assertTrue(u.getLocations().contains(LocationPopulator.fetch().getFirst()));
 
-        u = userDAO.detachLocationtoUser(1L,1L);
+        u = userDAO.detachLocationtoUser(testUser.getId(),1L);
         assertEquals(u.getLocations().size(), 0);
         assertFalse(u.getLocations().contains(LocationPopulator.fetch().getFirst()));
     }
