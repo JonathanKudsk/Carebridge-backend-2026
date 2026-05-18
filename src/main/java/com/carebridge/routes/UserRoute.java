@@ -12,7 +12,9 @@ public class UserRoute {
     public EndpointGroup getRoutes() {
         return () -> {
           
-            get("/careworkers", controller::readAllCareWorkers, Role.PLANNER, Role.ADMIN);            
+            get("/careworkers", controller::readAllCareWorkers, Role.PLANNER, Role.ADMIN);
+            get("/substitutes/locations", controller::readSubstituteLocations, Role.PLANNER, Role.ADMIN);
+            get("/substitutes", controller::readAllSubstitutes, Role.PLANNER, Role.ADMIN);
 
             get("/", controller::readAll, Role.CAREWORKER, Role.ADMIN, Role.SUBSTITUTE);
             get("/{id}", controller::read, Role.CAREWORKER, Role.ADMIN, Role.SUBSTITUTE);

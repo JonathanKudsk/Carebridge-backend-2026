@@ -12,6 +12,7 @@ import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 import com.carebridge.entities.enums.Role;
 import com.carebridge.exceptions.ApiRuntimeException;
+import com.carebridge.services.mappers.SubstituteMapper;
 import com.carebridge.services.mappers.UserMapper;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
@@ -179,6 +180,23 @@ public class UserController implements IController<User, Long> {
         }
     }
 
+    private Long parseOptionalLongQueryParam(Context ctx, String queryParamName) {
+        String value = ctx.queryParam(queryParamName);
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        try {
+            long id = Long.parseLong(value);
+            if (id <= 0) {
+                throw new ApiRuntimeException(400, "Invalid " + queryParamName);
+            }
+            return id;
+        } catch (NumberFormatException e) {
+            throw new ApiRuntimeException(400, "Invalid " + queryParamName);
+        }
+    }
+
 
     public void linkResidents(Context ctx) {
         try {
@@ -233,6 +251,36 @@ public class UserController implements IController<User, Long> {
             ctx.json(list);
         } catch (Exception e) {
             logger.error("readAllCareWorkers failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
+
+    public void readAllSubstitutes(Context ctx) {
+        try {
+            Long locationId = parseOptionalLongQueryParam(ctx, "locationId");
+            String locationName = ctx.queryParam("locationName");
+            var list = userDAO.readAllSubstitutes(locationId, locationName)
+                    .stream()
+                    .map(SubstituteMapper::toDTO)
+                    .collect(Collectors.toList());
+            ctx.json(list);
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("readAllSubstitutes failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
+
+    public void readSubstituteLocations(Context ctx) {
+        try {
+            var list = userDAO.readSubstituteLocations()
+                    .stream()
+                    .map(SubstituteMapper::toLocationDTO)
+                    .collect(Collectors.toList());
+            ctx.json(list);
+        } catch (Exception e) {
+            logger.error("readSubstituteLocations failed", e);
             ctx.status(500).json("{\"msg\":\"Internal error\"}");
         }
     }

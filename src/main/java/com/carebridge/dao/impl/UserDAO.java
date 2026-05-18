@@ -72,6 +72,58 @@ public class UserDAO implements IDAO<User, Long> {
         }
     }
 
+    public List<User> readAllSubstitutes(Long locationId, String locationName) {
+        try (var em = em()) {
+            StringBuilder query = new StringBuilder(
+                    "SELECT DISTINCT u FROM User u " +
+                            "LEFT JOIN FETCH u.locations fetchedLocation " +
+                            "WHERE u.role = :role"
+            );
+
+            if (locationId != null) {
+                query.append(" AND EXISTS (SELECT 1 FROM User filterUser JOIN filterUser.locations filterLocation ")
+                        .append("WHERE filterUser = u AND filterLocation.id = :locationId)");
+            }
+
+            if (locationName != null && !locationName.isBlank()) {
+                query.append(" AND EXISTS (SELECT 1 FROM User filterUser JOIN filterUser.locations filterLocation ")
+                        .append("WHERE filterUser = u AND LOWER(filterLocation.locationName) LIKE :locationName)");
+            }
+
+            query.append(" ORDER BY u.name");
+
+            var typedQuery = em.createQuery(query.toString(), User.class)
+                    .setParameter("role", Role.SUBSTITUTE);
+
+            if (locationId != null) {
+                typedQuery.setParameter("locationId", locationId);
+            }
+
+            if (locationName != null && !locationName.isBlank()) {
+                typedQuery.setParameter("locationName", "%" + locationName.toLowerCase() + "%");
+            }
+
+            return typedQuery.getResultList();
+        } catch (Exception e) {
+            logger.error("Error fetching substitutes", e);
+            throw new ApiRuntimeException(500, "Error fetching substitutes: " + e.getMessage());
+        }
+    }
+
+    public List<Location> readSubstituteLocations() {
+        try (var em = em()) {
+            return em.createQuery(
+                            "SELECT DISTINCT l FROM Location l JOIN l.users u " +
+                                    "WHERE u.role = :role ORDER BY l.locationName",
+                            Location.class)
+                    .setParameter("role", Role.SUBSTITUTE)
+                    .getResultList();
+        } catch (Exception e) {
+            logger.error("Error fetching substitute locations", e);
+            throw new ApiRuntimeException(500, "Error fetching substitute locations: " + e.getMessage());
+        }
+    }
+
     @Override
     public User create(User u) {
         if (u == null) throw new ApiRuntimeException(400, "User cannot be null");
