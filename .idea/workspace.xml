@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="fixed test broken by change in entity" />
+    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="fixed test that called post when was supposed to be put">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/LocationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/LocationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/City.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/City.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/restTest/LocationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/restTest/LocationTest.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -55,58 +61,59 @@
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.App.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.demo | ---- Location API ----.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.demo | 2) Populate database (POST; ANYONE).executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.demo | 3) Login as seeded ADMIN (from Populator).executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.demo | Create template#2.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.demo | Get specific template#2.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.demo | Update template.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CityDAOTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CityDaoTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CityDaoTest.testDeleteCity.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CityDaoTest.testReadCity.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CityDaoTest.testUpdateEventType.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.LocationDAOTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.LocationDAOTest.testCreateCity.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.LocationDAOTest.testReadAllLocations.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.LocationTest.delete.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.LocationTest.read.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.LocationTest.readAll.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.TemplateTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserDAOTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserDAOTest.testAttachLocationToUser.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserDAOTest.testDetachLocationToUser.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserDAOTest.testReadUser.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserDAOTest.testReadUserWithLocation.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserTest.readWithLocation.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;#124 on developer-basic-CRUD-for-Locations&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Carl Gullacksen/Desktop/GitHub/sem4/SYM/Carebridge-backend-2026&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.App.executor": "Run",
+    "HTTP Request.demo | ---- Location API ----.executor": "Run",
+    "HTTP Request.demo | 2) Populate database (POST; ANYONE).executor": "Run",
+    "HTTP Request.demo | 3) Login as seeded ADMIN (from Populator).executor": "Run",
+    "HTTP Request.demo | Create template#2.executor": "Run",
+    "HTTP Request.demo | Get specific template#2.executor": "Run",
+    "HTTP Request.demo | Update template.executor": "Run",
+    "JUnit.CityDAOTest.executor": "Run",
+    "JUnit.CityDaoTest.executor": "Run",
+    "JUnit.CityDaoTest.testDeleteCity.executor": "Run",
+    "JUnit.CityDaoTest.testReadCity.executor": "Run",
+    "JUnit.CityDaoTest.testUpdateEventType.executor": "Run",
+    "JUnit.LocationDAOTest.executor": "Run",
+    "JUnit.LocationDAOTest.testCreateCity.executor": "Run",
+    "JUnit.LocationDAOTest.testReadAllLocations.executor": "Run",
+    "JUnit.LocationTest.delete.executor": "Run",
+    "JUnit.LocationTest.executor": "Run",
+    "JUnit.LocationTest.read.executor": "Run",
+    "JUnit.LocationTest.readAll.executor": "Run",
+    "JUnit.TemplateTest.executor": "Run",
+    "JUnit.UserDAOTest.executor": "Run",
+    "JUnit.UserDAOTest.testAttachLocationToUser.executor": "Run",
+    "JUnit.UserDAOTest.testDetachLocationToUser.executor": "Run",
+    "JUnit.UserDAOTest.testReadUser.executor": "Run",
+    "JUnit.UserDAOTest.testReadUserWithLocation.executor": "Run",
+    "JUnit.UserTest.readWithLocation.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "#124 on developer-basic-CRUD-for-Locations",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Carl Gullacksen/Desktop/GitHub/sem4/SYM/Carebridge-backend-2026",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="JUnit.LocationTest">
     <configuration name="CityDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="carebridge-backend" />
@@ -218,6 +225,10 @@
       <workItem from="1778702052799" duration="972000" />
       <workItem from="1779041149335" duration="17876000" />
       <workItem from="1779087694256" duration="5706000" />
+      <workItem from="1779100838057" duration="945000" />
+      <workItem from="1779102598952" duration="4000" />
+      <workItem from="1779104484674" duration="181000" />
+      <workItem from="1779105027896" duration="766000" />
     </task>
     <task id="LOCAL-00001" summary="Created ShiftStatus and ShiftType enums">
       <option name="closed" value="true" />
@@ -275,7 +286,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779100722573</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="fixed test that called post when was supposed to be put">
+      <option name="closed" value="true" />
+      <created>1779101065555</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1779101065555</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -297,6 +316,23 @@
     <MESSAGE value="created Crud with test for locations and cities" />
     <MESSAGE value="added the ability to attach, detach and read a location to a user" />
     <MESSAGE value="fixed test broken by change in entity" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed test broken by change in entity" />
+    <MESSAGE value="fixed test that called post when was supposed to be put" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed test that called post when was supposed to be put" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/LocationController.java</url>
+          <line>62</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/LocationController.java</url>
+          <line>84</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

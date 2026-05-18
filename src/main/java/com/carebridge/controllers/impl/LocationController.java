@@ -97,7 +97,7 @@ public class LocationController implements IController<Location, Long> {
         } catch (ApiRuntimeException e) {
             ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
         } catch (Exception e) {
-            logger.error("Update template failed", e);
+            logger.error("Update Location failed", e);
             ctx.status(500).json("{\"msg\":\"Internal error\"}");
         }
     }

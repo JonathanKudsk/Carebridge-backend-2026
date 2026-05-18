@@ -569,7 +569,7 @@ Content-Type: application/json
   "address": "test",
   "city":
   {
-    "cityname": "by",
+    "cityName": "by",
     "postalCode": "1234"
   }
 }
@@ -584,7 +584,7 @@ Content-Type: application/json
   "address": "test",
   "city":
     {
-      "cityname": "by",
+      "cityName": "by",
       "postalCode": "1234"
     }
 }

@@ -39,6 +39,7 @@ public class City {
     public City(String cityname, int postalcode) {
         this.cityname = cityname;
         this.postalcode = postalcode;
+        this.locations = new HashSet<>();
     }
 
     // ========== Methods ==========

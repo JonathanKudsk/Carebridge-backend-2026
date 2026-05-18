@@ -115,10 +115,12 @@ class LocationTest {
     @Test
     void create() {
         Location test = Location.builder()
+                .id(4)
                 .locationName("test")
                 .address("test")
                 .build();
         test.setCity(City.builder()
+                        .id(3)
                         .postalcode(1211)
                         .cityname("testBy")
                 .build());
@@ -130,13 +132,13 @@ class LocationTest {
                         "  \"locationName\": \"test\",\n" +
                         "  \"address\": \"test\",\n" +
                         "  \"city\":\n" +
-                        "    {\n" +
-                        "      \"cityname\": \"testBy\",\n" +
-                        "      \"postalCode\": \"1211\"\n" +
-                        "    }\n" +
+                        "  {\n" +
+                        "    \"cityName\": \"testBy\",\n" +
+                        "    \"postalCode\": \"1211\"\n" +
+                        "  }\n" +
                         "}";
 
-        TemplateDetailedResponseDTO added = given()
+        LocationResponseDTO added = given()
                 .header("Authorization", "Bearer " + adminAuthToken) // Admin role allows Admin token
                 .header("Content-type", "application/json")
                 .and()
@@ -146,17 +148,17 @@ class LocationTest {
                 .then()
                 .statusCode(201)
                 .contentType(ContentType.JSON)
-                .extract().body().jsonPath().getObject("$", TemplateDetailedResponseDTO.class);
+                .extract().body().jsonPath().getObject("$", LocationResponseDTO.class);
 
         assertEquals(added, expected);
 
-        TemplateDetailedResponseDTO actual = (TemplateDetailedResponseDTO) given().
+        LocationResponseDTO actual = (LocationResponseDTO) given().
                 when()
                 .get("/locations/" + added.getId())
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .extract().body().jsonPath().getObject("$", TemplateDetailedResponseDTO.class);
+                .extract().body().jsonPath().getObject("$", LocationResponseDTO.class);
 
         assertEquals(actual, expected);
     }
@@ -169,6 +171,7 @@ class LocationTest {
                 .address("update")
                 .build();
         test.setCity(City.builder()
+                .id(3)
                 .postalcode(1211)
                 .cityname("testBy")
                 .build());
@@ -177,16 +180,16 @@ class LocationTest {
 
         String body =
                 "{\n" +
-                        "  \"locationName\": \"test\",\n" +
-                        "  \"address\": \"test\",\n" +
+                        "  \"locationName\": \"update\",\n" +
+                        "  \"address\": \"update\",\n" +
                         "  \"city\":\n" +
-                        "    {\n" +
-                        "      \"cityname\": \"testBy\",\n" +
-                        "      \"postalCode\": \"1211\"\n" +
-                        "    }\n" +
+                        "  {\n" +
+                        "    \"cityName\": \"testBy\",\n" +
+                        "    \"postalCode\": \"1211\"\n" +
+                        "  }\n" +
                         "}";
 
-        TemplateDetailedResponseDTO added = given()
+        LocationResponseDTO added = given()
                 .header("Authorization", "Bearer " + adminAuthToken) // Admin role allows Admin token
                 .header("Content-type", "application/json")
                 .and()
@@ -196,17 +199,17 @@ class LocationTest {
                 .then()
                 .statusCode(201)
                 .contentType(ContentType.JSON)
-                .extract().body().jsonPath().getObject("$", TemplateDetailedResponseDTO.class);
+                .extract().body().jsonPath().getObject("$", LocationResponseDTO.class);
 
         assertEquals(added, expected);
 
-        TemplateDetailedResponseDTO actual = (TemplateDetailedResponseDTO) given().
+        LocationResponseDTO actual = (LocationResponseDTO) given().
                 when()
                 .get("/locations/" + added.getId())
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .extract().body().jsonPath().getObject("$", TemplateDetailedResponseDTO.class);
+                .extract().body().jsonPath().getObject("$", LocationResponseDTO.class);
 
         assertEquals(actual, expected);
     }
