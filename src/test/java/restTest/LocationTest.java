@@ -192,7 +192,7 @@ class LocationTest {
                 .and()
                 .body(body)
                 .when()
-                .post("/locations/1")
+                .put("/locations/1")
                 .then()
                 .statusCode(201)
                 .contentType(ContentType.JSON)
