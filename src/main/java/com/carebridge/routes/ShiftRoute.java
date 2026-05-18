@@ -4,6 +4,8 @@ import com.carebridge.controllers.impl.ShiftController;
 import com.carebridge.entities.enums.Role;
 import io.javalin.apibuilder.EndpointGroup;
 
+
+import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.post;
 
 public class ShiftRoute {
@@ -13,6 +15,7 @@ public class ShiftRoute {
     public EndpointGroup getRoutes() {
         return () -> {
             post("/", shiftController::create, Role.PLANNER, Role.ADMIN);
+            get("/by-user", shiftController::readByUser, Role.CAREWORKER, Role.PLANNER, Role.ADMIN);
         };
     }
 }
