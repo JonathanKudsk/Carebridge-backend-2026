@@ -14,7 +14,7 @@ public class App {
 
         Populator.populate(HibernateConfig.getEntityManagerFactory());
 
-        TestDataPopulator.populate();
+       // TestDataPopulator.populate();
 
         app.get("/", ctx -> ctx.result("Carebridge API is running"));
     }
