@@ -80,6 +80,28 @@ public class SubstituteDAOTest {
         try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
 
+            em.createNativeQuery("""
+                            DELETE FROM users_locations
+                            WHERE locations_id IN (
+                                SELECT id FROM locations WHERE location_name IN ('Central Care', 'North Care')
+                            )
+                            OR user_id IN (
+                                SELECT id FROM users WHERE email IN ('anna.sub@example.com', 'bo.sub@example.com')
+                            )
+                            """)
+                    .executeUpdate();
+
+            em.createNativeQuery("""
+                            DELETE FROM location_substitute
+                            WHERE location_id IN (
+                                SELECT id FROM locations WHERE location_name IN ('Central Care', 'North Care')
+                            )
+                            OR user_id IN (
+                                SELECT id FROM users WHERE email IN ('anna.sub@example.com', 'bo.sub@example.com')
+                            )
+                            """)
+                    .executeUpdate();
+
             List<Location> locations = em.createQuery(
                             "SELECT l FROM Location l WHERE l.locationName IN :names",
                             Location.class)
@@ -90,7 +112,7 @@ public class SubstituteDAOTest {
             List<User> substitutes = em.createQuery(
                             "SELECT s FROM User s WHERE s.email IN :emails",
                             User.class)
-                    .setParameter("emails", List.of("anna.substitute@example.com", "bo.substitute@example.com"))
+                    .setParameter("emails", List.of("anna.sub@example.com", "bo.sub@example.com"))
                     .getResultList();
             substitutes.forEach(substitute -> substitute.getLocations().clear());
 
@@ -106,14 +128,14 @@ public class SubstituteDAOTest {
         List<User> substitutes = userDAO.readAllSubstitutes(null, null);
 
         User anna = substitutes.stream()
-                .filter(substitute -> substitute.getEmail().equals("anna.substitute@example.com"))
+                .filter(substitute -> substitute.getEmail().equals("anna.sub@example.com"))
                 .findFirst()
                 .orElseThrow();
 
-        assertEquals("Anna Substitute", anna.getName());
-        assertEquals("anna.display@example.com", anna.getDisplayEmail());
+        assertEquals("Anna Vikar", anna.getName());
+        assertEquals("anna@example.com", anna.getDisplayEmail());
         assertEquals("11111111", anna.getDisplayPhone());
-        assertEquals("anna.internal@example.com", anna.getInternalEmail());
+        assertEquals("anna.intern@example.com", anna.getInternalEmail());
         assertEquals("22222222", anna.getInternalPhone());
         assertEquals("Central Care", anna.getLocations().iterator().next().getLocationName());
     }
@@ -123,7 +145,7 @@ public class SubstituteDAOTest {
         List<User> substitutes = userDAO.readAllSubstitutes(centralLocationId, null);
 
         assertEquals(1, substitutes.size());
-        assertEquals("anna.substitute@example.com", substitutes.get(0).getEmail());
+        assertEquals("anna.sub@example.com", substitutes.get(0).getEmail());
     }
 
     @Test
@@ -131,7 +153,7 @@ public class SubstituteDAOTest {
         List<User> substitutes = userDAO.readAllSubstitutes(null, "north");
 
         assertEquals(1, substitutes.size());
-        assertEquals("bo.substitute@example.com", substitutes.get(0).getEmail());
+        assertEquals("bo.sub@example.com", substitutes.get(0).getEmail());
     }
 
     @Test

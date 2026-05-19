@@ -6,13 +6,13 @@ import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.ResidentDAO;
 import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dtos.LinkResidentsRequest;
+import com.carebridge.dtos.LocationResponseDTO;
 import com.carebridge.dtos.UserDTO;
 import com.carebridge.dtos.UserWithLocationDTO;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 import com.carebridge.entities.enums.Role;
 import com.carebridge.exceptions.ApiRuntimeException;
-import com.carebridge.services.mappers.SubstituteMapper;
 import com.carebridge.services.mappers.UserMapper;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
@@ -261,7 +261,7 @@ public class UserController implements IController<User, Long> {
             String locationName = ctx.queryParam("locationName");
             var list = userDAO.readAllSubstitutes(locationId, locationName)
                     .stream()
-                    .map(SubstituteMapper::toDTO)
+                    .map(UserWithLocationDTO::new)
                     .collect(Collectors.toList());
             ctx.json(list);
         } catch (ApiRuntimeException e) {
@@ -276,7 +276,7 @@ public class UserController implements IController<User, Long> {
         try {
             var list = userDAO.readSubstituteLocations()
                     .stream()
-                    .map(SubstituteMapper::toLocationDTO)
+                    .map(LocationResponseDTO::new)
                     .collect(Collectors.toList());
             ctx.json(list);
         } catch (Exception e) {
