@@ -22,6 +22,7 @@ public class Routes {
     private final MessageRoute messageRoute = new MessageRoute();
     private final ShiftRoute shiftRoute = new ShiftRoute();
     private final BudgetRoute budgetRoute = new BudgetRoute();
+    private final SavingsGoalRoute savingsGoalRoute = new SavingsGoalRoute();
 
     public EndpointGroup getRoutes() {
         return () -> {
@@ -39,6 +40,7 @@ public class Routes {
             path("/messages", messageRoute.getRoutes());
             path("/shifts", shiftRoute.getRoutes());
             path("/budgets", budgetRoute.getRoutes());
+            path("/savings-goals", savingsGoalRoute.getRoutes());
 
             get("/populate", controller::populate, Role.ANYONE);
             post("/populate", controller::populate, Role.ANYONE);

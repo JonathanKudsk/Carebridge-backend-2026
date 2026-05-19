@@ -66,6 +66,7 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(Message.class);
         configuration.addAnnotatedClass(ShiftAssignment.class);
         configuration.addAnnotatedClass(Budget.class);
+        configuration.addAnnotatedClass(SavingsGoal.class);
     }
 
     private static EntityManagerFactory createEMF(boolean forTest) {
