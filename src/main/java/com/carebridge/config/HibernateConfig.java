@@ -123,10 +123,6 @@ public class HibernateConfig {
         String DBHost = Utils.getPropertyValue("DB_HOST", "application.properties");
         String DBSSLMode = Utils.getPropertyValue("DB_SSLMODE", "application.properties");
 
-        if (DBSSLMode == null || DBSSLMode.isEmpty()) {
-            DBSSLMode = "require";
-        }
-
         props.put("hibernate.connection.url",
                 "jdbc:postgresql://" + DBHost + "/" + DBName + "?sslmode=" + DBSSLMode);
         props.put("hibernate.connection.username", DBUser);

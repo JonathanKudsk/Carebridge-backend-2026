@@ -6,6 +6,7 @@ import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.ResidentDAO;
 import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dtos.LinkResidentsRequest;
+import com.carebridge.dtos.LocationResponseDTO;
 import com.carebridge.dtos.UserDTO;
 import com.carebridge.dtos.UserWithLocationDTO;
 import com.carebridge.entities.Resident;
@@ -179,6 +180,23 @@ public class UserController implements IController<User, Long> {
         }
     }
 
+    private Long parseOptionalLongQueryParam(Context ctx, String queryParamName) {
+        String value = ctx.queryParam(queryParamName);
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        try {
+            long id = Long.parseLong(value);
+            if (id <= 0) {
+                throw new ApiRuntimeException(400, "Invalid " + queryParamName);
+            }
+            return id;
+        } catch (NumberFormatException e) {
+            throw new ApiRuntimeException(400, "Invalid " + queryParamName);
+        }
+    }
+
 
     public void linkResidents(Context ctx) {
         try {
@@ -237,6 +255,36 @@ public class UserController implements IController<User, Long> {
         }
     }
 
+    public void readAllSubstitutes(Context ctx) {
+        try {
+            Long locationId = parseOptionalLongQueryParam(ctx, "locationId");
+            String locationName = ctx.queryParam("locationName");
+            var list = userDAO.readAllSubstitutes(locationId, locationName)
+                    .stream()
+                    .map(UserWithLocationDTO::new)
+                    .collect(Collectors.toList());
+            ctx.json(list);
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("readAllSubstitutes failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
+
+    public void readSubstituteLocations(Context ctx) {
+        try {
+            var list = userDAO.readSubstituteLocations()
+                    .stream()
+                    .map(LocationResponseDTO::new)
+                    .collect(Collectors.toList());
+            ctx.json(list);
+        } catch (Exception e) {
+            logger.error("readSubstituteLocations failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
+
     public void getUserWithLocation(Context ctx){
         try {
             Long id = validatePrimaryKey(ctx.pathParam("id")) ? Long.parseLong(ctx.pathParam("id")) : null;
@@ -273,8 +321,8 @@ public class UserController implements IController<User, Long> {
 
     public void attachUserLocation(Context ctx) {
         try {
-            Long userId = validatePrimaryKey(ctx.pathParam("UserId")) ? Long.parseLong(ctx.pathParam("UserId")) : null;
-            Long locationID = Long.parseLong(ctx.pathParam("LocationID"));
+            Long userId = validatePrimaryKey(ctx.pathParam("userId")) ? Long.parseLong(ctx.pathParam("userId")) : null;
+            Long locationID = Long.parseLong(ctx.pathParam("locationId"));
             userDAO.attachLocationtoUser(userId,locationID);
             ctx.status(201);
         } catch (ApiRuntimeException e) {
@@ -287,8 +335,8 @@ public class UserController implements IController<User, Long> {
 
     public void detachUserLocation(Context ctx) {
         try {
-            Long userId = validatePrimaryKey(ctx.pathParam("UserId")) ? Long.parseLong(ctx.pathParam("UserId")) : null;
-            Long locationID = Long.parseLong(ctx.pathParam("LocationID"));
+            Long userId = validatePrimaryKey(ctx.pathParam("userId")) ? Long.parseLong(ctx.pathParam("userId")) : null;
+            Long locationID = Long.parseLong(ctx.pathParam("locationId"));
             userDAO.detachLocationtoUser(userId,locationID);
             ctx.status(204);
         } catch (ApiRuntimeException e) {
