@@ -3,6 +3,7 @@ package com.carebridge.config;
 import com.carebridge.entities.EventType;
 import com.carebridge.entities.Template;
 import com.carebridge.entities.Journal;
+import com.carebridge.entities.StaffJournal;
 import com.carebridge.entities.User;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.JournalEntry;
@@ -43,6 +44,9 @@ public class Populator {
                 admin.setInternalEmail("admin.internal@carebridge.io");
                 admin.setInternalPhone("111-1111-1111");
                 em.persist(admin);
+                StaffJournal adminJournal = new StaffJournal();
+                adminJournal.setUser(admin);
+                em.persist(adminJournal);
             }
 
             User alice = findUserByEmail(em, "alice@carebridge.io");
@@ -57,8 +61,10 @@ public class Populator {
                 alice.setDisplayPhone("111-1111-1111");
                 alice.setInternalEmail("alice.internal@carebridge.io");
                 alice.setInternalPhone("222-2222-2222");
-
                 em.persist(alice);
+                StaffJournal aliceJournal = new StaffJournal();
+                aliceJournal.setUser(alice);
+                em.persist(aliceJournal);
             }
 
             User guardian = findUserByEmail(em, "guardian@carebridge.io");
