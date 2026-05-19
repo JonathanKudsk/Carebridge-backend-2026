@@ -18,6 +18,7 @@ import com.carebridge.entities.JournalEntry;
 import com.carebridge.entities.JournalEntryAnswer;
 import com.carebridge.entities.Template;
 import com.carebridge.entities.User;
+import com.carebridge.entities.enums.Role;
 import com.carebridge.enums.EntryType;
 import com.carebridge.enums.RiskAssessment;
 import com.carebridge.exceptions.ApiRuntimeException;
@@ -30,6 +31,7 @@ import java.time.format.DateTimeParseException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class JournalEntryController implements IController<JournalEntry, Long> {
@@ -40,7 +42,7 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
     private final TemplateDAO templateDAO = TemplateDAO.getInstance();
     private final UserDAO userDAO = UserDAO.getInstance();
 
-    // Admins and careworkers can access all journals, while guardians can only
+    // Admins, careworkers, and substitutes can access all journals, while guardians can only
     // access journals belonging to residents they are linked to.
     private boolean canAccessJournal(Context ctx, Long journalId) {
         var tokenUser = ctx.attribute("user");
@@ -50,11 +52,7 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
             return false;
         }
 
-        boolean isAdminOrCareworker = jwtUser.getRoles().stream()
-                .map(String::toUpperCase)
-                .anyMatch(role -> role.equals("ADMIN") || role.equals("CAREWORKER"));
-
-        if (isAdminOrCareworker) {
+        if (hasFullJournalAccess(jwtUser)) {
             return true;
         }
 
@@ -68,6 +66,18 @@ public class JournalEntryController implements IController<JournalEntry, Long> {
 
         ctx.status(403).json("{\"msg\":\"Forbidden\"}");
         return false;
+    }
+
+    static boolean hasFullJournalAccess(JwtUserDTO jwtUser) {
+        if (jwtUser == null || jwtUser.getRoles() == null) {
+            return false;
+        }
+
+        return jwtUser.getRoles().stream()
+                .map(role -> role.toUpperCase(Locale.ROOT))
+                .anyMatch(role -> role.equals(Role.ADMIN.name())
+                        || role.equals(Role.CAREWORKER.name())
+                        || role.equals(Role.SUBSTITUTE.name()));
     }
 
     @Override

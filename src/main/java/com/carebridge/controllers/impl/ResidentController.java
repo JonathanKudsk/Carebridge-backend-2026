@@ -10,6 +10,7 @@ import com.carebridge.entities.MedicationChart;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 import com.carebridge.services.ResidentService;
+import com.carebridge.services.mappers.ResidentMapper;
 import io.javalin.http.Context;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
@@ -123,7 +124,7 @@ public class ResidentController implements IController<Resident, Long> {
                 return;
             }
 
-            ctx.status(200).json(toResponseDTO(resident));
+            ctx.status(200).json(ResidentMapper.toDetailsDTO(resident));
         } catch (NumberFormatException e) {
             ctx.status(400).result("Invalid ID format");
         } catch (Exception e) {

@@ -1,7 +1,6 @@
 @url = http://localhost:7070/api
 @admin_email = admin@carebridge.io
 @admin_password = admin123
-
 ### 1) Health check (no auth)
 GET {{url}}/auth/healthcheck
 
@@ -603,3 +602,185 @@ Authorization: Bearer {{new_jwt_token}}
         client.assert(response.status === 401, "Burde returnere 401 for invalideret token, fik: " + response.status);
     });
 %}
+
+### ---- Location API ----
+
+### Get all templates
+GET {{url}}/locations
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### Get specific template
+GET {{url}}/locations/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### Delete specific template
+DELETE {{url}}/locations/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### Create template
+POST {{url}}/locations
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "locationName": "HTTP Test location",
+  "address": "test",
+  "city":
+  {
+    "cityName": "by",
+    "postalCode": "1234"
+  }
+}
+
+### Update template
+POST {{url}}/locations/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "locationName": "HTTP Test location",
+  "address": "test",
+  "city":
+    {
+      "cityName": "by",
+      "postalCode": "1234"
+    }
+}
+
+### ---- Substitute API ----
+
+### Create substitute test location
+POST {{url}}/locations
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "locationName": "HTTP Substitute location",
+  "address": "Substitute Street 1",
+  "city":
+  {
+    "cityName": "Substitute City",
+    "postalCode": "4321"
+  }
+}
+
+> {%
+    client.test("Create substitute test location", function () {
+        client.assert(response.status === 201, "Failed to create substitute test location");
+        client.assert(response.body.id, "No location id returned");
+        client.global.set("substitute_location_id", response.body.id);
+    });
+%}
+
+### Create substitute test user
+POST {{url}}/auth/register
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "name": "HTTP Substitute",
+  "email": "http.substitute@carebridge.io",
+  "password": "StrongPass!123",
+  "displayName": "HTTP Substitute",
+  "displayEmail": "http.substitute.display@carebridge.io",
+  "displayPhone": "555-0101",
+  "internalEmail": "http.substitute.internal@carebridge.io",
+  "internalPhone": "555-0102",
+  "role": "SUBSTITUTE"
+}
+
+> {%
+    client.test("Create substitute test user", function () {
+        client.assert([201, 409].includes(response.status), "Failed to create substitute test user");
+    });
+%}
+
+### Read substitute test user by email
+GET {{url}}/users/by-email/http.substitute@carebridge.io
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+> {%
+    client.test("Read substitute test user by email", function () {
+        client.assert(response.status === 200, "Failed to read substitute test user");
+        client.assert(response.body.id, "No substitute user id returned");
+        client.global.set("substitute_user_id", response.body.id);
+    });
+%}
+
+### Attach substitute location to substitute user
+PUT {{url}}/users/{{substitute_user_id}}/locations/{{substitute_location_id}}
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+> {%
+    client.test("Attach substitute location", function () {
+        client.assert([200, 201, 204].includes(response.status), "Failed to attach substitute location");
+    });
+%}
+
+### Read all substitutes
+GET {{url}}/users/substitutes
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+> {%
+    client.test("Read all substitutes", function () {
+        client.assert(response.status === 200, "Failed to read all substitutes");
+        client.assert(Array.isArray(response.body), "Substitute response is not an array");
+    });
+%}
+
+### Read substitutes filtered by location id
+GET {{url}}/users/substitutes?locationId={{substitute_location_id}}
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+> {%
+    client.test("Read substitutes by location id", function () {
+        client.assert(response.status === 200, "Failed to read substitutes by location id");
+        client.assert(Array.isArray(response.body), "Substitute response is not an array");
+        client.assert(response.body.some(substitute => substitute.email === "http.substitute@carebridge.io"), "Expected substitute was not returned");
+    });
+%}
+
+### Read substitutes filtered by location name
+GET {{url}}/users/substitutes?locationName=HTTP%20Substitute
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+> {%
+    client.test("Read substitutes by location name", function () {
+        client.assert(response.status === 200, "Failed to read substitutes by location name");
+        client.assert(Array.isArray(response.body), "Substitute response is not an array");
+        client.assert(response.body.some(substitute => substitute.email === "http.substitute@carebridge.io"), "Expected substitute was not returned");
+    });
+%}
+
+### Read locations with substitutes
+GET {{url}}/users/substitutes/locations
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+> {%
+    client.test("Read substitute locations", function () {
+        client.assert(response.status === 200, "Failed to read substitute locations");
+        client.assert(Array.isArray(response.body), "Substitute locations response is not an array");
+        client.assert(response.body.some(location => location.locationName === "HTTP Substitute location"), "Expected substitute location was not returned");
+    });
+%}
+
+### 5) Read a user with location by id
+GET {{url}}/users/1/locations
+Authorization: Bearer {{jwt_token}}
+
+### 5) attach a location to user (admin)
+PUT {{url}}/users/1/locations/1
+Authorization: Bearer {{jwt_token}}
+
+### 5) detach a location to user (admin)
+DELETE {{url}}/users/1/locations/1
+Authorization: Bearer {{jwt_token}}

@@ -1,7 +1,5 @@
 package com.carebridge.config;
 
-
-import com.carebridge.dtos.ChatRoomDTO;
 import com.carebridge.entities.*;
 import com.carebridge.entities.enums.Role;
 import com.carebridge.utils.Utils;
@@ -67,6 +65,11 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(ShiftAssignment.class);
         configuration.addAnnotatedClass(Budget.class);
         configuration.addAnnotatedClass(SavingsGoal.class);
+        configuration.addAnnotatedClass(PlanPeriod.class);
+        configuration.addAnnotatedClass(Location.class);
+        configuration.addAnnotatedClass(City.class);
+        configuration.addAnnotatedClass(Handbook.class);
+        configuration.addAnnotatedClass(HandbookTab.class);
     }
 
     private static EntityManagerFactory createEMF(boolean forTest) {
@@ -121,10 +124,6 @@ public class HibernateConfig {
         String DBPassword = Utils.getPropertyValue("DB_PASSWORD", "application.properties");
         String DBHost = Utils.getPropertyValue("DB_HOST", "application.properties");
         String DBSSLMode = Utils.getPropertyValue("DB_SSLMODE", "application.properties");
-
-        if (DBSSLMode == null || DBSSLMode.isEmpty()) {
-            DBSSLMode = "require";
-        }
 
         props.put("hibernate.connection.url",
                 "jdbc:postgresql://" + DBHost + "/" + DBName + "?sslmode=" + DBSSLMode);

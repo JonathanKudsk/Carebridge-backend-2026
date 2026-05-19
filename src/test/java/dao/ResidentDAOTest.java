@@ -45,7 +45,7 @@ public class ResidentDAOTest {
     public void resetDatabase() {
         try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
-            em.createNativeQuery("TRUNCATE TABLE resident_user, resident, users RESTART IDENTITY CASCADE").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE guardian_residents, resident, users RESTART IDENTITY CASCADE").executeUpdate();
             em.getTransaction().commit();
         }
 
@@ -170,5 +170,32 @@ public class ResidentDAOTest {
         }
 
         residentDAO.delete(anotherLinkedResident.getId());
+    }
+
+    @Test
+    public void testGetAllSorted() {
+        Resident resident1 = new Resident("Carl", "Carlsen", "666666-6666", null, null);
+        Resident resident2 = new Resident("Alice", "Alsen", "777777-7777", null, null);
+        Resident resident3 = new Resident("Bob", "Bobsen", "888888-8888", null, null);
+
+        resident1 = residentDAO.create(resident1);
+        resident2 = residentDAO.create(resident2);
+        resident3 = residentDAO.create(resident3);
+
+        List<Resident> residents = residentDAO.getAllSorted();
+
+        assertNotNull(residents);
+        assertTrue(residents.size() >= 3);
+
+        for (int i = 0; i < residents.size() - 1; i++) {
+            String current = residents.get(i).getFirstName();
+            String next = residents.get(i + 1).getFirstName();
+
+            assertTrue(current.compareTo(next) <= 0);
+        }
+
+        residentDAO.delete(resident1.getId());
+        residentDAO.delete(resident2.getId());
+        residentDAO.delete(resident3.getId());
     }
 }

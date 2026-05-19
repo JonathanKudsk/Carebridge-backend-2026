@@ -10,7 +10,9 @@ import jakarta.persistence.EntityTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -39,6 +41,9 @@ public class Populator {
                 admin.setInternalPhone("111-1111-1111");
                 em.persist(admin);
             }
+            admin.setTotpSecret("JBSWY3DPEHPK3PXP");
+            admin.setTotpEnabled(true);
+            admin.setTotpGracePeriodEnd(Instant.now().plus(14, ChronoUnit.DAYS));
 
             User alice = findUserByEmail(em, "alice@carebridge.io");
             if (alice == null) {
@@ -130,6 +135,21 @@ public class Populator {
             unlinkedEntry.setEditCloseTime(LocalDateTime.now().plusHours(24));
             unlinkedJournal.addEntry(unlinkedEntry);
 
+            // --- LOOP FOR AT TESTE FRONTEND PAGINERING ---
+            for (int i = 1; i <= 25; i++) {
+                JournalEntry dummyEntry = new JournalEntry();
+                dummyEntry.setAuthor(alice);
+                dummyEntry.setJournal(unlinkedJournal);
+                dummyEntry.setTitle("Test journal " + i + " med feber");
+                dummyEntry.setEntryType(EntryType.DAILY);
+                // Skiftes lidt mellem HIGH og LOW, så du kan teste risk_level filtret i React
+                dummyEntry.setRiskAssessment(i % 2 == 0 ? RiskAssessment.HIGH : RiskAssessment.LOW);
+                dummyEntry.setTemplate(defaultTemplate);
+                dummyEntry.setCreatedAt(LocalDateTime.now().minusDays(i));
+                dummyEntry.setUpdatedAt(LocalDateTime.now().minusDays(i));
+                dummyEntry.setEditCloseTime(LocalDateTime.now().plusHours(24));
+                unlinkedJournal.addEntry(dummyEntry);
+            }
             em.persist(unlinkedResident);
 
             MedicationChart chart2 = new MedicationChart();
@@ -143,8 +163,7 @@ public class Populator {
                     new EventType("Reminder", "#ffc107"),
                     new EventType("Holiday", "#dc3545"),
                     new EventType("Private", "#6f42c1"),
-                    new EventType("Other", "#adb5bd")
-            );
+                    new EventType("Other", "#adb5bd"));
 
             for (EventType type : predefinedTypes) {
                 EventType existing = findEventTypeByName(em, type.getName());
@@ -156,7 +175,8 @@ public class Populator {
             tx.commit();
             logger.info("Database populated successfully.");
         } catch (RuntimeException ex) {
-            if (tx.isActive()) tx.rollback();
+            if (tx.isActive())
+                tx.rollback();
             logger.error("Population failed", ex);
             throw ex;
         } finally {

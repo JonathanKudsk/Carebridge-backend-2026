@@ -12,11 +12,11 @@ public class MedicationRoute {
 
     public EndpointGroup getRoutes() {
         return () -> {
-            get("/{chartId}", controller::readAll, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
-            get("/resident/{residentId}", controller::readByResident, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
-            post("/{chartId}/medications", controller::create, Role.ADMIN, Role.CAREWORKER);
-            get("/{chartId}/medications/{medicationId}", controller::read, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
-            put("/{chartId}/medications/{medicationId}", controller::update, Role.ADMIN, Role.CAREWORKER);
+            get("/{chartId}", controller::readAll, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN, Role.SUBSTITUTE);
+            get("/resident/{residentId}", controller::readByResident, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN, Role.SUBSTITUTE);
+            post("/{chartId}/medications", controller::create, Role.ADMIN, Role.CAREWORKER, Role.SUBSTITUTE);
+            get("/{chartId}/medications/{medicationId}", controller::read, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN, Role.SUBSTITUTE);
+            put("/{chartId}/medications/{medicationId}", controller::update, Role.ADMIN, Role.CAREWORKER, Role.SUBSTITUTE);
             delete("/{chartId}/medications/{medicationId}", controller::delete, Role.ADMIN);
         };
     }
