@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.Instant;
@@ -16,6 +18,9 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("USER")
 @Table(
         name = "users",
         uniqueConstraints = @UniqueConstraint(name = "uq_users_email", columnNames = "email")
@@ -94,6 +99,11 @@ public class User implements ISecurityUser {
     )
     private List<Resident> residents = new ArrayList<>();
 
+    @ManyToMany (cascade = CascadeType.REMOVE)
+    @Getter
+    @Setter
+    private Set<Location> locations = new HashSet<>();
+
     // ========== CONSTRUCTORS ==========
 
     public User() {
@@ -130,6 +140,18 @@ public class User implements ISecurityUser {
     public void removeRole(String roleName) {
         if (roleName != null && this.role.name().equalsIgnoreCase(roleName)) {
             this.role = Role.USER;
+        }
+    }
+
+    public void addLocation(Location location) {
+        if (locations.add(location)){
+            location.addUser(this);
+        }
+    }
+
+    public void removeLocation(Location location) {
+        if (locations.remove(location)){
+            location.removeUser(this);
         }
     }
 

@@ -2,6 +2,7 @@ package com.carebridge.dao.impl;
 
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.IDAO;
+import com.carebridge.entities.Location;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 import com.carebridge.entities.enums.Role;
@@ -9,6 +10,7 @@ import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.ValidationException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.NoResultException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -210,6 +212,76 @@ public class UserDAO implements IDAO<User, Long> {
         } catch (Exception e) {
             logger.error("Error deleting user {}", id, e);
             throw new ApiRuntimeException(500, "Error deleting user: " + e.getMessage());
+        }
+    }
+
+    public User readWithLocation(Long id) {
+        try (var em = em()) {
+            var list = em.createQuery("SELECT u FROM User u left join FETCH u.locations where u.id = :id", User.class)
+                    .setParameter("id", id)
+                    .getResultList();
+            return list.isEmpty() ? null : list.get(0);
+        } catch (Exception e) {
+            logger.error("Error fetching user by id {}", id, e);
+            throw new ApiRuntimeException(500, "Error fetching user: " + e.getMessage());
+        }
+    }
+
+    public User attachLocationtoUser (Long userId, Long locationId) {
+        try (var em = em()) {
+            em.getTransaction().begin();
+            User u = em.createQuery("SELECT u FROM User u left join FETCH u.locations WHERE u.id = :userId", User.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            Location l = em.find(Location.class, locationId);
+            if (l == null)
+                throw new ApiRuntimeException(404, "Location not found");
+
+            u.addLocation(l);
+
+            em.merge(u);
+
+            em.getTransaction().commit();
+            logger.info("Location {} attached to user {}", locationId ,userId);
+            return u;
+
+        } catch (NoResultException e) { //only thrown by user search query
+            throw new ApiRuntimeException(404, "User not found");
+        } catch (ApiRuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error attaching location {} to user {}",locationId, userId, e);
+            throw new ApiRuntimeException(500, "Error attaching location to user: " + e.getMessage());
+        }
+    }
+
+    public User detachLocationtoUser(Long userId, Long locationId) {
+        try (var em = em()) {
+            em.getTransaction().begin();
+            User u = em.createQuery("SELECT u FROM User u left join FETCH u.locations WHERE u.id = :userId", User.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            Location l = em.find(Location.class, locationId);
+            if (l == null)
+                throw new ApiRuntimeException(404, "Location not found");
+
+            u.removeLocation(l);
+
+            em.merge(u);
+
+            em.getTransaction().commit();
+            logger.info("Location {} detached to user {}", locationId ,userId);
+            return u;
+
+        } catch (NoResultException e) { //only thrown by user search query
+            throw new ApiRuntimeException(404, "User not found");
+        } catch (ApiRuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error detaching location {} to user {}",locationId, userId, e);
+            throw new ApiRuntimeException(500, "Error detaching location to user: " + e.getMessage());
         }
     }
 }
