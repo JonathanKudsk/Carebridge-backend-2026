@@ -114,6 +114,24 @@ public class ShiftController {
         }
     }
 
+    public void delete(Context ctx) {
+        try {
+            Long id = parseId(ctx);
+            shiftDAO.delete(id);
+            ctx.status(204);
+            logger.info("Shift deleted with id: {}", id);
+        } catch (ApiRuntimeException e) {
+            if (e.getErrorCode() == 404) {
+                toonObjectMapper.writeMessage(ctx, 404, "Vagt ikke fundet");
+                return;
+            }
+            toonObjectMapper.writeMessage(ctx, e.getErrorCode(), e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error deleting shift", e);
+            toonObjectMapper.writeMessage(ctx, 500, "Internal server error");
+        }
+    }
+
     private void validateCreateRequest(CreateShiftRequestDTO dto) throws ValidationException {
         if (dto.getStartShift() == null || dto.getEndShift() == null) {
             throw new ValidationException("startShift and endShift are required");
