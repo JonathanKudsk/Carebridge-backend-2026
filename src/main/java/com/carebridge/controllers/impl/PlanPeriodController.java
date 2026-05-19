@@ -7,7 +7,7 @@ import com.carebridge.dtos.JwtUserDTO;
 import com.carebridge.dtos.PlanPeriodResponseDTO;
 import com.carebridge.entities.PlanPeriod;
 import com.carebridge.entities.User;
-import com.carebridge.enums.PlanStatus;
+import com.carebridge.entities.enums.PlanStatus;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.ValidationException;
 import com.carebridge.utils.toon.ToonObjectMapper;
