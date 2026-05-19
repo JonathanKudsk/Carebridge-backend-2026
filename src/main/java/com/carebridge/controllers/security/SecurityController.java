@@ -11,7 +11,10 @@ import com.carebridge.dtos.UserDTO;
 import com.carebridge.dtos.security.ITokenSecurity;
 import com.carebridge.dtos.security.TokenSecurity;
 import com.carebridge.dtos.security.TokenVerificationException;
+import com.carebridge.dao.impl.StaffJournalDAO;
+import com.carebridge.entities.StaffJournal;
 import com.carebridge.entities.User;
+import com.carebridge.entities.enums.Role;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.NotAuthorizedException;
 import com.carebridge.exceptions.ValidationException;
@@ -59,6 +62,18 @@ public class SecurityController implements ISecurityController {
             try {
                 AuthRequest req = ctx.bodyAsClass(AuthRequest.class);
                 User verified = securityDAO.getVerifiedUser(req.getEmail(), req.getPassword());
+
+                //Skip 2FA if run local (except for the tests)
+                //workflow.yml sets DEPLOYED to a non-null value, which means the 2FA is active when deployed.
+                boolean DEPLOYED = System.getenv("DEPLOYED") != null;
+                if (!DEPLOYED && !HibernateConfig.getTest()) {
+                    String token = createToken(buildJwtUser(verified));
+                    ctx.status(200).json(out.put("token", token)
+                            .put("email", verified.getEmail())
+                            .put("role", verified.getRole().name())
+                            .put("isEmployed", verified.isEmployed()));
+                    return;
+                }
 
                 if (!verified.isTotpEnabled()) {
                     // First login or abandoned setup — must complete TOTP setup before getting a full JWT
@@ -192,6 +207,13 @@ public class SecurityController implements ISecurityController {
                         dto.getInternalPhone(),
                         dto.getRole()
                 );
+
+                // Opret tom personalejournal for ansatte
+                if (created.getRole() == Role.ADMIN || created.getRole() == Role.CAREWORKER) {
+                    StaffJournal journal = new StaffJournal();
+                    journal.setUser(created);
+                    StaffJournalDAO.getInstance().create(journal);
+                }
 
                 // Lav JWT
                 JwtUserDTO jwtUser = JwtUserDTO.builder()

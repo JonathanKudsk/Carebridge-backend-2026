@@ -22,6 +22,7 @@ public class Routes {
     private final ChatRoomUserRoute chatRoomUserRoute = new ChatRoomUserRoute();
     private final MessageRoute messageRoute = new MessageRoute();
     private final ShiftRoute shiftRoute = new ShiftRoute();
+    private final StaffJournalRoute staffJournalRoute = new StaffJournalRoute();
     private final BudgetRoute budgetRoute = new BudgetRoute();
     private final SavingsGoalRoute savingsGoalRoute = new SavingsGoalRoute();
     private final ShiftAssignmentRoute shiftAssignmentRoute = new ShiftAssignmentRoute();
@@ -44,6 +45,7 @@ public class Routes {
             path("/chatroom-users", chatRoomUserRoute.getRoutes());
             path("/messages", messageRoute.getRoutes());
             path("/shifts", shiftRoute.getRoutes());
+            path("/staff-journals", staffJournalRoute.getRoutes());
             path("/budgets", budgetRoute.getRoutes());
             path("/savings-goals", savingsGoalRoute.getRoutes());
             path("/shift-assignments", shiftAssignmentRoute.getRoutes());
