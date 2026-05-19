@@ -18,6 +18,9 @@ public class Medication implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version;
+
     @Column(nullable = false)
     private String name;
 
@@ -63,6 +66,10 @@ public class Medication implements Serializable {
     // Getters and setters
     public Long getId() {
         return id;
+    }
+
+    public Long getVersion() {
+        return version;
     }
 
     public String getName() {
