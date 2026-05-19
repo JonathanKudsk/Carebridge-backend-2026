@@ -179,4 +179,58 @@ public class ShiftController {
             throw new ApiRuntimeException(400, "Invalid id");
         }
     }
+
+    public void readByUser(Context ctx) {
+    try {
+        JwtUserDTO authUser = ctx.attribute("user");
+        if (authUser == null) {
+            throw new UnauthorizedResponse("Not authenticated");
+        }
+
+        Long userId;
+
+        if (hasRole(authUser, "CAREWORKER")) {
+            if (ctx.queryParam("userId") != null) {
+                ctx.status(403).json("{\"msg\":\"CAREWORKER can only view their own shifts\"}");
+                return;
+            }
+            userId = resolveUserId(authUser);
+        } else {
+            String param = ctx.queryParam("userId");
+            if (param == null || param.isBlank()) {
+                ctx.status(400).json("{\"msg\":\"userId query param is required\"}");
+                return;
+            }
+            try {
+                userId = Long.parseLong(param);
+            } catch (NumberFormatException e) {
+                ctx.status(400).json("{\"msg\":\"userId must be a valid number\"}");
+                return;
+            }
+        }
+
+        List<Shift> shifts = shiftDAO.findByAssignedUserId(userId);
+        ctx.status(200).json(shifts);
+        logger.info("readByUser: {} shifts returned for userId={}", shifts.size(), userId);
+
+    } catch (UnauthorizedResponse e) {
+        ctx.status(401).json("{\"msg\":\"" + e.getMessage() + "\"}");
+    } catch (ApiRuntimeException e) {
+        ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+    } catch (Exception e) {
+        logger.error("Error in readByUser", e);
+        ctx.status(500).json("{\"msg\":\"Internal server error\"}");
+    }
+}
+    private Long resolveUserId(JwtUserDTO authUser) {
+    User user = userDAO.readByEmail(authUser.getUsername());
+    if (user == null) throw new ApiRuntimeException(404, "Authenticated user not found");
+    return user.getId();
+}
+
+    private boolean hasRole(JwtUserDTO authUser, String role) {
+    return authUser.getRoles().stream()
+            .map(String::toUpperCase)
+            .anyMatch(r -> r.equals(role.toUpperCase()));
+}
 }
