@@ -4,16 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="fixed test that called post when was supposed to be put">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteLocationDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteResponseDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/services/mappers/SubstituteMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/dao/SubstituteDAOTest.java" afterDir="false" />
+    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="Add substitute read endpoints with location filtering&#10;&#10;- add DAO queries for reading substitutes and substitute locations&#10;- expose substitute endpoints under users routes&#10;- return substitutes using existing UserWithLocationDTO&#10;- add demo.http requests for substitute endpoint testing&#10;- fix user/location path parameter casing&#10;- include DB port in Hibernate dev config&#10;- improve related test cleanup for location/substitute data">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/config/HibernateConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/config/HibernateConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/config/Populator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/config/Populator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteLocationDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteResponseDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/services/mappers/SubstituteMapper.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +25,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="developer" />
+        <entry key="$PROJECT_DIR$" value="developer-basic-CRUD-for-Locations-READ" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -111,7 +106,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "developer-basic-CRUD-for-Locations-READ",
+    "git-widget-placeholder": "developer-basic-CRUD-for-Locations-READ-tests",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
@@ -136,7 +131,7 @@
             <map>
               <entry key="demo | Attach substitute location to substitute user" value="STOPPED" />
               <entry key="demo | Read all substitutes" value="STOPPED" />
-              <entry key="demo | Read locations with substitutes" value="STOPPED" />
+              <entry key="demo | Read substitute test user by email" value="STOPPED" />
               <entry key="demo | Read substitutes filtered by location id" value="STOPPED" />
               <entry key="demo | Read substitutes filtered by location name" value="STOPPED" />
             </map>
@@ -145,14 +140,14 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="HTTP Request.demo | Read locations with substitutes">
+  <component name="RunManager" selected="HTTP Request.demo | Read substitutes filtered by location name">
     <configuration name="demo | Attach substitute location to substitute user" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Attach substitute location to substitute user" index="47" runType="Run single request">
       <method v="2" />
     </configuration>
     <configuration name="demo | Read all substitutes" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Read all substitutes" index="48" runType="Run single request">
       <method v="2" />
     </configuration>
-    <configuration name="demo | Read locations with substitutes" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Read locations with substitutes" index="51" runType="Run single request">
+    <configuration name="demo | Read substitute test user by email" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Read substitute test user by email" index="46" runType="Run single request">
       <method v="2" />
     </configuration>
     <configuration name="demo | Read substitutes filtered by location id" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Read substitutes filtered by location id" index="49" runType="Run single request">
@@ -163,11 +158,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="HTTP Request.demo | Read locations with substitutes" />
         <item itemvalue="HTTP Request.demo | Read substitutes filtered by location name" />
         <item itemvalue="HTTP Request.demo | Read substitutes filtered by location id" />
-        <item itemvalue="HTTP Request.demo | Read all substitutes" />
+        <item itemvalue="HTTP Request.demo | Read substitute test user by email" />
         <item itemvalue="HTTP Request.demo | Attach substitute location to substitute user" />
+        <item itemvalue="HTTP Request.demo | Read all substitutes" />
       </list>
     </recent_temporary>
   </component>
@@ -264,7 +259,23 @@
       <option name="project" value="LOCAL" />
       <updated>1779101065555</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Add substitute read endpoints and demo HTTP checks&#10;&#10;- add substitute read queries with optional location filtering&#10;- expose substitute list and substitute-location endpoints&#10;- add DTO mapper support for substitute responses&#10;- fix user/location route param casing&#10;- include DB port in Hibernate dev config&#10;- add demo.http requests for substitute endpoint testing">
+      <option name="closed" value="true" />
+      <created>1779181665061</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1779181665061</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Add substitute read endpoints with location filtering&#10;&#10;- add DAO queries for reading substitutes and substitute locations&#10;- expose substitute endpoints under users routes&#10;- return substitutes using existing UserWithLocationDTO&#10;- add demo.http requests for substitute endpoint testing&#10;- fix user/location path parameter casing&#10;- include DB port in Hibernate dev config&#10;- improve related test cleanup for location/substitute data">
+      <option name="closed" value="true" />
+      <created>1779183142243</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1779183142244</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -287,7 +298,9 @@
     <MESSAGE value="added the ability to attach, detach and read a location to a user" />
     <MESSAGE value="fixed test broken by change in entity" />
     <MESSAGE value="fixed test that called post when was supposed to be put" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed test that called post when was supposed to be put" />
+    <MESSAGE value="Add substitute read endpoints and demo HTTP checks&#10;&#10;- add substitute read queries with optional location filtering&#10;- expose substitute list and substitute-location endpoints&#10;- add DTO mapper support for substitute responses&#10;- fix user/location route param casing&#10;- include DB port in Hibernate dev config&#10;- add demo.http requests for substitute endpoint testing" />
+    <MESSAGE value="Add substitute read endpoints with location filtering&#10;&#10;- add DAO queries for reading substitutes and substitute locations&#10;- expose substitute endpoints under users routes&#10;- return substitutes using existing UserWithLocationDTO&#10;- add demo.http requests for substitute endpoint testing&#10;- fix user/location path parameter casing&#10;- include DB port in Hibernate dev config&#10;- improve related test cleanup for location/substitute data" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add substitute read endpoints with location filtering&#10;&#10;- add DAO queries for reading substitutes and substitute locations&#10;- expose substitute endpoints under users routes&#10;- return substitutes using existing UserWithLocationDTO&#10;- add demo.http requests for substitute endpoint testing&#10;- fix user/location path parameter casing&#10;- include DB port in Hibernate dev config&#10;- improve related test cleanup for location/substitute data" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
