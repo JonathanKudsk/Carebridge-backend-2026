@@ -120,11 +120,10 @@ public class HibernateConfig {
         String DBUser = Utils.getPropertyValue("DB_USER", "application.properties");
         String DBPassword = Utils.getPropertyValue("DB_PASSWORD", "application.properties");
         String DBHost = Utils.getPropertyValue("DB_HOST", "application.properties");
-        String DBPort = Utils.getPropertyValue("DB_PORT", "application.properties");
         String DBSSLMode = Utils.getPropertyValue("DB_SSLMODE", "application.properties");
 
         props.put("hibernate.connection.url",
-                "jdbc:postgresql://" + DBHost + ":" + DBPort + "/" + DBName + "?sslmode=" + DBSSLMode);
+                "jdbc:postgresql://" + DBHost + ":" + "/" + DBName + "?sslmode=" + DBSSLMode);
         props.put("hibernate.connection.username", DBUser);
         props.put("hibernate.connection.password", DBPassword);
         return props;
