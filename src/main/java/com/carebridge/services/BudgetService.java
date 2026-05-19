@@ -2,20 +2,28 @@ package com.carebridge.services;
 
 import com.carebridge.dao.impl.BudgetDAO;
 import com.carebridge.dao.impl.ResidentDAO;
+import com.carebridge.dao.impl.SavingsGoalDAO;
 import com.carebridge.dtos.BudgetResponseDTO;
 import com.carebridge.dtos.CreateBudgetRequestDTO;
+import com.carebridge.dtos.SavingsGoalResponseDTO;
+import com.carebridge.dtos.UpdateSavingsGoalRequestDTO;
 import com.carebridge.entities.Budget;
 import com.carebridge.entities.Resident;
+import com.carebridge.entities.SavingsGoal;
 import com.carebridge.exceptions.ApiRuntimeException;
+
+import java.util.List;
 
 public class BudgetService {
 
     private final BudgetDAO budgetDAO;
     private final ResidentDAO residentDAO;
+    private final SavingsGoalDAO savingsGoalDAO;
 
     public BudgetService() {
         this.budgetDAO = BudgetDAO.getInstance();
         this.residentDAO = ResidentDAO.getInstance();
+        this.savingsGoalDAO = SavingsGoalDAO.getInstance();
     }
 
     public BudgetResponseDTO createBudget(CreateBudgetRequestDTO request) {
@@ -98,5 +106,34 @@ public class BudgetService {
                 budget.getNotes(),
                 resident.getId()
         );
+    }
+
+    public SavingsGoalResponseDTO toResponseDTO(SavingsGoal goal) {
+        Long budgetId = goal.getBudget() != null ? goal.getBudget().getId() : null;
+        return new SavingsGoalResponseDTO(
+                goal.getId(),
+                budgetId,
+                goal.getGoalName(),
+                goal.getTargetAmount(),
+                goal.getMonthlySavingAmount(),
+                goal.getCurrentBalance()
+        );
+    }
+
+    public SavingsGoal updateSavingsGoal(Long id, UpdateSavingsGoalRequestDTO req) {
+        SavingsGoal goal = savingsGoalDAO.read(id);
+        if (req.getGoalName() != null && !req.getGoalName().isBlank())
+            goal.setGoalName(req.getGoalName());
+        if (req.getTargetAmount() != null && req.getTargetAmount() > 0)
+            goal.setTargetAmount(req.getTargetAmount());
+        if (req.getMonthlySavingAmount() != null && req.getMonthlySavingAmount() > 0)
+            goal.setMonthlySavingAmount(req.getMonthlySavingAmount());
+        if (req.getCurrentBalance() != null && req.getCurrentBalance() >= 0)
+            goal.setCurrentBalance(req.getCurrentBalance());
+        return savingsGoalDAO.update(id, goal);
+    }
+
+    public List<SavingsGoal> getSavingsGoalsByResidentId(Long residentId) {
+        return savingsGoalDAO.findByResidentId(residentId);
     }
 }

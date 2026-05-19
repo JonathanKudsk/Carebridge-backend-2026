@@ -13,10 +13,10 @@ public class SavingsGoalRoute {
         return () -> {
             post("/", controller::create, Role.CAREWORKER, Role.ADMIN);
             get("/", controller::readAll, Role.CAREWORKER, Role.ADMIN);
+            get("/resident/{residentId}", controller::getByResident, Role.CAREWORKER, Role.ADMIN);
             get("/{id}", controller::read, Role.CAREWORKER, Role.ADMIN);
             put("/{id}", controller::update, Role.CAREWORKER, Role.ADMIN);
             delete("/{id}", controller::delete, Role.CAREWORKER, Role.ADMIN);
-            get("/resident/{residentId}", controller::getByResident, Role.CAREWORKER, Role.ADMIN);
         };
     }
 }
