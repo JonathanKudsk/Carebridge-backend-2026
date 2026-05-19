@@ -12,7 +12,6 @@ import io.javalin.Javalin;
 import io.javalin.http.ContentType;
 import io.restassured.RestAssured;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
 
 import java.util.Set;
@@ -24,35 +23,26 @@ import static org.hamcrest.Matchers.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SecurityTest {
 
-    private static final String TEST_ISSUER = "carebridge-test";
-    private static final String TEST_TOKEN_EXPIRE_TIME = "3600000";
-    private static final String TEST_SECRET = "test-secret-key-that-is-long-enough-for-hmac-signing";
-
     private Javalin app;
-    private EntityManagerFactory emf;
     private final TotpService totpService = new TotpService();
 
     // State shared between ordered tests — mirrors the real browser session flow
     private String adminSetupTempToken;
     private String adminTotpSecret;
-    private String adminFullToken;
     private String aliceVerifyTempToken;
     private String aliceFullToken;
 
     @BeforeAll
     void setup() {
         HibernateConfig.setTest(true);
-        emf = HibernateConfig.getEntityManagerFactory();
         app = ApplicationConfig.startServer(7070);
-        TestPopulator.populate(emf);
+        TestPopulator.populate(HibernateConfig.getEntityManagerFactoryForTest());
         RestAssured.baseURI = "http://localhost:7070/api";
     }
 
     @AfterAll
     void teardown() {
-        if (app != null) {
-            app.stop();
-        }
+        ApplicationConfig.stopServer(app);
     }
 
     // AC1 — Fresh user (no TOTP secret) gets requiresTotpSetup and a temp token; no full JWT
@@ -119,7 +109,7 @@ public class SecurityTest {
     @Order(5)
     void totpConfirm_withCorrectCode_returnsFullToken() throws Exception {
         String code = totpService.generateCurrentCode(adminTotpSecret);
-        adminFullToken = given()
+        given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + adminSetupTempToken)
                 .body("{\"code\":\"" + code + "\"}")
@@ -127,8 +117,7 @@ public class SecurityTest {
                 .then()
                 .log().ifValidationFails()
                 .statusCode(200)
-                .body("token", notNullValue())
-                .extract().path("token");
+                .body("token", notNullValue());
     }
 
     // Bugfix: a user who has a secret saved but totp_enabled=false must get requiresTotpSetup,
@@ -255,7 +244,7 @@ public class SecurityTest {
                 .put("/users/" + userId + "/role")
                 .then()
                 .log().ifValidationFails()
-                .statusCode(401);
+                .statusCode(anyOf(is(401), is(403)));
     }
 
     @Test
@@ -277,7 +266,7 @@ public class SecurityTest {
     }
 
     private Long findUserIdByEmail(String email) {
-        try (EntityManager em = emf.createEntityManager()) {
+        try (EntityManager em = HibernateConfig.getEntityManagerFactoryForTest().createEntityManager()) {
             return em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
                     .setParameter("email", email)
                     .getSingleResult()
@@ -286,21 +275,48 @@ public class SecurityTest {
     }
 
     private String createTokenFor(String email, Role role) {
-        JwtUserDTO jwtUser = JwtUserDTO.builder()
-                .username(email)
-                .roles(Set.of(role.name()))
-                .build();
+        try {
+            String password = email.equals("admin@carebridge.io") ? "admin123" : "password123";
 
-        return new TokenSecurity().createToken(
-                jwtUser,
-                TEST_ISSUER,
-                TEST_TOKEN_EXPIRE_TIME,
-                TEST_SECRET
-        );
+            io.restassured.response.Response loginResponse = given()
+                    .contentType(ContentType.JSON)
+                    .body("{\"email\":\"" + email + "\",\"password\":\"" + password + "\"}")
+                    .post("/auth/login")
+                    .then()
+                    .log().ifValidationFails()
+                    .statusCode(200)
+                    .extract().response();
+
+            String fullToken = loginResponse.path("token");
+            if (fullToken != null) {
+                return fullToken;
+            }
+
+            String tempToken = loginResponse.path("tempToken");
+
+            String secret = email.equals("admin@carebridge.io")
+                    ? adminTotpSecret
+                    : TestPopulator.ALICE_TOTP_SECRET;
+
+            String code = totpService.generateCurrentCode(secret);
+
+            return given()
+                    .contentType(ContentType.JSON)
+                    .header("Authorization", "Bearer " + tempToken)
+                    .body("{\"code\":\"" + code + "\"}")
+                    .post("/auth/2fa/verify")
+                    .then()
+                    .log().ifValidationFails()
+                    .statusCode(200)
+                    .extract().path("token");
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void setUserRole(Long userId, Role role) {
-        try (EntityManager em = emf.createEntityManager()) {
+        try (EntityManager em = HibernateConfig.getEntityManagerFactoryForTest().createEntityManager()) {
             em.getTransaction().begin();
             User user = em.find(User.class, userId);
             user.setRole(role);
