@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="Add substitute read endpoints with location filtering&#10;&#10;- add DAO queries for reading substitutes and substitute locations&#10;- expose substitute endpoints under users routes&#10;- return substitutes using existing UserWithLocationDTO&#10;- add demo.http requests for substitute endpoint testing&#10;- fix user/location path parameter casing&#10;- include DB port in Hibernate dev config&#10;- improve related test cleanup for location/substitute data">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteLocationDTO.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteResponseDTO.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/services/mappers/SubstituteMapper.java" beforeDir="false" />
@@ -275,7 +274,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779183142244</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Add substitute read endpoints with location filtering&#10;&#10;- add DAO queries for reading substitutes and substitute locations&#10;- expose substitute endpoints under users routes&#10;- return substitutes using existing UserWithLocationDTO&#10;- add demo.http requests for substitute endpoint testing&#10;- fix user/location path parameter casing&#10;- include DB port in Hibernate dev config&#10;- improve related test cleanup for location/substitute data">
+      <option name="closed" value="true" />
+      <created>1779183442842</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1779183442842</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
