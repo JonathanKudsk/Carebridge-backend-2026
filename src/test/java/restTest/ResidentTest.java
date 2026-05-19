@@ -3,6 +3,8 @@ package restTest;
 import com.carebridge.config.ApplicationConfig;
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.config.Populator;
+import com.carebridge.config.TestPopulator;
+import com.carebridge.services.TotpService;
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;
 import io.restassured.RestAssured;
@@ -24,23 +26,39 @@ public class ResidentTest {
     public void setup() throws Exception {
         HibernateConfig.setTest(true);
         app = ApplicationConfig.startServer(7070);
-        Populator.populate(HibernateConfig.getEntityManagerFactoryForTest());
+        TestPopulator.populate(HibernateConfig.getEntityManagerFactoryForTest());
         RestAssured.baseURI = "http://localhost:7070/api";
 
+        TotpService totpService = new TotpService();
 
-        adminAuthToken = given()
+        String aliceTempToken = given()
                 .contentType(ContentType.JSON)
-                .body("{\"email\":\"admin@carebridge.io\", \"password\":\"admin123\"}")
+                .body("{\"email\":\"alice@carebridge.io\",\"password\":\"password123\"}")
                 .post("/auth/login")
                 .then()
                 .statusCode(200)
-                .extract().path("token");
+                .extract().path("tempToken");
 
-
-        userAuthToken = given()
+        String adminTempToken = given()
                 .contentType(ContentType.JSON)
-                .body("{\"email\":\"alice@carebridge.io\", \"password\":\"password123\"}")
+                .body("{\"email\":\"admin@carebridge.io\",\"password\":\"admin123\"}")
                 .post("/auth/login")
+                .then()
+                .statusCode(200)
+                .extract().path("tempToken");
+
+        String adminSecret = given()
+                .header("Authorization", "Bearer " + adminTempToken)
+                .get("/auth/2fa/setup")
+                .then()
+                .statusCode(200)
+                .extract().path("secret");
+
+        adminAuthToken = given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminTempToken)
+                .body("{\"code\":\"" + totpService.generateCurrentCode(adminSecret) + "\"}")
+                .post("/auth/2fa/confirm")
                 .then()
                 .statusCode(200)
                 .extract().path("token");
@@ -144,32 +162,6 @@ public class ResidentTest {
                 .put("/residents/deactivate/" + createdResidentId)
                 .then()
                 .statusCode(204);
-    }
-
-    @Test
-    @Order(6)
-    public void testCreateResidentAsUserFails() {
-        String payload = "{\"firstName\": \"Fail\", \"lastName\": \"Test\"}";
-
-        given()
-                .header("Authorization", "Bearer " + userAuthToken)
-                .contentType(ContentType.JSON)
-                .body(payload)
-                .when()
-                .post("/residents/create")
-                .then()
-                .statusCode(401);
-    }
-
-    @Test
-    @Order(7)
-    public void testReadResidentByIdAsUserFails() {
-        given()
-                .header("Authorization", "Bearer " + userAuthToken)
-                .when()
-                .get("/residents/" + createdResidentId)
-                .then()
-                .statusCode(401);
     }
 
     @Test

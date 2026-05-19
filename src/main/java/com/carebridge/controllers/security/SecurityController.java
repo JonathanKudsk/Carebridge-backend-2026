@@ -82,10 +82,13 @@ public class SecurityController implements ISecurityController {
                 } else if (isWithinGracePeriod(verified)) {
                     // Freshly enrolled — grace period active, skip 2FA challenge
                     String token = createToken(buildJwtUser(verified));
+                    long expiresAt = resolveExpiresAt();
                     ctx.status(200).json(out.put("token", token)
                             .put("email", verified.getEmail())
                             .put("role", verified.getRole().name())
-                            .put("isEmployed", verified.isEmployed()));
+                            .put("isEmployed", verified.isEmployed())
+                            .put("expiresAt", expiresAt)
+                            .put("warningAt", expiresAt - 30_000));
                 } else {
                     // Returning user with 2FA active — must verify TOTP code
                     String tempToken = createTempToken(verified.getEmail(), "VERIFY");
@@ -137,9 +140,12 @@ public class SecurityController implements ISecurityController {
                 securityDAO.renewGracePeriod(email);
 
                 String token = createToken(buildJwtUser(user));
+                long expiresAt = resolveExpiresAt();
                 ctx.status(200).json(out.put("token", token)
                         .put("email", email)
-                        .put("role", user.getRole().name()));
+                        .put("role", user.getRole().name())
+                        .put("expiresAt", expiresAt)
+                        .put("warningAt", expiresAt - 30_000));
             } catch (TokenVerificationException e) {
                 ctx.status(401).json(out.put("msg", e.getMessage()));
             } catch (Exception e) {
@@ -166,9 +172,12 @@ public class SecurityController implements ISecurityController {
                 securityDAO.renewGracePeriod(email);
 
                 String token = createToken(buildJwtUser(user));
+                long expiresAt = resolveExpiresAt();
                 ctx.status(200).json(out.put("token", token)
                         .put("email", email)
-                        .put("role", user.getRole().name()));
+                        .put("role", user.getRole().name())
+                        .put("expiresAt", expiresAt)
+                        .put("warningAt", expiresAt - 30_000));
             } catch (TokenVerificationException e) {
                 ctx.status(401).json(out.put("msg", e.getMessage()));
             } catch (Exception e) {
@@ -364,5 +373,92 @@ public class SecurityController implements ISecurityController {
 
     public void healthCheck(@NotNull Context ctx) {
         ctx.status(200).json("{\"msg\": \"API is up and running\"}");
+    }
+
+    // POST /auth/refresh — udsted nyt token og invalider det gamle
+    public Handler refresh() {
+        return ctx -> {
+            ObjectNode out = objectMapper.createObjectNode();
+            try {
+                String header = ctx.header("Authorization");
+                if (header == null || !header.startsWith("Bearer ")) {
+                    ctx.status(401).json(out.put("msg", "Authorization header missing"));
+                    return;
+                }
+                String oldToken = header.substring("Bearer ".length());
+
+                if (TokenBlacklist.contains(oldToken)) {
+                    ctx.status(401).json(out.put("msg", "Token already invalidated"));
+                    return;
+                }
+
+                JwtUserDTO user = verifyToken(oldToken);
+                TokenBlacklist.add(oldToken);
+
+                String newToken = createToken(user);
+                long expiresAt = resolveExpiresAt();
+
+                ctx.status(200).json(out
+                        .put("token", newToken)
+                        .put("expiresAt", expiresAt)
+                        .put("warningAt", expiresAt - 30_000));
+            } catch (Exception e) {
+                ctx.status(401).json(out.put("msg", "Could not refresh token — please log in again"));
+            }
+        };
+    }
+
+    // POST /auth/logout — invalider det aktuelle token
+    public Handler logout() {
+        return ctx -> {
+            ObjectNode out = objectMapper.createObjectNode();
+            String header = ctx.header("Authorization");
+            if (header != null && header.startsWith("Bearer ")) {
+                TokenBlacklist.add(header.substring("Bearer ".length()));
+            }
+            ctx.status(200).json(out.put("msg", "Logged out successfully"));
+        };
+    }
+
+    // GET /auth/session — returnér resterende tid på token
+    public Handler sessionInfo() {
+        return ctx -> {
+            ObjectNode out = objectMapper.createObjectNode();
+            try {
+                String header = ctx.header("Authorization");
+                if (header == null || !header.startsWith("Bearer ")) {
+                    ctx.status(401).json(out.put("msg", "Not authenticated"));
+                    return;
+                }
+                String token = header.substring("Bearer ".length());
+
+                if (TokenBlacklist.contains(token)) {
+                    ctx.status(401).json(out.put("msg", "Token invalidated"));
+                    return;
+                }
+
+                int timeToExpireMs = tokenSecurity.timeToExpire(token);
+                if (timeToExpireMs <= 0) {
+                    ctx.status(401).json(out.put("msg", "Token expired"));
+                    return;
+                }
+
+                long expiresAt = System.currentTimeMillis() + timeToExpireMs;
+                ctx.status(200).json(out
+                        .put("timeToExpireMs", timeToExpireMs)
+                        .put("expiresAt", expiresAt)
+                        .put("warningAt", expiresAt - 30_000));
+            } catch (Exception e) {
+                ctx.status(401).json(out.put("msg", "Invalid token"));
+            }
+        };
+    }
+
+    private long resolveExpiresAt() {
+        boolean deployed = System.getenv("DEPLOYED") != null;
+        String expireStr = deployed
+                ? System.getenv("TOKEN_EXPIRE_TIME")
+                : Utils.getPropertyValue("TOKEN_EXPIRE_TIME", "application.properties");
+        return System.currentTimeMillis() + Long.parseLong(expireStr);
     }
 }

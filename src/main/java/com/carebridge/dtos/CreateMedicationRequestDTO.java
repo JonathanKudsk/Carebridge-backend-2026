@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 public class CreateMedicationRequestDTO {
 
+    private Long version;
     private String name;
     private String dosage;
     private String frequency;
@@ -14,6 +15,9 @@ public class CreateMedicationRequestDTO {
     private Boolean active;
 
     public CreateMedicationRequestDTO() {}
+
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

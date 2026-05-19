@@ -34,16 +34,23 @@ public class Resident {
     @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL)
     private MedicationChart medicationChart;
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "resident_user",
+            name = "guardian_residents",
             joinColumns = @JoinColumn(name = "resident_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            inverseJoinColumns = @JoinColumn(name = "guardian_id")
     )
     private Set<User> users = new HashSet<>();
 
     @OneToMany(mappedBy = "resident", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Dosage> dosages = new ArrayList<>();
+
+    @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL)
+    private Budget budget;
 
     public Resident() {}
 
@@ -133,5 +140,12 @@ public class Resident {
 
     public void setMedicationChart(MedicationChart medicationChart) {
         this.medicationChart = medicationChart;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+        if (user != null && user.getResidentProfile() != this) {
+            user.setResidentProfile(this);
+        }
     }
 }

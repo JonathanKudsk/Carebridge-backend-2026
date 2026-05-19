@@ -3,9 +3,11 @@ package com.carebridge.dao.impl;
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.IDAO;
 import com.carebridge.entities.Medication;
+import com.carebridge.exceptions.ConflictException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.OptimisticLockException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +80,12 @@ public class MedicationDAO implements IDAO<Medication, Long> {
             existing.setActive(updated.isActive());
             em.getTransaction().commit();
             return existing;
+        } catch (OptimisticLockException e) {
+            throw new ConflictException("Medication was modified by another user", null);
         } catch (Exception e) {
+            if (e.getCause() instanceof OptimisticLockException ole) {
+                throw new ConflictException("Medication was modified by another user", null);
+            }
             logger.error("Error updating Medication", e);
             throw new RuntimeException("Error updating Medication", e);
         }

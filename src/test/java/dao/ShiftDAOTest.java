@@ -3,6 +3,7 @@ package dao;
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.impl.ShiftDAO;
 import com.carebridge.entities.Shift;
+import com.carebridge.enums.ShiftStatus;
 import com.carebridge.exceptions.ApiRuntimeException;
 import org.junit.jupiter.api.*;
 
@@ -31,7 +32,7 @@ public class ShiftDAOTest {
         testShift.setEndShift(LocalDateTime.now().plusHours(2));
         testShift.setShiftType("DAY");
         testShift.setLocation("Unit 1");
-        testShift.setStatus("ACTIVE");
+        testShift.setStatus(ShiftStatus.OPEN);
         testShift.setPlanPeriodId(1L);
         testShift.setAssignedUserId(1L);
         testShift.setCreatedBy(1L);
@@ -58,7 +59,7 @@ public class ShiftDAOTest {
         shift.setEndShift(LocalDateTime.now().plusHours(4));
         shift.setShiftType("NIGHT");
         shift.setLocation("Unit 2");
-        shift.setStatus("ACTIVE");
+        shift.setStatus(ShiftStatus.OPEN);
         shift.setPlanPeriodId(2L);
         shift.setAssignedUserId(2L);
         shift.setCreatedBy(1L);
@@ -79,11 +80,11 @@ public class ShiftDAOTest {
     @Test
     public void testUpdateShift() {
         testShift.setLocation("Updated Unit");
-        testShift.setStatus("UPDATED");
+        testShift.setStatus(ShiftStatus.ASSIGNED);
 
         Shift updated = shiftDAO.update(testShift.getId(), testShift);
         assertEquals("Updated Unit", updated.getLocation());
-        assertEquals("UPDATED", updated.getStatus());
+        assertEquals(ShiftStatus.ASSIGNED, updated.getStatus());
     }
 
     @Test
@@ -93,7 +94,7 @@ public class ShiftDAOTest {
         shift.setEndShift(LocalDateTime.now().plusHours(6));
         shift.setShiftType("EVENING");
         shift.setLocation("Unit 3");
-        shift.setStatus("ACTIVE");
+        shift.setStatus(ShiftStatus.OPEN);
         shift.setPlanPeriodId(3L);
         shift.setAssignedUserId(3L);
         shift.setCreatedBy(1L);
@@ -110,7 +111,7 @@ public class ShiftDAOTest {
         shift2.setEndShift(LocalDateTime.now().plusHours(8));
         shift2.setShiftType("DAY");
         shift2.setLocation("Unit 4");
-        shift2.setStatus("ACTIVE");
+        shift2.setStatus(ShiftStatus.OPEN);
         shift2.setPlanPeriodId(4L);
         shift2.setAssignedUserId(4L);
         shift2.setCreatedBy(1L);
@@ -130,7 +131,7 @@ public class ShiftDAOTest {
         invalid.setEndShift(LocalDateTime.now().plusHours(1));
         invalid.setShiftType("DAY");
         invalid.setLocation("Unit 5");
-        invalid.setStatus("ACTIVE");
+        invalid.setStatus(ShiftStatus.OPEN);
         invalid.setPlanPeriodId(5L);
         invalid.setAssignedUserId(5L);
         invalid.setCreatedBy(1L);

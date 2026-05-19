@@ -1,5 +1,6 @@
 package com.carebridge.entities;
 
+import com.carebridge.enums.ShiftStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,8 +31,9 @@ public class Shift {
     @Column(name = "location", nullable = false)
     private String location;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private ShiftStatus status;
 
     @Column(name = "plan_period_id", nullable = false)
     private Long planPeriodId;
