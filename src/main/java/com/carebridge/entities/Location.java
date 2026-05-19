@@ -52,6 +52,7 @@ public class Location {
     public Location(String locationName, String address) {
         this.locationName = locationName;
         this.address = address;
+        this.users = new HashSet<>();
     }
 
     // ========== Methods ==========
@@ -63,12 +64,18 @@ public class Location {
     }
 
     public void addUser (User user){
+        if (users == null) {
+            users = new HashSet<>();
+        }
         if(users.add(user)){
             user.addLocation(this);
         }
     }
 
     public void removeUser (User user){
+        if (users == null) {
+            users = new HashSet<>();
+        }
         if(users.remove(user)){
             user.removeLocation(this);
         }

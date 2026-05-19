@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 public class PlanPeriodDAO implements IDAO<PlanPeriod, Long> {
@@ -67,7 +67,7 @@ public class PlanPeriodDAO implements IDAO<PlanPeriod, Long> {
         if (!planPeriod.getEndDate().isAfter(planPeriod.getStartDate())) throw new ApiRuntimeException(400, "endDate must be after startDate");
         if (planPeriod.getCreatedBy() == null) throw new ApiRuntimeException(400, "createdBy is required");
         if (planPeriod.getStatus() == null) planPeriod.setStatus(PlanStatus.DRAFT);
-        if (planPeriod.getCreatedAt() == null) planPeriod.setCreatedAt(LocalDateTime.now());
+        if (planPeriod.getCreatedAt() == null) planPeriod.setCreatedAt(Instant.now());
 
         EntityManager em = em();
         try {

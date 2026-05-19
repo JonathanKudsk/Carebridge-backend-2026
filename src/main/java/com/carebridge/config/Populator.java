@@ -15,7 +15,9 @@ import jakarta.persistence.EntityTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -44,6 +46,9 @@ public class Populator {
                 admin.setInternalPhone("111-1111-1111");
                 em.persist(admin);
             }
+            admin.setTotpSecret("JBSWY3DPEHPK3PXP");
+            admin.setTotpEnabled(true);
+            admin.setTotpGracePeriodEnd(Instant.now().plus(14, ChronoUnit.DAYS));
 
             User alice = findUserByEmail(em, "alice@carebridge.io");
             if (alice == null) {

@@ -18,6 +18,6 @@ public class LocationResponseDTO {
         this.id = location.getId();
         this.locationName = location.getLocationName();
         this.Address = location.getAddress();
-        this.city = new CityResponseDTO(location.getCity());
+        this.city = location.getCity() == null ? null : new CityResponseDTO(location.getCity());
     }
 }

@@ -4,8 +4,45 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="Added a GuardianDTO to keep info of a Residents guardians.&#10;In the Resident entity the other side of the ManyToMany relation with Users (so Guardians can be added to a Resisdent), the naming of the joiningtable did not match the naming in the User entity, so the naming has been updated.&#10;Updated the read() for Resident to also fetch guardians and their userprofile.&#10;Updated the ResidentDAOTest to truncate the correct table.&#10;Updated the ResidentDetailsResponseDTO to include info about the Residents userprofile and their Guardians.&#10;Updated which roles can access the Resident endpoints.&#10;Added 2FA to make the Resident Rest tests work">
+    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="Merge branch 'developer' of https://github.com/JonathanKudsk/Carebridge-backend-2026 into TEAM-4-US-3-TASK-5-ResidentDetails-feature&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/HandbookController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/PlanPeriodController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/HandbookTabDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/CreatePlanPeriodRequestDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/HandbookResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/HandbookTabResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/PlanPeriodResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteLocationDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/populators/HandbookPopulator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/HandbookRoute.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/PlanPeriodRoute.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/services/HandbookService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/services/mappers/HandbookMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/services/mappers/SubstituteMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/carebridge/services/mappers/ResidentMapperTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/dao/SubstituteDAOTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/serviceTest/ResidentServiceTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/config/HibernateConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/config/HibernateConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/config/Populator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/config/Populator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/ShiftController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/ShiftController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/PlanPeriodDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/PlanPeriodDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/UserDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/LocationResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/LocationResponseDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/HandbookTab.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/HandbookTab.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/Location.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/Location.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/PlanPeriod.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/PlanPeriod.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/Routes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/Routes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/ShiftRoute.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/ShiftRoute.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/UserRoute.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/UserRoute.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/carebridge/dao/impl/HandbookDAOTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/carebridge/dao/impl/HandbookDAOTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/dao/LocationDAOTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/dao/LocationDAOTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/restTest/LocationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/restTest/LocationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/restTest/SecurityTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/restTest/SecurityTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,7 +59,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="developer" />
+        <entry key="$PROJECT_DIR$" value="developer-basic-CRUD-for-Locations-READ" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -61,10 +98,20 @@
   "keyToString": {
     "Application.App.executor": "Run",
     "HTTP Request.demo | ---- Location API ----.executor": "Run",
+    "HTTP Request.demo | ---- Substitute API ----.executor": "Run",
+    "HTTP Request.demo | 1) Health check (no auth).executor": "Run",
     "HTTP Request.demo | 2) Populate database (POST; ANYONE).executor": "Run",
     "HTTP Request.demo | 3) Login as seeded ADMIN (from Populator).executor": "Run",
+    "HTTP Request.demo | 4) List users (ADMIN only).executor": "Run",
+    "HTTP Request.demo | Attach substitute location to substitute user.executor": "Run",
+    "HTTP Request.demo | Create substitute test user.executor": "Run",
     "HTTP Request.demo | Create template#2.executor": "Run",
     "HTTP Request.demo | Get specific template#2.executor": "Run",
+    "HTTP Request.demo | Read all substitutes.executor": "Run",
+    "HTTP Request.demo | Read locations with substitutes.executor": "Run",
+    "HTTP Request.demo | Read substitute test user by email.executor": "Run",
+    "HTTP Request.demo | Read substitutes filtered by location id.executor": "Run",
+    "HTTP Request.demo | Read substitutes filtered by location name.executor": "Run",
     "HTTP Request.demo | Update template.executor": "Run",
     "JUnit.CityDAOTest.executor": "Run",
     "JUnit.CityDaoTest.executor": "Run",
@@ -78,9 +125,6 @@
     "JUnit.LocationTest.executor": "Run",
     "JUnit.LocationTest.read.executor": "Run",
     "JUnit.LocationTest.readAll.executor": "Run",
-    "JUnit.ResidentDAOTest.executor": "Run",
-    "JUnit.ResidentTest.executor": "Run",
-    "JUnit.ResidentTest.testCreateResidentAsUserFails.executor": "Run",
     "JUnit.TemplateTest.executor": "Run",
     "JUnit.UserDAOTest.executor": "Run",
     "JUnit.UserDAOTest.testAttachLocationToUser.executor": "Run",
@@ -88,8 +132,6 @@
     "JUnit.UserDAOTest.testReadUser.executor": "Run",
     "JUnit.UserDAOTest.testReadUserWithLocation.executor": "Run",
     "JUnit.UserTest.readWithLocation.executor": "Run",
-    "Maven.carebridge-backend [test].executor": "Run",
-    "Maven.carebridge-backend [verify].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -98,7 +140,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "TEAM-4-US-3-TASK-5-ResidentDetails-feature",
+    "git-widget-placeholder": "Merging TEAM-4-US-3-TASK-5-ResidentDetails-feature",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
@@ -115,88 +157,46 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.ResidentDAOTest">
-    <configuration name="App" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.carebridge.App" />
-      <module name="carebridge-backend" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.carebridge.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+  <component name="RunDashboard">
+    <option name="configurationStatuses">
+      <map>
+        <entry key="HttpClient.HttpRequestRunConfigurationType">
+          <value>
+            <map>
+              <entry key="demo | Attach substitute location to substitute user" value="STOPPED" />
+              <entry key="demo | Read all substitutes" value="STOPPED" />
+              <entry key="demo | Read substitute test user by email" value="STOPPED" />
+              <entry key="demo | Read substitutes filtered by location id" value="STOPPED" />
+              <entry key="demo | Read substitutes filtered by location name" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="RunManager" selected="HTTP Request.demo | Read substitutes filtered by location name">
+    <configuration name="demo | Attach substitute location to substitute user" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Attach substitute location to substitute user" index="47" runType="Run single request">
+      <method v="2" />
     </configuration>
-    <configuration name="LocationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="carebridge-backend" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="restTest.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="restTest" />
-      <option name="MAIN_CLASS_NAME" value="restTest.LocationTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="demo | Read all substitutes" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Read all substitutes" index="48" runType="Run single request">
+      <method v="2" />
     </configuration>
-    <configuration name="ResidentDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="carebridge-backend" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="dao.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="dao" />
-      <option name="MAIN_CLASS_NAME" value="dao.ResidentDAOTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="demo | Read substitute test user by email" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Read substitute test user by email" index="46" runType="Run single request">
+      <method v="2" />
     </configuration>
-    <configuration name="ResidentTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="carebridge-backend" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="restTest.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="restTest" />
-      <option name="MAIN_CLASS_NAME" value="restTest.ResidentTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="demo | Read substitutes filtered by location id" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Read substitutes filtered by location id" index="49" runType="Run single request">
+      <method v="2" />
     </configuration>
-    <configuration name="ResidentTest.testCreateResidentAsUserFails" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="carebridge-backend" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="restTest.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="restTest" />
-      <option name="MAIN_CLASS_NAME" value="restTest.ResidentTest" />
-      <option name="METHOD_NAME" value="testCreateResidentAsUserFails" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="demo | Read substitutes filtered by location name" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Read substitutes filtered by location name" index="50" runType="Run single request">
+      <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.ResidentDAOTest" />
-        <item itemvalue="JUnit.ResidentTest" />
-        <item itemvalue="JUnit.ResidentTest.testCreateResidentAsUserFails" />
-        <item itemvalue="Application.App" />
-        <item itemvalue="JUnit.LocationTest" />
+        <item itemvalue="HTTP Request.demo | Read substitutes filtered by location name" />
+        <item itemvalue="HTTP Request.demo | Read substitutes filtered by location id" />
+        <item itemvalue="HTTP Request.demo | Read substitute test user by email" />
+        <item itemvalue="HTTP Request.demo | Attach substitute location to substitute user" />
+        <item itemvalue="HTTP Request.demo | Read all substitutes" />
       </list>
     </recent_temporary>
   </component>
@@ -293,15 +293,31 @@
       <option name="project" value="LOCAL" />
       <updated>1779101065555</updated>
     </task>
-    <task id="LOCAL-00009" summary="Added a GuardianDTO to keep info of a Residents guardians.&#10;In the Resident entity the other side of the ManyToMany relation with Users (so Guardians can be added to a Resisdent), the naming of the joiningtable did not match the naming in the User entity, so the naming has been updated.&#10;Updated the read() for Resident to also fetch guardians and their userprofile.&#10;Updated the ResidentDAOTest to truncate the correct table.&#10;Updated the ResidentDetailsResponseDTO to include info about the Residents userprofile and their Guardians.&#10;Updated which roles can access the Resident endpoints.&#10;Added 2FA to make the Resident Rest tests work">
+    <task id="LOCAL-00009" summary="Add substitute read endpoints and demo HTTP checks&#10;&#10;- add substitute read queries with optional location filtering&#10;- expose substitute list and substitute-location endpoints&#10;- add DTO mapper support for substitute responses&#10;- fix user/location route param casing&#10;- include DB port in Hibernate dev config&#10;- add demo.http requests for substitute endpoint testing">
       <option name="closed" value="true" />
-      <created>1779187127568</created>
+      <created>1779181665061</created>
       <option name="number" value="00009" />
       <option name="presentableId" value="LOCAL-00009" />
       <option name="project" value="LOCAL" />
-      <updated>1779187127568</updated>
+      <updated>1779181665061</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Add substitute read endpoints with location filtering&#10;&#10;- add DAO queries for reading substitutes and substitute locations&#10;- expose substitute endpoints under users routes&#10;- return substitutes using existing UserWithLocationDTO&#10;- add demo.http requests for substitute endpoint testing&#10;- fix user/location path parameter casing&#10;- include DB port in Hibernate dev config&#10;- improve related test cleanup for location/substitute data">
+      <option name="closed" value="true" />
+      <created>1779183142243</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1779183142244</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Add substitute read endpoints with location filtering&#10;&#10;- add DAO queries for reading substitutes and substitute locations&#10;- expose substitute endpoints under users routes&#10;- return substitutes using existing UserWithLocationDTO&#10;- add demo.http requests for substitute endpoint testing&#10;- fix user/location path parameter casing&#10;- include DB port in Hibernate dev config&#10;- improve related test cleanup for location/substitute data">
+      <option name="closed" value="true" />
+      <created>1779183442842</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1779183442842</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -324,8 +340,9 @@
     <MESSAGE value="added the ability to attach, detach and read a location to a user" />
     <MESSAGE value="fixed test broken by change in entity" />
     <MESSAGE value="fixed test that called post when was supposed to be put" />
-    <MESSAGE value="Added a GuardianDTO to keep info of a Residents guardians.&#10;In the Resident entity the other side of the ManyToMany relation with Users (so Guardians can be added to a Resisdent), the naming of the joiningtable did not match the naming in the User entity, so the naming has been updated.&#10;Updated the read() for Resident to also fetch guardians and their userprofile.&#10;Updated the ResidentDAOTest to truncate the correct table.&#10;Updated the ResidentDetailsResponseDTO to include info about the Residents userprofile and their Guardians.&#10;Updated which roles can access the Resident endpoints.&#10;Added 2FA to make the Resident Rest tests work" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added a GuardianDTO to keep info of a Residents guardians.&#10;In the Resident entity the other side of the ManyToMany relation with Users (so Guardians can be added to a Resisdent), the naming of the joiningtable did not match the naming in the User entity, so the naming has been updated.&#10;Updated the read() for Resident to also fetch guardians and their userprofile.&#10;Updated the ResidentDAOTest to truncate the correct table.&#10;Updated the ResidentDetailsResponseDTO to include info about the Residents userprofile and their Guardians.&#10;Updated which roles can access the Resident endpoints.&#10;Added 2FA to make the Resident Rest tests work" />
+    <MESSAGE value="Add substitute read endpoints and demo HTTP checks&#10;&#10;- add substitute read queries with optional location filtering&#10;- expose substitute list and substitute-location endpoints&#10;- add DTO mapper support for substitute responses&#10;- fix user/location route param casing&#10;- include DB port in Hibernate dev config&#10;- add demo.http requests for substitute endpoint testing" />
+    <MESSAGE value="Add substitute read endpoints with location filtering&#10;&#10;- add DAO queries for reading substitutes and substitute locations&#10;- expose substitute endpoints under users routes&#10;- return substitutes using existing UserWithLocationDTO&#10;- add demo.http requests for substitute endpoint testing&#10;- fix user/location path parameter casing&#10;- include DB port in Hibernate dev config&#10;- improve related test cleanup for location/substitute data" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add substitute read endpoints with location filtering&#10;&#10;- add DAO queries for reading substitutes and substitute locations&#10;- expose substitute endpoints under users routes&#10;- return substitutes using existing UserWithLocationDTO&#10;- add demo.http requests for substitute endpoint testing&#10;- fix user/location path parameter casing&#10;- include DB port in Hibernate dev config&#10;- improve related test cleanup for location/substitute data" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

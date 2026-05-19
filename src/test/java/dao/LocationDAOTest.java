@@ -29,12 +29,17 @@ class LocationDAOTest {
 
     @BeforeEach
     void setup() {
+        clearTables();
         LocationPopulator.populate();
     }
 
     @AfterEach
         //delete all data
     void teardown() {
+        clearTables();
+    }
+
+    private void clearTables() {
         EntityManager em = emf.createEntityManager();
 
         em.getTransaction().begin();
