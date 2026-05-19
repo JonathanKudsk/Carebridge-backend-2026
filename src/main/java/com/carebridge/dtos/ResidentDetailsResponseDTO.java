@@ -1,8 +1,9 @@
 package com.carebridge.dtos;
 
 import java.time.Instant;
+import java.util.List;
 
-public class ResidentDetailsDTO {
+public class ResidentDetailsResponseDTO {
     private Long id;
     private String firstName;
     private String lastName;
@@ -20,11 +21,12 @@ public class ResidentDetailsDTO {
     private String displayEmail;
     private Instant createdAt;
     private Instant updatedAt;
+    private List<GuardianDTO> guardians;
 
-    public ResidentDetailsDTO() {
+    public ResidentDetailsResponseDTO() {
     }
 
-    public ResidentDetailsDTO(
+    public ResidentDetailsResponseDTO(
             Long id,
             String firstName,
             String lastName,
@@ -39,7 +41,8 @@ public class ResidentDetailsDTO {
             String displayPhone,
             String displayEmail,
             Instant createdAt,
-            Instant updatedAt
+            Instant updatedAt,
+            List<GuardianDTO> guardians
     ) {
         this.id = id;
         this.firstName = firstName;
@@ -56,6 +59,7 @@ public class ResidentDetailsDTO {
         this.displayEmail = displayEmail;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.guardians = guardians;
     }
 
     public Long getId() {
@@ -116,5 +120,13 @@ public class ResidentDetailsDTO {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public List<GuardianDTO> getGuardians() {
+        return guardians;
+    }
+
+    public void setGuardians(List<GuardianDTO> guardians) {
+        this.guardians = guardians;
     }
 }

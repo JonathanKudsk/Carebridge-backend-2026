@@ -1,12 +1,14 @@
 package com.carebridge.services.mappers;
 
 import com.carebridge.dtos.CreateResidentRequestDTO;
-import com.carebridge.dtos.ResidentDetailsDTO;
+import com.carebridge.dtos.GuardianDTO;
+import com.carebridge.dtos.ResidentDetailsResponseDTO;
 import com.carebridge.dtos.ResidentResponseDTO;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,8 +48,10 @@ public class ResidentMapper {
         );
     }
 
-    public static ResidentDetailsDTO toDetailsDTO(Resident resident) {
-        if (resident == null) return null;
+    public static ResidentDetailsResponseDTO toDetailsDTO(Resident resident) {
+        if (resident == null) {
+            return null;
+        }
 
         Long journalId = (resident.getJournal() != null) ? resident.getJournal().getId() : null;
         Long medicationChartId = (resident.getMedicationChart() != null) ? resident.getMedicationChart().getId() : null;
@@ -69,8 +73,21 @@ public class ResidentMapper {
             updatedAt = user.getUpdated_at();
         }
 
+        List<GuardianDTO> guardianDTOs = new ArrayList<>();
+        if (resident.getUsers() != null) {
+            for (User guardianUser : resident.getUsers()) {
+                guardianDTOs.add(new GuardianDTO(
+                        guardianUser.getId(),
+                        guardianUser.getName(),
+                        guardianUser.getDisplayPhone(),
+                        guardianUser.getDisplayEmail(),
+                        guardianUser.getDisplayName()
+                ));
+            }
+        }
 
-        return new ResidentDetailsDTO(
+
+        return new ResidentDetailsResponseDTO(
                 resident.getId(),
                 resident.getFirstName(),
                 resident.getLastName(),
@@ -85,7 +102,8 @@ public class ResidentMapper {
                 displayPhone,
                 displayEmail,
                 createdAt,
-                updatedAt
+                updatedAt,
+                guardianDTOs
         );
     }
 

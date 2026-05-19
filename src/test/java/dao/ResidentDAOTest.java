@@ -45,7 +45,7 @@ public class ResidentDAOTest {
     public void resetDatabase() {
         try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
-            em.createNativeQuery("TRUNCATE TABLE resident_user, resident, users RESTART IDENTITY CASCADE").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE guardian_residents, resident, users RESTART IDENTITY CASCADE").executeUpdate();
             em.getTransaction().commit();
         }
 

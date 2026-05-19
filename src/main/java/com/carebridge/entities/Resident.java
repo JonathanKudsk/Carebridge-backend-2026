@@ -40,9 +40,9 @@ public class Resident {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "resident_user",
+            name = "guardian_residents",
             joinColumns = @JoinColumn(name = "resident_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            inverseJoinColumns = @JoinColumn(name = "guardian_id")
     )
     private Set<User> users = new HashSet<>();
 

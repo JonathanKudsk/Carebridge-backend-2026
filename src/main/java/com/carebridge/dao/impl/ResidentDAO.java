@@ -47,6 +47,7 @@ public class ResidentDAO implements IDAO<Resident, Long> {
                     "SELECT r FROM Resident r " +
                             //"LEFT JOIN FETCH r.medicationChart " +
                             "LEFT JOIN FETCH r.user " +
+                            "LEFT JOIN FETCH r.users " +
                             "WHERE r.id = :id", Resident.class);
 
             query.setParameter("id", id);
