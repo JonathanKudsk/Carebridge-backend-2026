@@ -4,12 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="fixed test that called post when was supposed to be put">
+    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="Added a GuardianDTO to keep info of a Residents guardians.&#10;In the Resident entity the other side of the ManyToMany relation with Users (so Guardians can be added to a Resisdent), the naming of the joiningtable did not match the naming in the User entity, so the naming has been updated.&#10;Updated the read() for Resident to also fetch guardians and their userprofile.&#10;Updated the ResidentDAOTest to truncate the correct table.&#10;Updated the ResidentDetailsResponseDTO to include info about the Residents userprofile and their Guardians.&#10;Updated which roles can access the Resident endpoints.&#10;Added 2FA to make the Resident Rest tests work">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/LocationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/LocationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/City.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/City.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/restTest/LocationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/restTest/LocationTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,6 +78,9 @@
     "JUnit.LocationTest.executor": "Run",
     "JUnit.LocationTest.read.executor": "Run",
     "JUnit.LocationTest.readAll.executor": "Run",
+    "JUnit.ResidentDAOTest.executor": "Run",
+    "JUnit.ResidentTest.executor": "Run",
+    "JUnit.ResidentTest.testCreateResidentAsUserFails.executor": "Run",
     "JUnit.TemplateTest.executor": "Run",
     "JUnit.UserDAOTest.executor": "Run",
     "JUnit.UserDAOTest.testAttachLocationToUser.executor": "Run",
@@ -89,6 +88,8 @@
     "JUnit.UserDAOTest.testReadUser.executor": "Run",
     "JUnit.UserDAOTest.testReadUserWithLocation.executor": "Run",
     "JUnit.UserTest.readWithLocation.executor": "Run",
+    "Maven.carebridge-backend [test].executor": "Run",
+    "Maven.carebridge-backend [verify].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -97,7 +98,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "#124 on developer-basic-CRUD-for-Locations",
+    "git-widget-placeholder": "TEAM-4-US-3-TASK-5-ResidentDetails-feature",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
@@ -114,33 +115,16 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.LocationTest">
-    <configuration name="CityDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.ResidentDAOTest">
+    <configuration name="App" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.carebridge.App" />
       <module name="carebridge-backend" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="dao.*" />
+          <option name="PATTERN" value="com.carebridge.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="dao" />
-      <option name="MAIN_CLASS_NAME" value="dao.CityDAOTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="LocationDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="carebridge-backend" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="dao.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="dao" />
-      <option name="MAIN_CLASS_NAME" value="dao.LocationDAOTest" />
-      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -160,7 +144,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ResidentDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="carebridge-backend" />
       <extension name="coverage">
         <pattern>
@@ -169,23 +153,38 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="dao" />
-      <option name="MAIN_CLASS_NAME" value="dao.UserDAOTest" />
+      <option name="MAIN_CLASS_NAME" value="dao.ResidentDAOTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserDAOTest.testAttachLocationToUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ResidentTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="carebridge-backend" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="dao.*" />
+          <option name="PATTERN" value="restTest.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="dao" />
-      <option name="MAIN_CLASS_NAME" value="dao.UserDAOTest" />
-      <option name="METHOD_NAME" value="testAttachLocationToUser" />
+      <option name="PACKAGE_NAME" value="restTest" />
+      <option name="MAIN_CLASS_NAME" value="restTest.ResidentTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ResidentTest.testCreateResidentAsUserFails" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="carebridge-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="restTest.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="restTest" />
+      <option name="MAIN_CLASS_NAME" value="restTest.ResidentTest" />
+      <option name="METHOD_NAME" value="testCreateResidentAsUserFails" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -193,11 +192,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.ResidentDAOTest" />
+        <item itemvalue="JUnit.ResidentTest" />
+        <item itemvalue="JUnit.ResidentTest.testCreateResidentAsUserFails" />
+        <item itemvalue="Application.App" />
         <item itemvalue="JUnit.LocationTest" />
-        <item itemvalue="JUnit.LocationDAOTest" />
-        <item itemvalue="JUnit.UserDAOTest" />
-        <item itemvalue="JUnit.UserDAOTest.testAttachLocationToUser" />
-        <item itemvalue="JUnit.CityDAOTest" />
       </list>
     </recent_temporary>
   </component>
@@ -294,7 +293,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779101065555</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Added a GuardianDTO to keep info of a Residents guardians.&#10;In the Resident entity the other side of the ManyToMany relation with Users (so Guardians can be added to a Resisdent), the naming of the joiningtable did not match the naming in the User entity, so the naming has been updated.&#10;Updated the read() for Resident to also fetch guardians and their userprofile.&#10;Updated the ResidentDAOTest to truncate the correct table.&#10;Updated the ResidentDetailsResponseDTO to include info about the Residents userprofile and their Guardians.&#10;Updated which roles can access the Resident endpoints.&#10;Added 2FA to make the Resident Rest tests work">
+      <option name="closed" value="true" />
+      <created>1779187127568</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1779187127568</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -317,7 +324,8 @@
     <MESSAGE value="added the ability to attach, detach and read a location to a user" />
     <MESSAGE value="fixed test broken by change in entity" />
     <MESSAGE value="fixed test that called post when was supposed to be put" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed test that called post when was supposed to be put" />
+    <MESSAGE value="Added a GuardianDTO to keep info of a Residents guardians.&#10;In the Resident entity the other side of the ManyToMany relation with Users (so Guardians can be added to a Resisdent), the naming of the joiningtable did not match the naming in the User entity, so the naming has been updated.&#10;Updated the read() for Resident to also fetch guardians and their userprofile.&#10;Updated the ResidentDAOTest to truncate the correct table.&#10;Updated the ResidentDetailsResponseDTO to include info about the Residents userprofile and their Guardians.&#10;Updated which roles can access the Resident endpoints.&#10;Added 2FA to make the Resident Rest tests work" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added a GuardianDTO to keep info of a Residents guardians.&#10;In the Resident entity the other side of the ManyToMany relation with Users (so Guardians can be added to a Resisdent), the naming of the joiningtable did not match the naming in the User entity, so the naming has been updated.&#10;Updated the read() for Resident to also fetch guardians and their userprofile.&#10;Updated the ResidentDAOTest to truncate the correct table.&#10;Updated the ResidentDetailsResponseDTO to include info about the Residents userprofile and their Guardians.&#10;Updated which roles can access the Resident endpoints.&#10;Added 2FA to make the Resident Rest tests work" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
