@@ -2,23 +2,37 @@ package com.carebridge.controllers.impl;
 
 import com.carebridge.dao.impl.PlanPeriodDAO;
 import com.carebridge.dao.impl.ShiftDAO;
+import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dtos.CreateShiftRequestDTO;
 import com.carebridge.entities.PlanPeriod;
+import com.carebridge.dtos.JwtUserDTO;
+import com.carebridge.entities.User;
+import com.carebridge.dtos.EditShiftRequestDTO;
 import com.carebridge.entities.Shift;
+import com.carebridge.enums.ShiftStatus;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.PlanPeriodException;
+import com.carebridge.exceptions.ScheduleConflictException;
 import com.carebridge.exceptions.ValidationException;
 import com.carebridge.utils.toon.ToonObjectMapper;
+import com.carebridge.services.mappers.ShiftService;
 import io.javalin.http.Context;
+import io.javalin.http.UnauthorizedResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class ShiftController {
 
     private static final Logger logger = LoggerFactory.getLogger(ShiftController.class);
+    private static final String TOON_CONTENT_TYPE = "application/toon";
+
     private final ShiftDAO shiftDAO = ShiftDAO.getInstance();
     private final PlanPeriodDAO planPeriodDAO = PlanPeriodDAO.getInstance();
     private final ToonObjectMapper toonObjectMapper = new ToonObjectMapper();
+    private final UserDAO userDAO = UserDAO.getInstance();
+    private final ShiftService shiftService = ShiftService.getInstance();
 
     public void create(Context ctx) {
         try {
@@ -33,7 +47,7 @@ public class ShiftController {
             shift.setEndShift(dto.getEndShift());
             shift.setShiftType(dto.getShiftType().name());
             shift.setLocation(dto.getLocationId().toString());
-            shift.setStatus("OPEN");
+            shift.setStatus(ShiftStatus.OPEN);
             shift.setPlanPeriodId(dto.getPlanPeriodId());
             shift.setAssignedUserId(null);
             shift.setCreatedBy(createdBy);

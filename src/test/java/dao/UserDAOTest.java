@@ -4,8 +4,10 @@ import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.entities.User;
 import com.carebridge.entities.enums.Role;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
+import populator.LocationPopulator;
 
 import java.util.List;
 
@@ -16,11 +18,12 @@ public class UserDAOTest {
 
     private UserDAO userDAO;
     private User testUser;
+    private EntityManagerFactory emfTest;
 
     @BeforeAll
     public void setupClass() {
         HibernateConfig.setTest(true);
-        EntityManagerFactory emfTest = HibernateConfig.getEntityManagerFactoryForTest();
+        emfTest = HibernateConfig.getEntityManagerFactoryForTest();
         userDAO = UserDAO.getInstance();
     }
 
@@ -40,7 +43,9 @@ public class UserDAOTest {
         if (testUser != null) {
             try {
                 userDAO.delete(testUser.getId());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                throw ignored;
+            }
         }
     }
 
@@ -95,4 +100,52 @@ public class UserDAOTest {
         userDAO.delete(created.getId());
         assertNull(userDAO.read(created.getId()));
     }
+
+    @Test
+    public void testReadUserWithLocation() {
+        LocationPopulator.populate();
+        userDAO.attachLocationtoUser(testUser.getId(),1L);
+        User read = userDAO.readWithLocation(testUser.getId());
+        assertEquals(read.getLocations().size(), 1);
+        assertTrue(read.getLocations().contains(LocationPopulator.fetch().getFirst()));
+
+        cleanupLocation();
+    }
+
+    @Test
+    public void testAttachLocationToUser() {
+        LocationPopulator.populate();
+
+        User u = userDAO.attachLocationtoUser(testUser.getId(),1L);
+        assertEquals(u.getLocations().size(), 1);
+        assertTrue(u.getLocations().contains(LocationPopulator.fetch().getFirst()));
+
+        cleanupLocation();
+    }
+
+    @Test
+    public void testDetachLocationToUser() {
+        LocationPopulator.populate();
+
+        User u = userDAO.attachLocationtoUser(testUser.getId(),1L);
+        assertEquals(u.getLocations().size(), 1);
+        assertTrue(u.getLocations().contains(LocationPopulator.fetch().getFirst()));
+
+        u = userDAO.detachLocationtoUser(testUser.getId(),1L);
+        assertEquals(u.getLocations().size(), 0);
+        assertFalse(u.getLocations().contains(LocationPopulator.fetch().getFirst()));
+
+        cleanupLocation();
+    }
+
+    private void cleanupLocation(){
+        EntityManager em = emfTest.createEntityManager();
+        em.getTransaction().begin();
+        //delete everything location related
+        em.createNativeQuery("TRUNCATE TABLE cities, locations RESTART IDENTITY CASCADE")
+                .executeUpdate();
+        em.getTransaction().commit();
+        em.close();
+    }
+
 }
