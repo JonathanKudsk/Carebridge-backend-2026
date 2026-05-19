@@ -241,6 +241,7 @@ public class EventDAO implements IDAO<Event, Long> {
 
             return em.createQuery(
                             "SELECT DISTINCT e FROM Event e " +
+                            "LEFT JOIN FETCH e.seenByUsers " +
                             "LEFT JOIN FETCH e.usersWithAccess " +
                             "LEFT JOIN FETCH e.createdBy " +
                             "LEFT JOIN FETCH e.eventType " +
