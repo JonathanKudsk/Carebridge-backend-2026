@@ -1,15 +1,19 @@
 package com.carebridge.dtos;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class EditJournalEntryRequestDTO
 {
-    private String content;
-
-    public EditJournalEntryRequestDTO()
-    {
-    }
-
-    public String getContent() { return content; }
-
-    public void setContent(String content) { this.content = content; }
+    private String title;
+    private String riskAssessment;
+    private String entryType;
+    private CreateJournalEntryAnswerRequestDTO[] answers;
 
 }

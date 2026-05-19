@@ -13,10 +13,11 @@ public class JournalEntryRoutes
     public EndpointGroup getRoutes() {
         return () ->
         {
-            get("/{journalId}/journal-entries", controller::findAllEntriesByJournal, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
-            post("/{journalId}/journal-entries", controller::create, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
-            put("/{journalId}/journal-entries/{entryId}", controller::update, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
-            get("/{journalId}/journal-entries/{entryId}", controller::read, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN);
+            get("/{journalId}/journal-entries", controller::findAllEntriesByJournal, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN, Role.SUBSTITUTE);
+            post("/{journalId}/journal-entries", controller::create, Role.ADMIN, Role.CAREWORKER, Role.SUBSTITUTE);
+            put("/{journalId}/journal-entries/{entryId}", controller::update, Role.ADMIN, Role.CAREWORKER, Role.SUBSTITUTE);
+            get("/{journalId}/journal-entries/{entryId}", controller::read, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN, Role.SUBSTITUTE);
+            get("/{journalId}/journal-entries-data", controller::findAllEntriesByJournalToDTO, Role.ADMIN, Role.CAREWORKER, Role.GUARDIAN, Role.SUBSTITUTE);
         };
     }
 }

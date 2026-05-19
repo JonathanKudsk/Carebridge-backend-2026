@@ -11,18 +11,18 @@ public class EventRoute {
 
     public EndpointGroup getRoutes() {
         return () -> {
-            get("/", controller::readAll, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN);
-            get("/upcoming", controller::readUpcoming, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN);
-            get("/creator/{userId}", controller::readByCreator, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN);
+            get("/", controller::readAll, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN, Role.SUBSTITUTE);
+            get("/upcoming", controller::readUpcoming, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN, Role.SUBSTITUTE);
+            get("/creator/{userId}", controller::readByCreator, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN, Role.SUBSTITUTE);
 
-            get("/{id}", controller::read, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN);
+            get("/{id}", controller::read, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN, Role.SUBSTITUTE);
 
-            post("/", controller::create, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN);
-            put("/{id}", controller::update, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN);
+            post("/", controller::create, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN, Role.SUBSTITUTE);
+            put("/{id}", controller::update, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN, Role.SUBSTITUTE);
 
-            delete("/{id}", controller::delete, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN);
-            post("/{id}/mark-seen", controller::markSeen, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN);
-            delete("/{id}/mark-seen", controller::unmarkSeen, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN);
+            delete("/{id}", controller::delete, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN, Role.SUBSTITUTE);
+            post("/{id}/mark-seen", controller::markSeen, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN, Role.SUBSTITUTE);
+            delete("/{id}/mark-seen", controller::unmarkSeen, Role.CAREWORKER, Role.GUARDIAN, Role.ADMIN, Role.SUBSTITUTE);
         };
     }
 }

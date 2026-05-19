@@ -4,6 +4,7 @@ import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.ChatRoomDAO;
 import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dtos.ChatRoomDTO;
+import com.carebridge.dtos.PagedChatRoomsDTO;
 import com.carebridge.entities.ChatRoom;
 import com.carebridge.entities.ChatRoomUser;
 import com.carebridge.exceptions.ApiRuntimeException;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ChatRoomController implements IController<ChatRoom, Long> {
 
@@ -41,9 +43,29 @@ public class ChatRoomController implements IController<ChatRoom, Long> {
     @Override
     public void readAll(Context ctx) {
         try {
-            // Return rooms as DTOs so the frontend gets member ids instead of entities.
-            var list = chatRoomDAO.readAll().stream().map(ChatRoomMapper::toDTO).toList();
-            ctx.json(list);
+            String pageParam = ctx.queryParam("page");
+            String sizeParam = ctx.queryParam("size");
+
+            if (pageParam != null || sizeParam != null) {
+                int page = pageParam != null ? Integer.parseInt(pageParam) : 0;
+                int size = sizeParam != null ? Integer.parseInt(sizeParam) : 5;
+
+                List<ChatRoom> rooms = chatRoomDAO.readAllPaged(page, size);
+                for (ChatRoom room : rooms) {
+                    chatRoomDAO.evaluateAndUpdateChatRoomStatus(room.getId());
+                }
+
+                var dtos = chatRoomDAO.readAllPaged(page, size).stream().map(ChatRoomMapper::toDTO).toList();
+                long total = chatRoomDAO.count();
+                ctx.json(new PagedChatRoomsDTO(dtos, total));
+            } else {
+                List<ChatRoom> allRooms = chatRoomDAO.readAll();
+                for (ChatRoom room : allRooms) {
+                    chatRoomDAO.evaluateAndUpdateChatRoomStatus(room.getId());
+                }
+                var list = chatRoomDAO.readAll().stream().map(ChatRoomMapper::toDTO).toList();
+                ctx.json(list);
+            }
         } catch (Exception e) {
             logger.error("readAll chat rooms failed", e);
             ctx.status(500).json("{\"msg\":\"Internal error\"}");
