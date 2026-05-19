@@ -213,8 +213,6 @@ public class ShiftController {
             ctx.status(500).json("{\"msg\":\"Internal server error\"}");
         }
     }
-
-}
     private void respondError(Context ctx, int status, String message) {
         ctx.status(status)
                 .contentType(TOON_CONTENT_TYPE)
