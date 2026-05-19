@@ -2,23 +2,37 @@ package com.carebridge.controllers.impl;
 
 import com.carebridge.dao.impl.PlanPeriodDAO;
 import com.carebridge.dao.impl.ShiftDAO;
+import com.carebridge.dao.impl.UserDAO;
 import com.carebridge.dtos.CreateShiftRequestDTO;
 import com.carebridge.entities.PlanPeriod;
+import com.carebridge.dtos.JwtUserDTO;
+import com.carebridge.entities.User;
+import com.carebridge.dtos.EditShiftRequestDTO;
 import com.carebridge.entities.Shift;
+import com.carebridge.enums.ShiftStatus;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.PlanPeriodException;
+import com.carebridge.exceptions.ScheduleConflictException;
 import com.carebridge.exceptions.ValidationException;
 import com.carebridge.utils.toon.ToonObjectMapper;
+import com.carebridge.services.mappers.ShiftService;
 import io.javalin.http.Context;
+import io.javalin.http.UnauthorizedResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class ShiftController {
 
     private static final Logger logger = LoggerFactory.getLogger(ShiftController.class);
+    private static final String TOON_CONTENT_TYPE = "application/toon";
+
     private final ShiftDAO shiftDAO = ShiftDAO.getInstance();
     private final PlanPeriodDAO planPeriodDAO = PlanPeriodDAO.getInstance();
     private final ToonObjectMapper toonObjectMapper = new ToonObjectMapper();
+    private final UserDAO userDAO = UserDAO.getInstance();
+    private final ShiftService shiftService = ShiftService.getInstance();
 
     public void create(Context ctx) {
         try {
@@ -33,7 +47,7 @@ public class ShiftController {
             shift.setEndShift(dto.getEndShift());
             shift.setShiftType(dto.getShiftType().name());
             shift.setLocation(dto.getLocationId().toString());
-            shift.setStatus("OPEN");
+            shift.setStatus(ShiftStatus.OPEN);
             shift.setPlanPeriodId(dto.getPlanPeriodId());
             shift.setAssignedUserId(null);
             shift.setCreatedBy(createdBy);
@@ -183,4 +197,58 @@ public class ShiftController {
             throw new ApiRuntimeException(400, "Invalid id");
         }
     }
+
+    public void readByUser(Context ctx) {
+    try {
+        JwtUserDTO authUser = ctx.attribute("user");
+        if (authUser == null) {
+            throw new UnauthorizedResponse("Not authenticated");
+        }
+
+        Long userId;
+
+        if (hasRole(authUser, "CAREWORKER")) {
+            if (ctx.queryParam("userId") != null) {
+                ctx.status(403).json("{\"msg\":\"CAREWORKER can only view their own shifts\"}");
+                return;
+            }
+            userId = resolveUserId(authUser);
+        } else {
+            String param = ctx.queryParam("userId");
+            if (param == null || param.isBlank()) {
+                ctx.status(400).json("{\"msg\":\"userId query param is required\"}");
+                return;
+            }
+            try {
+                userId = Long.parseLong(param);
+            } catch (NumberFormatException e) {
+                ctx.status(400).json("{\"msg\":\"userId must be a valid number\"}");
+                return;
+            }
+        }
+
+        List<Shift> shifts = shiftDAO.findByAssignedUserId(userId);
+        ctx.status(200).json(shifts);
+        logger.info("readByUser: {} shifts returned for userId={}", shifts.size(), userId);
+
+    } catch (UnauthorizedResponse e) {
+        ctx.status(401).json("{\"msg\":\"" + e.getMessage() + "\"}");
+    } catch (ApiRuntimeException e) {
+        ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+    } catch (Exception e) {
+        logger.error("Error in readByUser", e);
+        ctx.status(500).json("{\"msg\":\"Internal server error\"}");
+    }
+}
+    private Long resolveUserId(JwtUserDTO authUser) {
+    User user = userDAO.readByEmail(authUser.getUsername());
+    if (user == null) throw new ApiRuntimeException(404, "Authenticated user not found");
+    return user.getId();
+}
+
+    private boolean hasRole(JwtUserDTO authUser, String role) {
+    return authUser.getRoles().stream()
+            .map(String::toUpperCase)
+            .anyMatch(r -> r.equals(role.toUpperCase()));
+}
 }

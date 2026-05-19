@@ -15,10 +15,11 @@ import java.util.List;
 public class ShiftDAO implements IDAO<Shift, Long> {
 
 	private static final Logger logger = LoggerFactory.getLogger(ShiftDAO.class);
-	private static final EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
+	private final EntityManagerFactory emf;
 	private static ShiftDAO instance;
 
 	private ShiftDAO() {
+		this.emf = HibernateConfig.getEntityManagerFactory();
 	}
 
 	public static synchronized ShiftDAO getInstance() {
@@ -54,7 +55,7 @@ public class ShiftDAO implements IDAO<Shift, Long> {
 		if (!shift.getEndShift().isAfter(shift.getStartShift())) throw new ApiRuntimeException(400, "endShift must be after startShift");
 		if (shift.getShiftType() == null || shift.getShiftType().isBlank()) throw new ApiRuntimeException(400, "shiftType is required");
 		if (shift.getLocation() == null || shift.getLocation().isBlank()) throw new ApiRuntimeException(400, "location is required");
-		if (shift.getStatus() == null || shift.getStatus().isBlank()) throw new ApiRuntimeException(400, "status is required");
+		if (shift.getStatus() == null) throw new ApiRuntimeException(400, "status is required");
 		if (shift.getPlanPeriodId() == null) throw new ApiRuntimeException(400, "planPeriodId is required");
 		if (shift.getAssignedUserId() == null) throw new ApiRuntimeException(400, "assignedUserId is required");
 		if (shift.getCreatedBy() == null) throw new ApiRuntimeException(400, "createdBy is required");
@@ -95,8 +96,6 @@ public class ShiftDAO implements IDAO<Shift, Long> {
 			if (!endShift.isAfter(startShift)) throw new ApiRuntimeException(400, "endShift must be after startShift");
 			if (updated.getShiftType() != null && updated.getShiftType().isBlank()) throw new ApiRuntimeException(400, "shiftType is required");
 			if (updated.getLocation() != null && updated.getLocation().isBlank()) throw new ApiRuntimeException(400, "location is required");
-			if (updated.getStatus() != null && updated.getStatus().isBlank()) throw new ApiRuntimeException(400, "status is required");
-
 			em.getTransaction().begin();
 			if (updated.getShiftType() != null) existing.setShiftType(updated.getShiftType());
 			if (updated.getLocation() != null) existing.setLocation(updated.getLocation());
@@ -142,5 +141,18 @@ public class ShiftDAO implements IDAO<Shift, Long> {
 			throw new ApiRuntimeException(500, "Error deleting shift: " + e.getMessage());
 		}
 		finally { em.close(); }
+	}
+
+	public List<Shift> findByAssignedUserId(Long userId) {
+		EntityManager em = em();
+		try {
+			return em.createQuery(
+							"SELECT s FROM Shift s WHERE s.assignedUserId = :userId", Shift.class)
+					.setParameter("userId", userId)
+					.getResultList();
+		} catch (Exception e) {
+			logger.error("Error finding shifts for userId={}", userId, e);
+			throw new ApiRuntimeException(500, "Error finding shifts: " + e.getMessage());
+		} finally { em.close(); }
 	}
 }

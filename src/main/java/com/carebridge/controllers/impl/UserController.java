@@ -5,9 +5,9 @@ import com.carebridge.config.Populator;
 import com.carebridge.controllers.IController;
 import com.carebridge.dao.impl.ResidentDAO;
 import com.carebridge.dao.impl.UserDAO;
-import com.carebridge.dtos.JwtUserDTO;
 import com.carebridge.dtos.LinkResidentsRequest;
 import com.carebridge.dtos.UserDTO;
+import com.carebridge.dtos.UserWithLocationDTO;
 import com.carebridge.entities.Resident;
 import com.carebridge.entities.User;
 import com.carebridge.entities.enums.Role;
@@ -27,6 +27,10 @@ public class UserController implements IController<User, Long> {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserDAO userDAO = UserDAO.getInstance();
     private final ResidentDAO residentDAO = ResidentDAO.getInstance();
+
+    static boolean hasCareWorkerEquivalentRole(User user) {
+        return user != null && (user.getRole() == Role.CAREWORKER || user.getRole() == Role.SUBSTITUTE);
+    }
 
     @Override
     public void read(Context ctx) {
@@ -223,12 +227,74 @@ public class UserController implements IController<User, Long> {
         try {
             var list = userDAO.readAll()
                     .stream()
-                    .filter(u -> u.getRole() == Role.CAREWORKER)
+                    .filter(UserController::hasCareWorkerEquivalentRole)
                     .map(UserMapper::toDTO)
                     .collect(Collectors.toList());
             ctx.json(list);
         } catch (Exception e) {
             logger.error("readAllCareWorkers failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
+
+    public void getUserWithLocation(Context ctx){
+        try {
+            Long id = validatePrimaryKey(ctx.pathParam("id")) ? Long.parseLong(ctx.pathParam("id")) : null;
+            User entity = userDAO.read(id);
+            if (entity == null) {
+                ctx.status(404).json("{\"msg\":\"User not found\"}");
+                return;
+            }
+            ctx.json(UserMapper.toDTO(entity));
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("read user failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
+
+    public void readWithLocation(Context ctx) {
+        try {
+            Long id = validatePrimaryKey(ctx.pathParam("id")) ? Long.parseLong(ctx.pathParam("id")) : null;
+            User entity = userDAO.readWithLocation(id);
+            if (entity == null) {
+                ctx.status(404).json("{\"msg\":\"User not found\"}");
+                return;
+            }
+            ctx.json(new UserWithLocationDTO(entity));
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("read user failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
+
+    public void attachUserLocation(Context ctx) {
+        try {
+            Long userId = validatePrimaryKey(ctx.pathParam("UserId")) ? Long.parseLong(ctx.pathParam("UserId")) : null;
+            Long locationID = Long.parseLong(ctx.pathParam("LocationID"));
+            userDAO.attachLocationtoUser(userId,locationID);
+            ctx.status(201);
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("attach to user failed", e);
+            ctx.status(500).json("{\"msg\":\"Internal error\"}");
+        }
+    }
+
+    public void detachUserLocation(Context ctx) {
+        try {
+            Long userId = validatePrimaryKey(ctx.pathParam("UserId")) ? Long.parseLong(ctx.pathParam("UserId")) : null;
+            Long locationID = Long.parseLong(ctx.pathParam("LocationID"));
+            userDAO.detachLocationtoUser(userId,locationID);
+            ctx.status(204);
+        } catch (ApiRuntimeException e) {
+            ctx.status(e.getErrorCode()).json("{\"msg\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            logger.error("attach to user failed", e);
             ctx.status(500).json("{\"msg\":\"Internal error\"}");
         }
     }

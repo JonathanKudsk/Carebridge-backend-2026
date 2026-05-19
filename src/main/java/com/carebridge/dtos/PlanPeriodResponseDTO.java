@@ -1,6 +1,6 @@
 package com.carebridge.dtos;
 
-import com.carebridge.enums.PlanStatus;
+import com.carebridge.entities.enums.PlanStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

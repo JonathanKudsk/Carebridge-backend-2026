@@ -13,6 +13,7 @@
         <mapping class="com.carebridge.entities.Event"/>
         <mapping class="com.carebridge.entities.EventType"/>
         <mapping class="com.carebridge.entities.Shift"/>
+        <mapping class="com.carebridge.entities.ShiftAssignment"/>
         <mapping class="com.carebridge.entities.JournalEntry"/>
         <mapping class="com.carebridge.entities.Journal"/>
         <mapping class="com.carebridge.entities.Resident"/>

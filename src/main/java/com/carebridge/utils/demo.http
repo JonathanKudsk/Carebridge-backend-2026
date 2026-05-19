@@ -541,3 +541,62 @@ Content-Type: application/json
     }
   ]
 }
+
+### ---- Location API ----
+
+### Get all templates
+GET {{url}}/locations
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### Get specific template
+GET {{url}}/locations/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### Delete specific template
+DELETE {{url}}/locations/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+### Create template
+POST {{url}}/locations
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "locationName": "HTTP Test location",
+  "address": "test",
+  "city":
+  {
+    "cityName": "by",
+    "postalCode": "1234"
+  }
+}
+
+### Update template
+POST {{url}}/locations/1
+Authorization: Bearer {{jwt_token}}
+Content-Type: application/json
+
+{
+  "locationName": "HTTP Test location",
+  "address": "test",
+  "city":
+    {
+      "cityName": "by",
+      "postalCode": "1234"
+    }
+}
+
+### 5) Read a user with location by id
+GET {{url}}/users/1/locations
+Authorization: Bearer {{jwt_token}}
+
+### 5) attach a location to user (admin)
+put {{url}}/users/1/locations/1
+Authorization: Bearer {{jwt_token}}
+
+### 5) detach a location to user (admin)
+put {{url}}/users/1/locations/1
+Authorization: Bearer {{jwt_token}}

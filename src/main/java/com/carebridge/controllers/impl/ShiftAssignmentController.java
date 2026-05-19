@@ -3,6 +3,7 @@ package com.carebridge.controllers.impl;
 import com.carebridge.dao.impl.ShiftDAO;
 import com.carebridge.dtos.ShiftAssignmentDTO;
 import com.carebridge.entities.Shift;
+import com.carebridge.enums.ShiftStatus;
 import com.carebridge.exceptions.ApiRuntimeException;
 import com.carebridge.exceptions.ScheduleConflictException;
 import com.carebridge.exceptions.ValidationException;
@@ -39,7 +40,7 @@ public class ShiftAssignmentController {
             Object createdAssignment = createShiftAssignment(dto.getShiftId(), dto.getUserId(), assignedBy);
 
             Shift patch = new Shift();
-            patch.setStatus("ASSIGNED");
+            patch.setStatus(ShiftStatus.ASSIGNED);
             patch.setAssignedUserId(dto.getUserId());
             shiftDAO.update(dto.getShiftId(), patch);
 
