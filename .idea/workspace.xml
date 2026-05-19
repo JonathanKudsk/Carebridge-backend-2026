@@ -4,10 +4,45 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="Add substitute read endpoints with location filtering&#10;&#10;- add DAO queries for reading substitutes and substitute locations&#10;- expose substitute endpoints under users routes&#10;- return substitutes using existing UserWithLocationDTO&#10;- add demo.http requests for substitute endpoint testing&#10;- fix user/location path parameter casing&#10;- include DB port in Hibernate dev config&#10;- improve related test cleanup for location/substitute data">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteLocationDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteResponseDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/services/mappers/SubstituteMapper.java" beforeDir="false" />
+    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="Merge branch 'developer' of https://github.com/JonathanKudsk/Carebridge-backend-2026 into TEAM-4-US-3-TASK-5-ResidentDetails-feature&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/HandbookController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/PlanPeriodController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/HandbookTabDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/CreatePlanPeriodRequestDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/HandbookResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/HandbookTabResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/PlanPeriodResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteLocationDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/populators/HandbookPopulator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/HandbookRoute.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/PlanPeriodRoute.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/services/HandbookService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/services/mappers/HandbookMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/services/mappers/SubstituteMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/carebridge/services/mappers/ResidentMapperTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/dao/SubstituteDAOTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/serviceTest/ResidentServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/config/HibernateConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/config/HibernateConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/config/Populator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/config/Populator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/ShiftController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/ShiftController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/PlanPeriodDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/PlanPeriodDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dao/impl/UserDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/LocationResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/LocationResponseDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/HandbookTab.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/HandbookTab.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/Location.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/Location.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/PlanPeriod.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/PlanPeriod.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/Routes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/Routes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/ShiftRoute.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/ShiftRoute.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/UserRoute.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/routes/UserRoute.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/carebridge/dao/impl/HandbookDAOTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/carebridge/dao/impl/HandbookDAOTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/dao/LocationDAOTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/dao/LocationDAOTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/restTest/LocationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/restTest/LocationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/restTest/SecurityTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/restTest/SecurityTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,7 +140,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "developer-basic-CRUD-for-Locations-READ-tests",
+    "git-widget-placeholder": "Merging TEAM-4-US-3-TASK-5-ResidentDetails-feature",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
