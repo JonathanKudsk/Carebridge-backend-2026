@@ -45,6 +45,20 @@ public class MedicationController implements IController<Medication, Long> {
         }
     }
 
+    // GET /medication-charts/resident/{residentId}
+    public void readByResident(Context ctx) {
+        try {
+            Long residentId = Long.parseLong(ctx.pathParam("residentId"));
+            MedicationChart chart = medicationChartDAO.readByResidentId(residentId);
+            ctx.json(toChartResponseDTO(chart));
+        } catch (IllegalArgumentException e) {
+            ctx.status(400).result(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Failed to get medication chart by resident", e);
+            ctx.status(500).result("Internal server error");
+        }
+    }
+
     // GET /medication-charts/{chartId}/medications/{medicationId}
     @Override
     public void read(Context ctx) {

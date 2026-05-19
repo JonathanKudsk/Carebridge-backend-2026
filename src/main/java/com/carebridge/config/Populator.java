@@ -1,11 +1,6 @@
 package com.carebridge.config;
 
-import com.carebridge.entities.EventType;
-import com.carebridge.entities.Template;
-import com.carebridge.entities.Journal;
-import com.carebridge.entities.User;
-import com.carebridge.entities.Resident;
-import com.carebridge.entities.JournalEntry;
+import com.carebridge.entities.*;
 import com.carebridge.enums.EntryType;
 import com.carebridge.enums.RiskAssessment;
 import com.carebridge.entities.enums.Role;
@@ -108,6 +103,11 @@ public class Populator {
 
             em.persist(linkedResident);
 
+            MedicationChart chart1 = new MedicationChart();
+            chart1.setResident(linkedResident);
+            linkedResident.setMedicationChart(chart1);
+            em.persist(chart1);
+
             Resident unlinkedResident = new Resident();
             unlinkedResident.setFirstName("Bent");
             unlinkedResident.setLastName("Berg");
@@ -132,6 +132,10 @@ public class Populator {
 
             em.persist(unlinkedResident);
 
+            MedicationChart chart2 = new MedicationChart();
+            chart2.setResident(unlinkedResident);
+            unlinkedResident.setMedicationChart(chart2);
+            em.persist(chart2);
 
             List<EventType> predefinedTypes = List.of(
                     new EventType("Meeting", "#007bff"),
