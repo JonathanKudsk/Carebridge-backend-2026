@@ -66,6 +66,7 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(ChatRoomUser.class);
         configuration.addAnnotatedClass(Message.class);
         configuration.addAnnotatedClass(ShiftAssignment.class);
+        configuration.addAnnotatedClass(PlanPeriod.class);
         configuration.addAnnotatedClass(Location.class);
         configuration.addAnnotatedClass(City.class);
         configuration.addAnnotatedClass(Handbook.class);
