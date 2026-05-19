@@ -49,6 +49,9 @@ public class Resident {
     @OneToMany(mappedBy = "resident", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Dosage> dosages = new ArrayList<>();
 
+    @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL)
+    private Budget budget;
+
     public Resident() {}
 
     public Resident(String firstName, String lastName, String cprNr, Journal journal, User guardian) {

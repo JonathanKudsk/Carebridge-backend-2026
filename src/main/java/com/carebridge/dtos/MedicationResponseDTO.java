@@ -6,6 +6,7 @@ public class MedicationResponseDTO {
 
     private Long id;
     private Long chartId;
+    private Long version;
     private String name;
     private String dosage;
     private String frequency;
@@ -17,11 +18,12 @@ public class MedicationResponseDTO {
 
     public MedicationResponseDTO() {}
 
-    public MedicationResponseDTO(Long id, Long chartId, String name, String dosage, String frequency,
-                                  LocalDate startDate, LocalDate endDate, String prescribingDoctor,
-                                  String notes, boolean active) {
+    public MedicationResponseDTO(Long id, Long chartId, Long version, String name, String dosage,
+                                  String frequency, LocalDate startDate, LocalDate endDate,
+                                  String prescribingDoctor, String notes, boolean active) {
         this.id = id;
         this.chartId = chartId;
+        this.version = version;
         this.name = name;
         this.dosage = dosage;
         this.frequency = frequency;
@@ -34,6 +36,7 @@ public class MedicationResponseDTO {
 
     public Long getId() { return id; }
     public Long getChartId() { return chartId; }
+    public Long getVersion() { return version; }
     public String getName() { return name; }
     public String getDosage() { return dosage; }
     public String getFrequency() { return frequency; }
