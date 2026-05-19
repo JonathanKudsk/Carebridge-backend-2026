@@ -321,8 +321,8 @@ public class UserController implements IController<User, Long> {
 
     public void attachUserLocation(Context ctx) {
         try {
-            Long userId = validatePrimaryKey(ctx.pathParam("UserId")) ? Long.parseLong(ctx.pathParam("UserId")) : null;
-            Long locationID = Long.parseLong(ctx.pathParam("LocationID"));
+            Long userId = validatePrimaryKey(ctx.pathParam("userId")) ? Long.parseLong(ctx.pathParam("userId")) : null;
+            Long locationID = Long.parseLong(ctx.pathParam("locationId"));
             userDAO.attachLocationtoUser(userId,locationID);
             ctx.status(201);
         } catch (ApiRuntimeException e) {
@@ -335,8 +335,8 @@ public class UserController implements IController<User, Long> {
 
     public void detachUserLocation(Context ctx) {
         try {
-            Long userId = validatePrimaryKey(ctx.pathParam("UserId")) ? Long.parseLong(ctx.pathParam("UserId")) : null;
-            Long locationID = Long.parseLong(ctx.pathParam("LocationID"));
+            Long userId = validatePrimaryKey(ctx.pathParam("userId")) ? Long.parseLong(ctx.pathParam("userId")) : null;
+            Long locationID = Long.parseLong(ctx.pathParam("locationId"));
             userDAO.detachLocationtoUser(userId,locationID);
             ctx.status(204);
         } catch (ApiRuntimeException e) {

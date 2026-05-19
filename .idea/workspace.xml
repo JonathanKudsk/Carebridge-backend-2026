@@ -5,11 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="fixed test that called post when was supposed to be put">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteLocationDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/dtos/SubstituteResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/services/mappers/SubstituteMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/dao/SubstituteDAOTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/LocationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/LocationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/City.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/City.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/config/HibernateConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/config/HibernateConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/config/Populator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/config/Populator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/UserController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/restTest/LocationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/restTest/LocationTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,10 +69,20 @@
   "keyToString": {
     "Application.App.executor": "Run",
     "HTTP Request.demo | ---- Location API ----.executor": "Run",
+    "HTTP Request.demo | ---- Substitute API ----.executor": "Run",
+    "HTTP Request.demo | 1) Health check (no auth).executor": "Run",
     "HTTP Request.demo | 2) Populate database (POST; ANYONE).executor": "Run",
     "HTTP Request.demo | 3) Login as seeded ADMIN (from Populator).executor": "Run",
+    "HTTP Request.demo | 4) List users (ADMIN only).executor": "Run",
+    "HTTP Request.demo | Attach substitute location to substitute user.executor": "Run",
+    "HTTP Request.demo | Create substitute test user.executor": "Run",
     "HTTP Request.demo | Create template#2.executor": "Run",
     "HTTP Request.demo | Get specific template#2.executor": "Run",
+    "HTTP Request.demo | Read all substitutes.executor": "Run",
+    "HTTP Request.demo | Read locations with substitutes.executor": "Run",
+    "HTTP Request.demo | Read substitute test user by email.executor": "Run",
+    "HTTP Request.demo | Read substitutes filtered by location id.executor": "Run",
+    "HTTP Request.demo | Read substitutes filtered by location name.executor": "Run",
     "HTTP Request.demo | Update template.executor": "Run",
     "JUnit.CityDAOTest.executor": "Run",
     "JUnit.CityDaoTest.executor": "Run",
@@ -97,7 +111,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "#124 on developer-basic-CRUD-for-Locations",
+    "git-widget-placeholder": "developer-basic-CRUD-for-Locations-READ",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
@@ -114,90 +128,46 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.LocationTest">
-    <configuration name="CityDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="carebridge-backend" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="dao.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="dao" />
-      <option name="MAIN_CLASS_NAME" value="dao.CityDAOTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+  <component name="RunDashboard">
+    <option name="configurationStatuses">
+      <map>
+        <entry key="HttpClient.HttpRequestRunConfigurationType">
+          <value>
+            <map>
+              <entry key="demo | Attach substitute location to substitute user" value="STOPPED" />
+              <entry key="demo | Read all substitutes" value="STOPPED" />
+              <entry key="demo | Read locations with substitutes" value="STOPPED" />
+              <entry key="demo | Read substitutes filtered by location id" value="STOPPED" />
+              <entry key="demo | Read substitutes filtered by location name" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="RunManager" selected="HTTP Request.demo | Read locations with substitutes">
+    <configuration name="demo | Attach substitute location to substitute user" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Attach substitute location to substitute user" index="47" runType="Run single request">
+      <method v="2" />
     </configuration>
-    <configuration name="LocationDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="carebridge-backend" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="dao.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="dao" />
-      <option name="MAIN_CLASS_NAME" value="dao.LocationDAOTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="demo | Read all substitutes" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Read all substitutes" index="48" runType="Run single request">
+      <method v="2" />
     </configuration>
-    <configuration name="LocationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="carebridge-backend" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="restTest.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="restTest" />
-      <option name="MAIN_CLASS_NAME" value="restTest.LocationTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="demo | Read locations with substitutes" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Read locations with substitutes" index="51" runType="Run single request">
+      <method v="2" />
     </configuration>
-    <configuration name="UserDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="carebridge-backend" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="dao.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="dao" />
-      <option name="MAIN_CLASS_NAME" value="dao.UserDAOTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="demo | Read substitutes filtered by location id" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Read substitutes filtered by location id" index="49" runType="Run single request">
+      <method v="2" />
     </configuration>
-    <configuration name="UserDAOTest.testAttachLocationToUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="carebridge-backend" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="dao.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="dao" />
-      <option name="MAIN_CLASS_NAME" value="dao.UserDAOTest" />
-      <option name="METHOD_NAME" value="testAttachLocationToUser" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="demo | Read substitutes filtered by location name" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" executionIdentifier="Read substitutes filtered by location name" index="50" runType="Run single request">
+      <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.LocationTest" />
-        <item itemvalue="JUnit.LocationDAOTest" />
-        <item itemvalue="JUnit.UserDAOTest" />
-        <item itemvalue="JUnit.UserDAOTest.testAttachLocationToUser" />
-        <item itemvalue="JUnit.CityDAOTest" />
+        <item itemvalue="HTTP Request.demo | Read locations with substitutes" />
+        <item itemvalue="HTTP Request.demo | Read substitutes filtered by location name" />
+        <item itemvalue="HTTP Request.demo | Read substitutes filtered by location id" />
+        <item itemvalue="HTTP Request.demo | Read all substitutes" />
+        <item itemvalue="HTTP Request.demo | Attach substitute location to substitute user" />
       </list>
     </recent_temporary>
   </component>
