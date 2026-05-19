@@ -2,6 +2,7 @@
 .env
 .env.local
 src/main/resources/application.properties
+src/test/resources/application.properties
 
 # ===== Maven build =====
 /target/
@@ -14,6 +15,10 @@ src/main/resources/application.properties
 *.iws
 out/
 
+# ===== Local AI guidance files =====
+/CLAUDE.md
+/CODE_STANDARD.md
+
 # ===== OS-specific =====
 .DS_Store
 Thumbs.db
@@ -21,3 +26,5 @@ Thumbs.db
 # ===== Temporary files =====
 *.tmp
 *.swp
+CODE_STANDARD.md
+target/classes/com/carebridge/dao/impl/ShiftAssignmentDAO.class

@@ -3,9 +3,16 @@ package com.carebridge.entities;
 import com.carebridge.enums.RiskAssessment;
 import com.carebridge.enums.EntryType;
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "journal_entries")
 public class JournalEntry {
 
@@ -18,11 +25,15 @@ public class JournalEntry {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
+    @ManyToOne
+    @JoinColumn(name = "template_id", nullable = false)
+    private Template template;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "journalEntry", cascade = CascadeType.PERSIST)
+    private List<JournalEntryAnswer> journalEntryAnswers;
+
     @Column(nullable = false, length = 255)
     private String title;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "risk_assessment", nullable = false, length = 10)
@@ -48,43 +59,15 @@ public class JournalEntry {
     // --- Constructors ---
     public JournalEntry() {}
 
-    public JournalEntry(User author, String title, String content, RiskAssessment riskAssessment, EntryType entryType) {
+    public JournalEntry(Journal journal, User author, String title, RiskAssessment riskAssessment, EntryType entryType, Template template) {
+        this.journal = journal;
         this.author = author;
         this.title = title;
-        this.content = content;
         this.riskAssessment = riskAssessment;
         this.entryType = entryType;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.editCloseTime = this.createdAt.plusHours(24);
+        this.template = template;
     }
-
-    // --- Getters & Setters ---
-    public Long getId() { return id; }
-
-    public User getAuthor() { return author; }
-    public void setAuthor(User author) { this.author = author; }
-
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
-
-    public RiskAssessment getRiskAssessment() { return riskAssessment; }
-    public void setRiskAssessment(RiskAssessment riskAssessment) { this.riskAssessment = riskAssessment; }
-
-    public EntryType getEntryType() { return entryType; }
-    public void setEntryType(EntryType entryType) { this.entryType = entryType; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-
-    public LocalDateTime getEditCloseTime() { return editCloseTime; }
-    public void setEditCloseTime(LocalDateTime editCloseTime) { this.editCloseTime = editCloseTime; }
-
-    public Journal getJournal() { return journal; }
-    public void setJournal(Journal journal) { this.journal = journal; }
-
 }
