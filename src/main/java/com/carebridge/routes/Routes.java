@@ -21,7 +21,7 @@ public class Routes {
     private final ChatRoomUserRoute chatRoomUserRoute = new ChatRoomUserRoute();
     private final MessageRoute messageRoute = new MessageRoute();
     private final ShiftRoute shiftRoute = new ShiftRoute();
-    private final SavingsGoalRoute savingsGoalRoute = new SavingsGoalRoute();
+    private final BudgetRoute budgetRoute = new BudgetRoute();
 
     public EndpointGroup getRoutes() {
         return () -> {
@@ -38,10 +38,11 @@ public class Routes {
             path("/chatroom-users", chatRoomUserRoute.getRoutes());
             path("/messages", messageRoute.getRoutes());
             path("/shifts", shiftRoute.getRoutes());
-            path("/savings-goals", savingsGoalRoute.getRoutes());
+            path("/budgets", budgetRoute.getRoutes());
 
             get("/populate", controller::populate, Role.ANYONE);
             post("/populate", controller::populate, Role.ANYONE);
+
             SecurityRoutes.getSecurityRoutes().addEndpoints();
         };
     }
