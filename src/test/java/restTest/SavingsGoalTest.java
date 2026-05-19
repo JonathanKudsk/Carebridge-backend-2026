@@ -70,7 +70,7 @@ public class SavingsGoalTest {
                         "{\"residentId\":%d,\"income\":5000.0,\"fixedExpenses\":1000.0,\"variableExpenses\":500.0,\"pocketMoneyAmount\":200.0,\"savingsAmount\":300.0}",
                         residentId))
                 .when()
-                .post("/budgets")
+                .post("/budgets/create")
                 .then()
                 .statusCode(201)
                 .extract().path("id");
