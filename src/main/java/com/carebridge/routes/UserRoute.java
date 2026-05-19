@@ -14,8 +14,8 @@ public class UserRoute {
           
             get("/careworkers", controller::readAllCareWorkers, Role.PLANNER, Role.ADMIN);            
 
-            get("/", controller::readAll, Role.CAREWORKER, Role.ADMIN);
-            get("/{id}", controller::read, Role.CAREWORKER, Role.ADMIN);
+            get("/", controller::readAll, Role.CAREWORKER, Role.ADMIN, Role.SUBSTITUTE);
+            get("/{id}", controller::read, Role.CAREWORKER, Role.ADMIN, Role.SUBSTITUTE);
 
 
             post("/", controller::create, Role.ADMIN);
@@ -23,6 +23,11 @@ public class UserRoute {
             delete("/{id}", controller::delete, Role.ADMIN);
             post("/{id}/link-residents", controller::linkResidents, Role.ADMIN);
             get("/by-email/{email}",controller::readByEmail, Role.ADMIN);
+
+
+            get("/{id}/locations", controller::readWithLocation,Role.CAREWORKER, Role.SUBSTITUTE, Role.PLANNER, Role.ADMIN);
+            put("/{userId}/locations/{locationId}", controller::attachUserLocation, Role.ADMIN);
+            delete("/{userId}/locations/{locationId}", controller::detachUserLocation, Role.ADMIN);
         };
     }
 }

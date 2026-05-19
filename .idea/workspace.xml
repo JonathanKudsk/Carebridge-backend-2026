@@ -4,16 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="Created ShiftStatus and ShiftType enums" />
+    <list default="true" id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="fixed test that called post when was supposed to be put">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/LocationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/LocationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/City.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/entities/City.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/carebridge/utils/demo.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/restTest/LocationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/restTest/LocationTest.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="developer" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -26,13 +39,20 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/JonathanKudsk/Carebridge-backend-2026.git&quot;,
-    &quot;accountId&quot;: &quot;0640aa20-5e9b-422a-bde1-006afebac647&quot;
+    &quot;url&quot;: &quot;https://github.com/JonathanKudsk/Carebridge-backend-2026&quot;,
+    &quot;accountId&quot;: &quot;8d607f38-8e69-4fbd-9194-fc9926586584&quot;
   }
+}</component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
 }</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
@@ -44,6 +64,31 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.App.executor": "Run",
+    "HTTP Request.demo | ---- Location API ----.executor": "Run",
+    "HTTP Request.demo | 2) Populate database (POST; ANYONE).executor": "Run",
+    "HTTP Request.demo | 3) Login as seeded ADMIN (from Populator).executor": "Run",
+    "HTTP Request.demo | Create template#2.executor": "Run",
+    "HTTP Request.demo | Get specific template#2.executor": "Run",
+    "HTTP Request.demo | Update template.executor": "Run",
+    "JUnit.CityDAOTest.executor": "Run",
+    "JUnit.CityDaoTest.executor": "Run",
+    "JUnit.CityDaoTest.testDeleteCity.executor": "Run",
+    "JUnit.CityDaoTest.testReadCity.executor": "Run",
+    "JUnit.CityDaoTest.testUpdateEventType.executor": "Run",
+    "JUnit.LocationDAOTest.executor": "Run",
+    "JUnit.LocationDAOTest.testCreateCity.executor": "Run",
+    "JUnit.LocationDAOTest.testReadAllLocations.executor": "Run",
+    "JUnit.LocationTest.delete.executor": "Run",
+    "JUnit.LocationTest.executor": "Run",
+    "JUnit.LocationTest.read.executor": "Run",
+    "JUnit.LocationTest.readAll.executor": "Run",
+    "JUnit.TemplateTest.executor": "Run",
+    "JUnit.UserDAOTest.executor": "Run",
+    "JUnit.UserDAOTest.testAttachLocationToUser.executor": "Run",
+    "JUnit.UserDAOTest.testDetachLocationToUser.executor": "Run",
+    "JUnit.UserDAOTest.testReadUser.executor": "Run",
+    "JUnit.UserDAOTest.testReadUserWithLocation.executor": "Run",
+    "JUnit.UserTest.readWithLocation.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -52,7 +97,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "developer-implementer-GET-plan-periods-endpoint",
+    "git-widget-placeholder": "#124 on developer-basic-CRUD-for-Locations",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
@@ -69,14 +114,102 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager" selected="JUnit.LocationTest">
+    <configuration name="CityDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="carebridge-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="dao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="dao" />
+      <option name="MAIN_CLASS_NAME" value="dao.CityDAOTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LocationDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="carebridge-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="dao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="dao" />
+      <option name="MAIN_CLASS_NAME" value="dao.LocationDAOTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LocationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="carebridge-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="restTest.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="restTest" />
+      <option name="MAIN_CLASS_NAME" value="restTest.LocationTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="carebridge-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="dao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="dao" />
+      <option name="MAIN_CLASS_NAME" value="dao.UserDAOTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserDAOTest.testAttachLocationToUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="carebridge-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="dao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="dao" />
+      <option name="MAIN_CLASS_NAME" value="dao.UserDAOTest" />
+      <option name="METHOD_NAME" value="testAttachLocationToUser" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.LocationTest" />
+        <item itemvalue="JUnit.LocationDAOTest" />
+        <item itemvalue="JUnit.UserDAOTest" />
+        <item itemvalue="JUnit.UserDAOTest.testAttachLocationToUser" />
+        <item itemvalue="JUnit.CityDAOTest" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26199.169" />
-        <option value="bundled-js-predefined-d6986cc7102b-9c94529fcfe0-JavaScript-IU-252.26199.169" />
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23339.11" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23339.11" />
       </set>
     </attachedChunks>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="cd1b2c3a-29c0-484b-a5fe-82afe87bee48" name="Changes" comment="" />
@@ -90,6 +223,12 @@
       <workItem from="1777366033497" duration="1113000" />
       <workItem from="1777367176687" duration="2677000" />
       <workItem from="1778702052799" duration="972000" />
+      <workItem from="1779041149335" duration="17876000" />
+      <workItem from="1779087694256" duration="5706000" />
+      <workItem from="1779100838057" duration="945000" />
+      <workItem from="1779102598952" duration="4000" />
+      <workItem from="1779104484674" duration="181000" />
+      <workItem from="1779105027896" duration="766000" />
     </task>
     <task id="LOCAL-00001" summary="Created ShiftStatus and ShiftType enums">
       <option name="closed" value="true" />
@@ -99,7 +238,63 @@
       <option name="project" value="LOCAL" />
       <updated>1776332398999</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="created Crud with test for locations and cities">
+      <option name="closed" value="true" />
+      <created>1779059316234</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1779059316234</updated>
+    </task>
+    <task id="LOCAL-00003" summary="created Crud with test for locations and cities">
+      <option name="closed" value="true" />
+      <created>1779087795996</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1779087795996</updated>
+    </task>
+    <task id="LOCAL-00004" summary="added the ability to attach, detach and read a location to a user">
+      <option name="closed" value="true" />
+      <created>1779093040560</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1779093040560</updated>
+    </task>
+    <task id="LOCAL-00005" summary="added the ability to attach, detach and read a location to a user">
+      <option name="closed" value="true" />
+      <created>1779093241946</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1779093241946</updated>
+    </task>
+    <task id="LOCAL-00006" summary="fixed test broken by change in entity">
+      <option name="closed" value="true" />
+      <created>1779100432711</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1779100432711</updated>
+    </task>
+    <task id="LOCAL-00007" summary="fixed test broken by change in entity">
+      <option name="closed" value="true" />
+      <created>1779100722573</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1779100722573</updated>
+    </task>
+    <task id="LOCAL-00008" summary="fixed test that called post when was supposed to be put">
+      <option name="closed" value="true" />
+      <created>1779101065555</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1779101065555</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -118,6 +313,26 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Created ShiftStatus and ShiftType enums" />
-    <option name="LAST_COMMIT_MESSAGE" value="Created ShiftStatus and ShiftType enums" />
+    <MESSAGE value="created Crud with test for locations and cities" />
+    <MESSAGE value="added the ability to attach, detach and read a location to a user" />
+    <MESSAGE value="fixed test broken by change in entity" />
+    <MESSAGE value="fixed test that called post when was supposed to be put" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed test that called post when was supposed to be put" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/LocationController.java</url>
+          <line>62</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/carebridge/controllers/impl/LocationController.java</url>
+          <line>84</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

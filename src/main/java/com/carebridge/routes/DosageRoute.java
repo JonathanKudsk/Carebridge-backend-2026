@@ -14,7 +14,7 @@ public class DosageRoute {
             post("/", controller::create, Role.ADMIN);
             put("/{id}", controller::update, Role.ADMIN);
             delete("/{id}", controller::delete, Role.ADMIN);
-            get("/{residentId}/dosages", controller::readAllByResident, Role.ADMIN, Role.CAREWORKER);
+            get("/{residentId}/dosages", controller::readAllByResident, Role.ADMIN, Role.CAREWORKER, Role.SUBSTITUTE);
         };
     }
 }
