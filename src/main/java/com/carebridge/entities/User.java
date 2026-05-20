@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.Instant;
@@ -16,6 +18,9 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("USER")
 @Table(
         name = "users",
         uniqueConstraints = @UniqueConstraint(name = "uq_users_email", columnNames = "email")
@@ -79,8 +84,8 @@ public class User implements ISecurityUser {
     // ========== NYE RELATIONER ==========
 
     // Hvis brugeren er en RESIDENT - link til deres Resident profil
-    /*@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Resident residentProfile;*/
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Resident residentProfile;
 
     @ManyToMany(mappedBy = "usersWithAccess")
     private Set<Event> accessibleEvents = new HashSet<>();
@@ -93,6 +98,11 @@ public class User implements ISecurityUser {
             inverseJoinColumns = @JoinColumn(name = "resident_id")
     )
     private List<Resident> residents = new ArrayList<>();
+
+    @ManyToMany (cascade = CascadeType.REMOVE)
+    @Getter
+    @Setter
+    private Set<Location> locations = new HashSet<>();
 
     // ========== CONSTRUCTORS ==========
 
@@ -130,6 +140,18 @@ public class User implements ISecurityUser {
     public void removeRole(String roleName) {
         if (roleName != null && this.role.name().equalsIgnoreCase(roleName)) {
             this.role = Role.USER;
+        }
+    }
+
+    public void addLocation(Location location) {
+        if (locations.add(location)){
+            location.addUser(this);
+        }
+    }
+
+    public void removeLocation(Location location) {
+        if (locations.remove(location)){
+            location.removeUser(this);
         }
     }
 
@@ -311,5 +333,13 @@ public class User implements ISecurityUser {
         if (resident != null && !this.residents.contains(resident)) {
             this.residents.add(resident);
         }
+    }
+
+    public Resident getResidentProfile() {
+        return residentProfile;
+    }
+
+    public void setResidentProfile(Resident residentProfile) {
+        this.residentProfile = residentProfile;
     }
 }

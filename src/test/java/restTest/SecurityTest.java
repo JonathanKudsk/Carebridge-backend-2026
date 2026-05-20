@@ -3,11 +3,18 @@ package restTest;
 import com.carebridge.config.ApplicationConfig;
 import com.carebridge.config.HibernateConfig;
 import com.carebridge.config.TestPopulator;
+import com.carebridge.dtos.JwtUserDTO;
+import com.carebridge.dtos.security.TokenSecurity;
+import com.carebridge.entities.User;
+import com.carebridge.entities.enums.Role;
 import com.carebridge.services.TotpService;
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;
 import io.restassured.RestAssured;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
+
+import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -203,5 +210,117 @@ public class SecurityTest {
                 .body("token", notNullValue())
                 .body("requiresTotpSetup", anyOf(nullValue(), equalTo(false)))
                 .body("requires2FA", anyOf(nullValue(), equalTo(false)));
+    }
+
+    @Test
+    @Order(12)
+    void adminCanChangeUserRoleSuccessfully() {
+        String adminToken = createTokenFor("admin@carebridge.io", Role.ADMIN);
+        Long userId = findUserIdByEmail("no2fa@carebridge.io");
+        setUserRole(userId, Role.USER);
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
+                .body("{\"role\":\"CAREWORKER\"}")
+                .put("/users/" + userId + "/role")
+                .then()
+                .log().ifValidationFails()
+                .statusCode(200)
+                .body("email", equalTo("no2fa@carebridge.io"))
+                .body("role", equalTo("CAREWORKER"));
+    }
+
+    @Test
+    @Order(13)
+    void nonAdminCannotChangeUserRole() {
+        String userToken = createTokenFor("alice@carebridge.io", Role.USER);
+        Long userId = findUserIdByEmail("no2fa@carebridge.io");
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + userToken)
+                .body("{\"role\":\"USER\"}")
+                .put("/users/" + userId + "/role")
+                .then()
+                .log().ifValidationFails()
+                .statusCode(anyOf(is(401), is(403)));
+    }
+
+    @Test
+    @Order(14)
+    void changeRoleMissingRoleReturnsClientError() {
+        String adminToken = createTokenFor("admin@carebridge.io", Role.ADMIN);
+        Long userId = findUserIdByEmail("no2fa@carebridge.io");
+        setUserRole(userId, Role.USER);
+
+        given()
+                .contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + adminToken)
+                .body("{}")
+                .put("/users/" + userId + "/role")
+                .then()
+                .log().ifValidationFails()
+                .statusCode(400)
+                .body("msg", notNullValue());
+    }
+
+    private Long findUserIdByEmail(String email) {
+        try (EntityManager em = HibernateConfig.getEntityManagerFactoryForTest().createEntityManager()) {
+            return em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
+                    .setParameter("email", email)
+                    .getSingleResult()
+                    .getId();
+        }
+    }
+
+    private String createTokenFor(String email, Role role) {
+        try {
+            String password = email.equals("admin@carebridge.io") ? "admin123" : "password123";
+
+            io.restassured.response.Response loginResponse = given()
+                    .contentType(ContentType.JSON)
+                    .body("{\"email\":\"" + email + "\",\"password\":\"" + password + "\"}")
+                    .post("/auth/login")
+                    .then()
+                    .log().ifValidationFails()
+                    .statusCode(200)
+                    .extract().response();
+
+            String fullToken = loginResponse.path("token");
+            if (fullToken != null) {
+                return fullToken;
+            }
+
+            String tempToken = loginResponse.path("tempToken");
+
+            String secret = email.equals("admin@carebridge.io")
+                    ? adminTotpSecret
+                    : TestPopulator.ALICE_TOTP_SECRET;
+
+            String code = totpService.generateCurrentCode(secret);
+
+            return given()
+                    .contentType(ContentType.JSON)
+                    .header("Authorization", "Bearer " + tempToken)
+                    .body("{\"code\":\"" + code + "\"}")
+                    .post("/auth/2fa/verify")
+                    .then()
+                    .log().ifValidationFails()
+                    .statusCode(200)
+                    .extract().path("token");
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void setUserRole(Long userId, Role role) {
+        try (EntityManager em = HibernateConfig.getEntityManagerFactoryForTest().createEntityManager()) {
+            em.getTransaction().begin();
+            User user = em.find(User.class, userId);
+            user.setRole(role);
+            em.getTransaction().commit();
+        }
     }
 }

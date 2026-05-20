@@ -4,9 +4,7 @@ import com.carebridge.config.HibernateConfig;
 import com.carebridge.dao.IDAO;
 import com.carebridge.entities.Resident;
 import com.carebridge.exceptions.ApiRuntimeException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,11 +43,19 @@ public class ResidentDAO implements IDAO<Resident, Long> {
 
     public Resident read(Long id) {
         try (EntityManager em = emf.createEntityManager()) {
-            Resident resident = em.find(Resident.class, id);
-            if (resident == null) {
-                throw new EntityNotFoundException("Resident not found with ID: " + id);
-            }
-            return resident;
+            TypedQuery<Resident> query = em.createQuery(
+                    "SELECT r FROM Resident r " +
+                            //"LEFT JOIN FETCH r.medicationChart " +
+                            "LEFT JOIN FETCH r.user " +
+                            "LEFT JOIN FETCH r.users " +
+                            "WHERE r.id = :id", Resident.class);
+
+            query.setParameter("id", id);
+
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            logger.error("Resident not found with ID: " + id);
+            throw new EntityNotFoundException("Resident not found with ID: " + id);
         } catch (Exception e) {
             logger.error("Error retrieving resident from db", e);
             throw new RuntimeException("Error retrieving resident from db.", e);

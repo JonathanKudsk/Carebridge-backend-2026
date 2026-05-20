@@ -5,6 +5,9 @@ import com.carebridge.controllers.security.AccessController;
 import com.carebridge.exceptions.ApiException;
 import com.carebridge.routes.Routes;
 import com.carebridge.utils.Utils;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.javalin.Javalin;
 import io.javalin.config.JavalinConfig;
 import io.javalin.http.Context;
@@ -27,7 +30,9 @@ public class ApplicationConfig {
         config.router.apiBuilder(routes.getRoutes());
 
         config.jsonMapper(new JavalinJackson().updateMapper(mapper -> {
-            mapper = new Utils().getObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         }));
     }
 

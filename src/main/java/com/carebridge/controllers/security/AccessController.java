@@ -36,7 +36,12 @@ public class AccessController implements IAccessController {
 
         String token = header.substring("Bearer ".length());
 
-        // 4️⃣ Verificer JWT token
+        // 4️⃣ Afvis blacklistede tokens (invalideret ved logout eller refresh)
+        if (TokenBlacklist.contains(token)) {
+            throw new UnauthorizedResponse("Token has been invalidated. Please log in again.");
+        }
+
+        // 5️⃣ Verificer JWT token
         JwtUserDTO user;
         try {
             user = securityController.verifyToken(token);
@@ -46,7 +51,7 @@ public class AccessController implements IAccessController {
             throw new UnauthorizedResponse("You need to log in, dude! Or your token is invalid.");
         }
 
-        // 5️⃣ Tjek at bruger har tilladte roller
+        // 6️⃣ Tjek at bruger har tilladte roller
         Set<String> allowedNames = allowed.stream()
                 .map(Object::toString)
                 .map(String::toUpperCase)
