@@ -1,0 +1,2679 @@
+@startuml CarebridgeDetailedClassDiagram
+title Carebridge Backend - Detailed Class Diagram
+
+left to right direction
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+skinparam class<<entity>> {
+    BackgroundColor #C6EFCE
+    BorderColor #2E7D32
+}
+skinparam interface<<entity>> {
+    BackgroundColor #C6EFCE
+    BorderColor #2E7D32
+}
+skinparam enum<<entity>> {
+    BackgroundColor #C6EFCE
+    BorderColor #2E7D32
+}
+skinparam class<<dao>> {
+    BackgroundColor #CFE2F3
+    BorderColor #1F4E79
+}
+skinparam interface<<dao>> {
+    BackgroundColor #CFE2F3
+    BorderColor #1F4E79
+}
+skinparam enum<<dao>> {
+    BackgroundColor #CFE2F3
+    BorderColor #1F4E79
+}
+skinparam class<<dto>> {
+    BackgroundColor #FFF2CC
+    BorderColor #B7791F
+}
+skinparam interface<<dto>> {
+    BackgroundColor #FFF2CC
+    BorderColor #B7791F
+}
+skinparam enum<<dto>> {
+    BackgroundColor #FFF2CC
+    BorderColor #B7791F
+}
+skinparam class<<controller>> {
+    BackgroundColor #F4CCCC
+    BorderColor #990000
+}
+skinparam interface<<controller>> {
+    BackgroundColor #F4CCCC
+    BorderColor #990000
+}
+skinparam enum<<controller>> {
+    BackgroundColor #F4CCCC
+    BorderColor #990000
+}
+skinparam class<<config>> {
+    BackgroundColor #E5E7EB
+    BorderColor #4B5563
+}
+skinparam interface<<config>> {
+    BackgroundColor #E5E7EB
+    BorderColor #4B5563
+}
+skinparam enum<<config>> {
+    BackgroundColor #E5E7EB
+    BorderColor #4B5563
+}
+skinparam class<<app>> {
+    BackgroundColor #E5E7EB
+    BorderColor #4B5563
+}
+skinparam interface<<app>> {
+    BackgroundColor #E5E7EB
+    BorderColor #4B5563
+}
+skinparam enum<<app>> {
+    BackgroundColor #E5E7EB
+    BorderColor #4B5563
+}
+' Included scope: App, config, controllers, dao, dtos, and entities.
+' Lombok-generated members are not expanded; only source-declared members are listed.
+
+package "com.carebridge" {
+  class "App" as com_carebridge_App <<app>> {
+    +{static} main(String[] args) : void
+  }
+
+}
+
+package "com.carebridge.config" {
+  class "ApplicationConfig" as com_carebridge_config_ApplicationConfig <<config>> {
+    -{static}{readOnly} AccessController accessController
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} Routes routes
+    -{static}{readOnly} String frontEndOrigin
+    -{static} int count
+    --
+    +{static} configuration(JavalinConfig config) : void
+    +{static} startServer(int port) : Javalin
+    +{static} afterRequest(Context ctx) : void
+    +{static} stopServer(Javalin app) : void
+    -{static} generalExceptionHandler(Exception e, Context ctx) : void
+    +{static} apiExceptionHandler(ApiException e, Context ctx) : void
+    -{static} corsHeaders(Context ctx) : void
+    -{static} corsHeadersOptions(Context ctx) : void
+  }
+
+  class "HibernateConfig" as com_carebridge_config_HibernateConfig <<config>> {
+    -{static} EntityManagerFactory emf
+    -{static} EntityManagerFactory emfTest
+    -{static} Boolean isTest
+    --
+    +{static} getTest() : Boolean
+    +{static} setTest(Boolean test) : void
+    +{static} getEntityManagerFactory() : EntityManagerFactory
+    +{static} getEntityManagerFactoryForTest() : EntityManagerFactory
+    -{static} getAnnotationConfiguration(Configuration configuration) : void
+    -{static} createEMF(boolean forTest) : EntityManagerFactory
+    -{static} setBaseProperties(Properties props) : Properties
+    -{static} setDeployedProperties(Properties props) : Properties
+    -{static} setDevProperties(Properties props) : Properties
+    -{static} setTestProperties(Properties props) : Properties
+  }
+
+  class "Populator" as com_carebridge_config_Populator <<config>> {
+    -{static}{readOnly} Logger logger
+    --
+    +{static} populate(EntityManagerFactory emf) : void
+    -{static} findUserByEmail(EntityManager em, String email) : User
+    -{static} findEventTypeByName(EntityManager em, String name) : EventType
+    -{static} findTemplateByTitle(EntityManager em, String title) : Template
+  }
+
+}
+
+package "com.carebridge.controllers" {
+  interface "IController<T, D>" as com_carebridge_controllers_IController <<controller>> {
+    +read(Context ctx) : void
+    +readAll(Context ctx) : void
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    +delete(Context ctx) : void
+    +validatePrimaryKey(D d) : boolean
+    +validateEntity(Context ctx) : T
+  }
+
+}
+
+package "com.carebridge.controllers.impl" {
+  class "AuditLogController" as com_carebridge_controllers_impl_AuditLogController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} AuditLogDAO auditLogDAO
+    --
+    +readAll(Context ctx) : void
+    +readByMedication(Context ctx) : void
+    -toResponseDTO(AuditLog log) : AuditLogResponseDTO
+  }
+
+  class "BudgetController" as com_carebridge_controllers_impl_BudgetController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} BudgetService budgetService
+    --
+    +create(Context ctx) : void
+    +getByResident(Context ctx) : void
+  }
+
+  class "ChatRoomController" as com_carebridge_controllers_impl_ChatRoomController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} ChatRoomDAO chatRoomDAO
+    -{readOnly} UserDAO userDAO
+    --
+    +read(Context ctx) : void
+    +readAll(Context ctx) : void
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    +delete(Context ctx) : void
+    +validatePrimaryKey(Long id) : boolean
+    +validateEntity(Context ctx) : ChatRoom
+    -parseId(String idRaw) : Long
+  }
+
+  class "ChatRoomUserController" as com_carebridge_controllers_impl_ChatRoomUserController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} ChatRoomUserDAO chatRoomUserDAO
+    -{readOnly} UserDAO userDAO
+    -{readOnly} ChatRoomDAO chatRoomDAO
+    --
+    +read(Context ctx) : void
+    +readAll(Context ctx) : void
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    +delete(Context ctx) : void
+    +validatePrimaryKey(Long id) : boolean
+    +validateEntity(Context ctx) : ChatRoomUser
+    -parseId(String idRaw) : Long
+    -resolveUser(Long userId) : com.carebridge.entities.User
+    -resolveChatRoom(Long chatRoomId) : com.carebridge.entities.ChatRoom
+  }
+
+  class "ChatRoomWebSocketController" as com_carebridge_controllers_impl_ChatRoomWebSocketController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} Map<Long, Set<WsContext>> rooms
+    --
+    +{static} onConnect(WsContext ctx) : void
+    +{static} onClose(WsContext ctx) : void
+    +{static} broadcast(Long chatRoomId, Object payload) : void
+    -{static} roomId(WsContext ctx) : Long
+  }
+
+  class "DosageController" as com_carebridge_controllers_impl_DosageController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} DosageDAO dosageDAO
+    -{readOnly} ResidentDAO residentDAO
+    --
+    +DosageController()
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    +delete(Context ctx) : void
+    +readAllByResident(Context ctx) : void
+  }
+
+  class "EventController" as com_carebridge_controllers_impl_EventController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} EventDAO eventDAO
+    -{readOnly} EventTypeDAO eventTypeDAO
+    -{readOnly} UserDAO userDAO
+    -{readOnly} ResidentDAO residentDAO
+    -{readOnly} EventAccessPolicyService policyService
+    --
+    +read(Context ctx) : void
+    +readAll(Context ctx) : void
+    -resolveZone(String tzParam) : ZoneId
+    -parseDateKeywordOrIso(String value, LocalDate today, int defaultOffsetDays) : LocalDate
+    -extractEmailFromToken(Object tokenUser) : String
+    -resolveUserAccessLevel(User user) : int
+    -extractUserIdFromToken(Object tokenUser) : Long
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    +delete(Context ctx) : void
+    +readByCreator(Context ctx) : void
+    +readUpcoming(Context ctx) : void
+    +markSeen(Context ctx) : void
+    +unmarkSeen(Context ctx) : void
+    +validatePrimaryKey(Long id) : boolean
+    +validateEntity(Context ctx) : Event
+    -parseId(Context ctx) : Long
+  }
+
+  class "EventTypeController" as com_carebridge_controllers_impl_EventTypeController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} EventTypeDAO eventTypeDAO
+    --
+    +read(Context ctx) : void
+    +readAll(Context ctx) : void
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    +delete(Context ctx) : void
+    +validatePrimaryKey(Long id) : boolean
+    +validateEntity(Context ctx) : EventType
+    -parseId(Context ctx) : Long
+  }
+
+  class "HandbookController" as com_carebridge_controllers_impl_HandbookController <<controller>> {
+    -{readOnly} HandbookService service
+    --
+    +getHandbook(Context ctx) : void
+    +updateTabContent(Context ctx) : void
+    +updateTabTitle(Context ctx) : void
+    +createTab(Context ctx) : void
+    +deleteTab(Context ctx) : void
+  }
+
+  class "JournalEntryController" as com_carebridge_controllers_impl_JournalEntryController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} JournalEntryDAO journalEntryDAO
+    -{readOnly} JournalDAO journalDAO
+    -{readOnly} TemplateDAO templateDAO
+    -{readOnly} UserDAO userDAO
+    --
+    -canAccessJournal(Context ctx, Long journalId) : boolean
+    package--{static} hasFullJournalAccess(JwtUserDTO jwtUser) : boolean
+    +read(Context ctx) : void
+    +search(Context ctx) : void
+    +readAll(Context ctx) : void
+    +findAllEntriesByJournal(Context ctx) : void
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    +delete(Context ctx) : void
+    +validatePrimaryKey(Long aLong) : boolean
+    +validateEntity(Context ctx) : JournalEntry
+    +findAllEntriesByJournalToDTO(Context ctx) : void
+  }
+
+  class "LocationController" as com_carebridge_controllers_impl_LocationController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} LocationDAO locationDAO
+    -{readOnly} CityDAO cityDAO
+    --
+    +read(Context ctx) : void
+    +readAll(Context ctx) : void
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    +delete(Context ctx) : void
+    +validatePrimaryKey(Long id) : boolean
+    +validateEntity(Context ctx) : Location
+    -parseId(Context ctx) : Long
+  }
+
+  class "MedicationController" as com_carebridge_controllers_impl_MedicationController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} MedicationChartDAO medicationChartDAO
+    -{readOnly} MedicationDAO medicationDAO
+    -{readOnly} AuditLogDAO auditLogDAO
+    -{readOnly} UserDAO userDAO
+    --
+    +readAll(Context ctx) : void
+    +readByResident(Context ctx) : void
+    +read(Context ctx) : void
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    -extractDoctorId(Context ctx) : Long
+    +delete(Context ctx) : void
+    +validatePrimaryKey(Long id) : boolean
+    +validateEntity(Context ctx) : Medication
+    -toResponseDTO(Medication m) : MedicationResponseDTO
+    -toChartResponseDTO(MedicationChart chart) : MedicationChartResponseDTO
+  }
+
+  class "MessageController" as com_carebridge_controllers_impl_MessageController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} MessageDAO messageDAO
+    -{readOnly} UserDAO userDAO
+    -{readOnly} ChatRoomDAO chatRoomDAO
+    --
+    +read(Context ctx) : void
+    +readAll(Context ctx) : void
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    +delete(Context ctx) : void
+    +validatePrimaryKey(Long id) : boolean
+    +validateEntity(Context ctx) : Message
+    -parseId(String idRaw) : Long
+    -resolveUser(Long userId) : com.carebridge.entities.User
+    -resolveChatRoom(Long chatRoomId) : com.carebridge.entities.ChatRoom
+  }
+
+  class "PlanPeriodController" as com_carebridge_controllers_impl_PlanPeriodController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} PlanPeriodDAO planPeriodDAO
+    -{readOnly} UserDAO userDAO
+    -{readOnly} ToonObjectMapper toonObjectMapper
+    --
+    +create(Context ctx) : void
+    +read(Context ctx) : void
+    +readAll(Context ctx) : void
+    -toResponseDTO(PlanPeriod planPeriod) : PlanPeriodResponseDTO
+    -extractCurrentUserId(Context ctx) : Long
+    -parseId(Context ctx) : Long
+  }
+
+  class "ResidentController" as com_carebridge_controllers_impl_ResidentController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} ResidentDAO residentDAO
+    -{readOnly} UserDAO userDAO
+    -{readOnly} ResidentService residentService
+    --
+    +create(Context ctx) : void
+    +delete(Context ctx) : void
+    +validatePrimaryKey(Long aLong) : boolean
+    +validateEntity(Context ctx) : Resident
+    +read(Context ctx) : void
+    +readAll(Context ctx) : void
+    +getAllSorted(Context ctx) : void
+    +update(Context ctx) : void
+    +deactivate(Context ctx) : void
+    -getAuthenticatedUser(Context ctx) : User
+    -toResponseDTO(Resident resident) : ResidentResponseDTO
+  }
+
+  class "SavingsGoalController" as com_carebridge_controllers_impl_SavingsGoalController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} SavingsGoalDAO savingsGoalDAO
+    -{readOnly} BudgetService budgetService
+    --
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    +read(Context ctx) : void
+    +readAll(Context ctx) : void
+    +getByResident(Context ctx) : void
+    +delete(Context ctx) : void
+    +validatePrimaryKey(Long id) : boolean
+    +validateEntity(Context ctx) : SavingsGoal
+  }
+
+  class "ShiftAssignmentController" as com_carebridge_controllers_impl_ShiftAssignmentController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} ShiftDAO shiftDAO
+    -{readOnly} ToonObjectMapper toonObjectMapper
+    --
+    +create(Context ctx) : void
+    -validateNoOverlap(Long userId, LocalDateTime start, LocalDateTime end) : void
+    -createShiftAssignment(Long shiftId, Long userId, Long assignedBy) : Object
+  }
+
+  class "ShiftController" as com_carebridge_controllers_impl_ShiftController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} String TOON_CONTENT_TYPE
+    -{readOnly} ShiftDAO shiftDAO
+    -{readOnly} PlanPeriodDAO planPeriodDAO
+    -{readOnly} ToonObjectMapper toonObjectMapper
+    -{readOnly} UserDAO userDAO
+    -{readOnly} ShiftService shiftService
+    --
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    +delete(Context ctx) : void
+    -validateCreateRequest(CreateShiftRequestDTO dto) : void
+    -validateMergedShift(Shift merged, CreateShiftRequestDTO dto) : void
+    -validateWithinPlanPeriod(Long planPeriodId, java.time.LocalDateTime startShift, java.time.LocalDateTime endShift) : void
+    -buildMergedShift(Shift existing, CreateShiftRequestDTO dto) : Shift
+    -parseId(Context ctx) : Long
+    +readByUser(Context ctx) : void
+    -resolveUserId(JwtUserDTO authUser) : Long
+    -hasRole(JwtUserDTO authUser, String role) : boolean
+  }
+
+  class "StaffJournalController" as com_carebridge_controllers_impl_StaffJournalController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} String UPLOAD_DIR
+    -{readOnly} StaffJournalDAO staffJournalDAO
+    -{readOnly} StaffJournalEntryDAO entryDAO
+    -{readOnly} StaffJournalContractDAO contractDAO
+    -{readOnly} UserDAO userDAO
+    --
+    +getByUserId(Context ctx) : void
+    +uploadContract(Context ctx) : void
+    +downloadContract(Context ctx) : void
+    +deleteContract(Context ctx) : void
+    +getEntries(Context ctx) : void
+    +createEntry(Context ctx) : void
+    +updateEntry(Context ctx) : void
+    +deleteEntry(Context ctx) : void
+    -toResponseDTO(StaffJournal journal, List<StaffJournalEntry> entries, List<StaffJournalContract> contracts) : StaffJournalResponseDTO
+    -toContractDTO(StaffJournalContract contract) : StaffJournalContractDTO
+    -toEntryDTO(StaffJournalEntry entry) : StaffJournalEntryResponseDTO
+  }
+
+  class "TemplateController" as com_carebridge_controllers_impl_TemplateController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} TemplateDAO templateDAO
+    --
+    +read(Context ctx) : void
+    +readAll(Context ctx) : void
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    +delete(Context ctx) : void
+    +validatePrimaryKey(Long id) : boolean
+    +validateEntity(Context ctx) : Template
+    -parseId(Context ctx) : Long
+  }
+
+  class "UserController" as com_carebridge_controllers_impl_UserController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} UserDAO userDAO
+    -{readOnly} ResidentDAO residentDAO
+    --
+    package--{static} hasCareWorkerEquivalentRole(User user) : boolean
+    +read(Context ctx) : void
+    +readAll(Context ctx) : void
+    +create(Context ctx) : void
+    +update(Context ctx) : void
+    +delete(Context ctx) : void
+    +readByEmail(Context ctx) : void
+    +me(Context ctx) : void
+    +populate(Context ctx) : void
+    +validatePrimaryKey(Long id) : boolean
+    +validatePrimaryKey(String idStr) : boolean
+    -parseOptionalLongQueryParam(Context ctx, String queryParamName) : Long
+    +linkResidents(Context ctx) : void
+    +validateEntity(Context ctx) : User
+    +readAllCareWorkers(Context ctx) : void
+    +readAllSubstitutes(Context ctx) : void
+    +readSubstituteLocations(Context ctx) : void
+    +getUserWithLocation(Context ctx) : void
+    +readWithLocation(Context ctx) : void
+    +attachUserLocation(Context ctx) : void
+    +detachUserLocation(Context ctx) : void
+  }
+
+}
+
+package "com.carebridge.controllers.security" {
+  class "AccessController" as com_carebridge_controllers_security_AccessController <<controller>> {
+    -{readOnly} SecurityController securityController
+    --
+    +accessHandler(Context ctx) : void
+  }
+
+  interface "IAccessController" as com_carebridge_controllers_security_IAccessController <<controller>> {
+    +accessHandler(Context ctx) : void
+  }
+
+  interface "ISecurityController" as com_carebridge_controllers_security_ISecurityController <<controller>> {
+    +login() : Handler
+    +register() : Handler
+    +authenticate() : Handler
+    +totpSetup() : Handler
+    +totpConfirm() : Handler
+    +totpVerify() : Handler
+    +authorize(JwtUserDTO userDTO, Set<RouteRole> allowedRoles) : boolean
+    +createToken(JwtUserDTO user) : String
+    +verifyToken(String token) : JwtUserDTO
+  }
+
+  class "SecurityController" as com_carebridge_controllers_security_SecurityController <<controller>> {
+    -{static}{readOnly} Logger logger
+    -{static} ISecurityDAO securityDAO
+    -{static} SecurityController instance
+    -{readOnly} ObjectMapper objectMapper
+    -{readOnly} ITokenSecurity tokenSecurity
+    -{readOnly} TotpService totpService
+    --
+    -SecurityController()
+    +{static} getInstance() : SecurityController
+    +login() : Handler
+    +totpSetup() : Handler
+    +totpConfirm() : Handler
+    +totpVerify() : Handler
+    +register() : Handler
+    +authenticate() : Handler
+    +authorize(JwtUserDTO user, Set<RouteRole> allowedRoles) : boolean
+    +createToken(JwtUserDTO user) : String
+    +verifyToken(String token) : JwtUserDTO
+    -isWithinGracePeriod(User user) : boolean
+    -buildJwtUser(User user) : JwtUserDTO
+    -createTempToken(String email, String scope) : String
+    -validateTempToken(Context ctx, String expectedScope) : String
+    +addRole() : Handler
+    +changeRole() : Handler
+    +healthCheck(Context ctx) : void
+    +refresh() : Handler
+    +logout() : Handler
+    +sessionInfo() : Handler
+    -resolveExpiresAt() : long
+  }
+
+  class "TokenBlacklist" as com_carebridge_controllers_security_TokenBlacklist <<controller>> {
+    -{static}{readOnly} Set<String> blacklist
+    --
+    +{static} add(String token) : void
+    +{static} contains(String token) : boolean
+  }
+
+}
+
+package "com.carebridge.dao" {
+  interface "IDAO<T, I>" as com_carebridge_dao_IDAO <<dao>> {
+    +read(I id) : T
+    +readAll() : List<T>
+    +create(T t) : T
+    +update(I id, T t) : T
+    +delete(I id) : void
+  }
+
+}
+
+package "com.carebridge.dao.impl" {
+  class "AuditLogDAO" as com_carebridge_dao_impl_AuditLogDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} AuditLogDAO instance
+    --
+    +{static} getInstance() : AuditLogDAO
+    +create(AuditLog log) : AuditLog
+    +readAll() : List<AuditLog>
+    +readByMedicationId(Long medicationId) : List<AuditLog>
+  }
+
+  class "BudgetDAO" as com_carebridge_dao_impl_BudgetDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} BudgetDAO instance
+    --
+    +{static} getInstance() : BudgetDAO
+    +create(Budget budget) : Budget
+    +read(Long id) : Budget
+    +readAll() : List<Budget>
+    +update(Long id, Budget updatedBudget) : Budget
+    +delete(Long id) : void
+  }
+
+  class "ChatRoomDAO" as com_carebridge_dao_impl_ChatRoomDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} ChatRoomDAO instance
+    --
+    -ChatRoomDAO()
+    +{static} getInstance() : ChatRoomDAO
+    -em() : EntityManager
+    +read(Long id) : ChatRoom
+    +readAll() : List<ChatRoom>
+    +readAllPaged(int page, int size) : List<ChatRoom>
+    +count() : long
+    +create(ChatRoom chatRoom) : ChatRoom
+    +update(Long id, ChatRoom updated) : ChatRoom
+    +delete(Long id) : void
+    -validateMember(ChatRoomUser member) : void
+    +deactivateChatRoomsForUser(Long userId) : void
+    +evaluateAndUpdateChatRoomStatus(Long chatRoomId) : void
+    +reevaluateChatRoomsForUser(Long userId) : void
+  }
+
+  class "ChatRoomUserDAO" as com_carebridge_dao_impl_ChatRoomUserDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} ChatRoomUserDAO instance
+    --
+    -ChatRoomUserDAO()
+    +{static} getInstance() : ChatRoomUserDAO
+    -em() : EntityManager
+    +read(Long id) : ChatRoomUser
+    +readAll() : List<ChatRoomUser>
+    +readByChatRoom(Long chatRoomId) : List<ChatRoomUser>
+    +readByUser(Long userId) : List<ChatRoomUser>
+    +create(ChatRoomUser entity) : ChatRoomUser
+    +update(Long id, ChatRoomUser updated) : ChatRoomUser
+    +delete(Long id) : void
+    -validate(ChatRoomUser entity) : void
+  }
+
+  class "CityDAO" as com_carebridge_dao_impl_CityDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} CityDAO instance
+    --
+    -CityDAO()
+    +{static} getInstance() : CityDAO
+    +read(Long id) : City
+    +read(int zip, String cityName) : City
+    +readAll() : List<City>
+    +create(City city) : City
+    +update(Long id, City city) : City
+    +delete(Long id) : void
+    -em() : EntityManager
+  }
+
+  class "DosageDAO" as com_carebridge_dao_impl_DosageDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} DosageDAO instance
+    --
+    +{static} getInstance() : DosageDAO
+    +create(Dosage dosage) : Dosage
+    +update(Long id, Dosage updated) : Dosage
+    +delete(Long id) : void
+    +read(Long id) : Dosage
+    +readAllByResident(Long residentId) : List<Dosage>
+  }
+
+  class "EventDAO" as com_carebridge_dao_impl_EventDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} EventDAO instance
+    --
+    -EventDAO()
+    +{static} getInstance() : EventDAO
+    -em() : EntityManager
+    -readWithFetch(EntityManager em, Long id) : Event
+    +read(Long id) : Event
+    +readAll() : List<Event>
+    +readByCreator(Long userId) : List<Event>
+    +create(Event e) : Event
+    +update(Long id, Event updated) : Event
+    +delete(Long id) : void
+    +addSeenByUser(Long eventId, User user) : void
+    +removeSeenByUser(Long eventId, User user) : void
+    -roleToAccessLevel(Role role) : int
+    +readAccessibleEvents(Long userId) : List<Event>
+    +readAccessibleEventsBetween(Long userId, Instant from, Instant to) : List<Event>
+    +readAccessibleById(Long eventId, Long userId, Integer userAccessLevel) : Event
+    +readBetween(Instant from, Instant to) : List<Event>
+  }
+
+  class "EventTypeDAO" as com_carebridge_dao_impl_EventTypeDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} EventTypeDAO instance
+    --
+    -EventTypeDAO()
+    +{static} getInstance() : EventTypeDAO
+    -em() : EntityManager
+    +read(Long id) : EventType
+    +readByName(String name) : EventType
+    +readAll() : List<EventType>
+    +create(EventType e) : EventType
+    +update(Long id, EventType updated) : EventType
+    +delete(Long id) : void
+  }
+
+  class "HandbookDAO" as com_carebridge_dao_impl_HandbookDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} HandbookDAO instance
+    --
+    +{static} getInstance() : HandbookDAO
+    +create(Handbook handbook) : Handbook
+    +read(Long id) : Handbook
+    +readAll() : List<Handbook>
+    +update(Long id, Handbook updatedHandbook) : Handbook
+    +delete(Long id) : void
+  }
+
+  class "HandbookTabDAO" as com_carebridge_dao_impl_HandbookTabDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} HandbookTabDAO instance
+    --
+    +{static} getInstance() : HandbookTabDAO
+    +create(HandbookTab tab) : HandbookTab
+    +findById(Long id) : HandbookTab
+    +update(HandbookTab tab) : HandbookTab
+    +delete(Long id) : void
+    +countByHandbookId(Long handbookId) : int
+  }
+
+  class "JournalDAO" as com_carebridge_dao_impl_JournalDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} JournalDAO instance
+    --
+    +{static} getInstance() : JournalDAO
+    +create(Journal journal) : Journal
+    +read(Long id) : Journal
+    +readAll() : List<Journal>
+    +update(Long id, Journal journal) : Journal
+    +delete(Long id) : void
+    +addEntryToJournal(Journal journal, JournalEntry journalEntry) : void
+    +guardianHasAccessToJournal(String guardianEmail, Long journalId) : boolean
+  }
+
+  class "JournalEntryDAO" as com_carebridge_dao_impl_JournalEntryDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} JournalEntryDAO instance
+    --
+    +{static} getInstance() : JournalEntryDAO
+    +create(JournalEntry journalEntry) : JournalEntry
+    +read(Long id) : JournalEntry
+    +readAll() : List<JournalEntry>
+    +getEntryIdsByJournalId(Long journalId) : List<Long>
+    +update(Long Id, JournalEntry journalEntry) : JournalEntry
+    +delete(Long id) : void
+    +getEntriesByJournalId(Long journalId) : List<JournalEntry>
+    +search(LocalDateTime dateFrom, LocalDateTime dateTo, Long employeeId, RiskAssessment riskLevel, String keyword, int page, int pageSize) : Object[]
+    -buildSearchPredicates(CriteriaBuilder cb, Root<JournalEntry> root, LocalDateTime dateFrom, LocalDateTime dateTo, Long employeeId, RiskAssessment riskLevel, String keyword) : List<Predicate>
+  }
+
+  class "LocationDAO" as com_carebridge_dao_impl_LocationDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} LocationDAO instance
+    --
+    -LocationDAO()
+    +{static} getInstance() : LocationDAO
+    +read(Long id) : Location
+    +readAll() : List<Location>
+    +create(Location template) : Location
+    +update(Long id, Location location) : Location
+    +delete(Long id) : void
+    -em() : EntityManager
+  }
+
+  class "MedicationChartDAO" as com_carebridge_dao_impl_MedicationChartDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} MedicationChartDAO instance
+    --
+    +{static} getInstance() : MedicationChartDAO
+    +create(MedicationChart chart) : MedicationChart
+    +read(Long chartId) : MedicationChart
+    +readByResidentId(Long residentId) : MedicationChart
+    +addMedication(Long chartId, Medication medication) : Medication
+    +removeMedication(Long chartId, Long medicationId) : void
+  }
+
+  class "MedicationDAO" as com_carebridge_dao_impl_MedicationDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} MedicationDAO instance
+    --
+    +{static} getInstance() : MedicationDAO
+    +create(Medication medication) : Medication
+    +read(Long id) : Medication
+    +readAll() : List<Medication>
+    +update(Long id, Medication updated) : Medication
+    +delete(Long id) : void
+  }
+
+  class "MessageDAO" as com_carebridge_dao_impl_MessageDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} MessageDAO instance
+    --
+    -MessageDAO()
+    +{static} getInstance() : MessageDAO
+    -em() : EntityManager
+    +read(Long id) : Message
+    +readAll() : List<Message>
+    +readByChatRoom(Long chatRoomId) : List<Message>
+    +create(Message message) : Message
+    +update(Long id, Message updated) : Message
+    +delete(Long id) : void
+  }
+
+  class "PlanPeriodDAO" as com_carebridge_dao_impl_PlanPeriodDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} PlanPeriodDAO instance
+    --
+    -PlanPeriodDAO()
+    +{static} getInstance() : PlanPeriodDAO
+    -em() : EntityManager
+    +read(Long id) : PlanPeriod
+    +readAll() : List<PlanPeriod>
+    +readActive() : List<PlanPeriod>
+    +create(PlanPeriod planPeriod) : PlanPeriod
+    +update(Long id, PlanPeriod updated) : PlanPeriod
+    +publish(Long id) : PlanPeriod
+    +delete(Long id) : void
+  }
+
+  class "ResidentDAO" as com_carebridge_dao_impl_ResidentDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} ResidentDAO instance
+    --
+    +{static} getInstance() : ResidentDAO
+    +create(Resident resident) : Resident
+    +read(Long id) : Resident
+    +readAll() : List<Resident>
+    +update(Long id, Resident updated) : Resident
+    +delete(Long id) : void
+    +deactivate(Long id) : void
+    +getAllSorted() : List<Resident>
+    +getAllSortedForGuardian(Long guardianId) : List<Resident>
+  }
+
+  class "SavingsGoalDAO" as com_carebridge_dao_impl_SavingsGoalDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} SavingsGoalDAO instance
+    --
+    +{static} getInstance() : SavingsGoalDAO
+    +create(SavingsGoal goal) : SavingsGoal
+    +read(Long id) : SavingsGoal
+    +readAll() : List<SavingsGoal>
+    +update(Long id, SavingsGoal goal) : SavingsGoal
+    +delete(Long id) : void
+    +findByBudgetId(Long budgetId) : List<SavingsGoal>
+    +findByResidentId(Long residentId) : List<SavingsGoal>
+  }
+
+  class "ShiftAssignmentDAO" as com_carebridge_dao_impl_ShiftAssignmentDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} ShiftAssignmentDAO instance
+    --
+    -ShiftAssignmentDAO()
+    +{static} getInstance() : ShiftAssignmentDAO
+    -em() : EntityManager
+    +read(Long id) : ShiftAssignment
+    +readAll() : List<ShiftAssignment>
+    +readByUser(Long userId) : List<ShiftAssignment>
+    +readByShift(Long shiftId) : List<ShiftAssignment>
+    +create(ShiftAssignment shiftAssignment) : ShiftAssignment
+    +update(Long id, ShiftAssignment updated) : ShiftAssignment
+    +delete(Long id) : void
+  }
+
+  class "ShiftDAO" as com_carebridge_dao_impl_ShiftDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{readOnly} EntityManagerFactory emf
+    -{static} ShiftDAO instance
+    --
+    -ShiftDAO()
+    +{static} getInstance() : ShiftDAO
+    -em() : EntityManager
+    +read(Long id) : Shift
+    +readAll() : List<Shift>
+    +create(Shift shift) : Shift
+    +update(Long id, Shift updated) : Shift
+    +delete(Long id) : void
+    +findByAssignedUserId(Long userId) : List<Shift>
+  }
+
+  class "StaffJournalContractDAO" as com_carebridge_dao_impl_StaffJournalContractDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} StaffJournalContractDAO instance
+    --
+    -StaffJournalContractDAO()
+    +{static} getInstance() : StaffJournalContractDAO
+    +create(StaffJournalContract contract) : StaffJournalContract
+    +read(Long id) : StaffJournalContract
+    +readAllByJournalId(Long journalId) : List<StaffJournalContract>
+    +delete(Long id) : void
+  }
+
+  class "StaffJournalDAO" as com_carebridge_dao_impl_StaffJournalDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} StaffJournalDAO instance
+    --
+    -StaffJournalDAO()
+    +{static} getInstance() : StaffJournalDAO
+    +create(StaffJournal journal) : StaffJournal
+    +read(Long id) : StaffJournal
+    +readByUserId(Long userId) : StaffJournal
+  }
+
+  class "StaffJournalEntryDAO" as com_carebridge_dao_impl_StaffJournalEntryDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} StaffJournalEntryDAO instance
+    --
+    -StaffJournalEntryDAO()
+    +{static} getInstance() : StaffJournalEntryDAO
+    +create(StaffJournalEntry entry) : StaffJournalEntry
+    +read(Long id) : StaffJournalEntry
+    +readAllByJournalId(Long journalId) : List<StaffJournalEntry>
+    +update(Long id, StaffJournalEntry patch) : StaffJournalEntry
+    +delete(Long id) : void
+  }
+
+  class "TemplateDAO" as com_carebridge_dao_impl_TemplateDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} TemplateDAO instance
+    --
+    -TemplateDAO()
+    +{static} getInstance() : TemplateDAO
+    +read(Long id) : Template
+    +readAll() : List<Template>
+    +create(Template template) : Template
+    +update(Long id, Template template) : Template
+    +delete(Long id) : void
+    -em() : EntityManager
+  }
+
+  class "UserDAO" as com_carebridge_dao_impl_UserDAO <<dao>> {
+    -{static}{readOnly} Logger logger
+    -{static}{readOnly} EntityManagerFactory emf
+    -{static} UserDAO instance
+    --
+    -UserDAO()
+    +{static} getInstance() : UserDAO
+    -em() : EntityManager
+    +read(Long id) : User
+    +readByEmail(String email) : User
+    +readAll() : List<User>
+    +readAllSubstitutes(Long locationId, String locationName) : List<User>
+    +readSubstituteLocations() : List<Location>
+    +create(User u) : User
+    +update(Long id, User updated) : User
+    +findUserIdsByRole(Role role) : List<Long>
+    +clearResidents(Long guardianId) : void
+    +linkResidents(Long guardianId, List<Resident> residentsToLink) : void
+    +findGuardianIdByResidentId(Long residentId) : Optional<Long>
+    +delete(Long id) : void
+    +readWithLocation(Long id) : User
+    +attachLocationtoUser(Long userId, Long locationId) : User
+    +detachLocationtoUser(Long userId, Long locationId) : User
+  }
+
+}
+
+package "com.carebridge.dao.security" {
+  interface "ISecurityDAO" as com_carebridge_dao_security_ISecurityDAO <<dao>> {
+    +getVerifiedUser(String email, String password) : User
+    +createUser(String name, String email, String rawPassword, String displayName, String displayEmail, String displayPhone, String internalEmail, String internalPhone, Role role) : User
+    +changeRole(Long userId, com.carebridge.entities.enums.Role newRole) : User
+    +getUserByEmail(String email) : User
+    +saveTotpSecret(String email, String secret) : void
+    +enableTotp(String email) : void
+    +renewGracePeriod(String email) : void
+  }
+
+  class "SecurityDAO" as com_carebridge_dao_security_SecurityDAO <<dao>> {
+    -{readOnly} EntityManagerFactory emf
+    --
+    +SecurityDAO(EntityManagerFactory emf)
+    -em() : EntityManager
+    +getVerifiedUser(String email, String password) : User
+    +createUser(String name, String email, String rawPassword, String displayName, String displayEmail, String displayPhone, String internalEmail, String internalPhone, Role role) : User
+    +changeRole(Long userId, Role newRole) : User
+    -findByEmail(EntityManager em, String email) : User
+    +getUserByEmail(String email) : User
+    +saveTotpSecret(String email, String secret) : void
+    +enableTotp(String email) : void
+    +renewGracePeriod(String email) : void
+  }
+
+}
+
+package "com.carebridge.dtos" {
+  class "AuditLogResponseDTO" as com_carebridge_dtos_AuditLogResponseDTO <<dto>> {
+    -Long id
+    -Instant timestamp
+    -Long doctorId
+    -Long medicationId
+    -Long chartId
+    -String action
+    -String description
+    --
+    +AuditLogResponseDTO()
+    +AuditLogResponseDTO(Long id, Instant timestamp, Long doctorId, Long medicationId, Long chartId, String action, String description)
+    +getId() : Long
+    +getTimestamp() : Instant
+    +getDoctorId() : Long
+    +getMedicationId() : Long
+    +getChartId() : Long
+    +getAction() : String
+    +getDescription() : String
+  }
+
+  class "AuthRequest" as com_carebridge_dtos_AuthRequest <<dto>> {
+    -String email
+    -String password
+  }
+
+  class "BudgetResponseDTO" as com_carebridge_dtos_BudgetResponseDTO <<dto>> {
+    -Long id
+    -BigDecimal income
+    -BigDecimal fixedExpenses
+    -BigDecimal variableExpenses
+    -BigDecimal pocketMoneyAmount
+    -BigDecimal savingsAmount
+    -String notes
+    -Long residentId
+    --
+    +BudgetResponseDTO()
+    +BudgetResponseDTO(Long id, BigDecimal income, BigDecimal fixedExpenses, BigDecimal variableExpenses, BigDecimal pocketMoneyAmount, BigDecimal savingsAmount, String notes, Long residentId)
+  }
+
+  class "ChangeRoleRequestDTO" as com_carebridge_dtos_ChangeRoleRequestDTO <<dto>> {
+    -Role role
+    --
+    +ChangeRoleRequestDTO()
+    +getRole() : Role
+    +setRole(Role role) : void
+  }
+
+  class "ChatRoomDTO" as com_carebridge_dtos_ChatRoomDTO <<dto>> {
+    -Long id
+    -List<ChatRoomUserDTO> members
+    -boolean isActive
+  }
+
+  class "ChatRoomUserDTO" as com_carebridge_dtos_ChatRoomUserDTO <<dto>> {
+    -Long id
+    -Long userId
+    -Long chatRoomId
+  }
+
+  class "CityResponseDTO" as com_carebridge_dtos_CityResponseDTO <<dto>> {
+    -long id
+    -String cityName
+    -int postalCode
+    --
+    +CityResponseDTO(City city)
+  }
+
+  class "CreateBudgetRequestDTO" as com_carebridge_dtos_CreateBudgetRequestDTO <<dto>> {
+    -BigDecimal income
+    -BigDecimal fixedExpenses
+    -BigDecimal variableExpenses
+    -BigDecimal pocketMoneyAmount
+    -BigDecimal savingsAmount
+    -String notes
+    -Long residentId
+    --
+    +CreateBudgetRequestDTO()
+  }
+
+  class "CreateCityRequestDTO" as com_carebridge_dtos_CreateCityRequestDTO <<dto>> {
+    -String cityName
+    -int postalCode
+  }
+
+  class "CreateDosageRequestDTO" as com_carebridge_dtos_CreateDosageRequestDTO <<dto>> {
+    -String medicineName
+    -String dosage
+    -String frequency
+    -LocalDate startDate
+    -LocalDate endDate
+    -String note
+    -Long residentId
+    --
+    +CreateDosageRequestDTO()
+    +getMedicineName() : String
+    +setMedicineName(String medicineName) : void
+    +getDosage() : String
+    +setDosage(String dosage) : void
+    +getFrequency() : String
+    +setFrequency(String frequency) : void
+    +getStartDate() : LocalDate
+    +setStartDate(LocalDate startDate) : void
+    +getEndDate() : LocalDate
+    +setEndDate(LocalDate endDate) : void
+    +getNote() : String
+    +setNote(String note) : void
+    +getResidentId() : Long
+    +setResidentId(Long residentId) : void
+  }
+
+  class "CreateFieldDTO" as com_carebridge_dtos_CreateFieldDTO <<dto>> {
+    -String title
+    -String fieldType
+  }
+
+  class "CreateFieldRequestDTO" as com_carebridge_dtos_CreateFieldRequestDTO <<dto>> {
+    package--String title
+    package--FieldType fieldType
+  }
+
+  class "CreateJournalEntryAnswerRequestDTO" as com_carebridge_dtos_CreateJournalEntryAnswerRequestDTO <<dto>> {
+    -String answer
+    -Long fieldId
+  }
+
+  class "CreateJournalEntryRequestDTO" as com_carebridge_dtos_CreateJournalEntryRequestDTO <<dto>> {
+    -Long journalId
+    -Long authorUserId
+    -String title
+    -EntryType entryType
+    -RiskAssessment riskAssessment
+    -Long TemplateId
+    -CreateJournalEntryAnswerRequestDTO[] answers
+  }
+
+  class "CreateLocationRequestDTO" as com_carebridge_dtos_CreateLocationRequestDTO <<dto>> {
+    -String locationName
+    -String address
+    -CreateCityRequestDTO city
+  }
+
+  class "CreateMedicationRequestDTO" as com_carebridge_dtos_CreateMedicationRequestDTO <<dto>> {
+    -Long version
+    -String name
+    -String dosage
+    -String frequency
+    -LocalDate startDate
+    -LocalDate endDate
+    -String prescribingDoctor
+    -String notes
+    -Boolean active
+    --
+    +CreateMedicationRequestDTO()
+    +getVersion() : Long
+    +setVersion(Long version) : void
+    +getName() : String
+    +setName(String name) : void
+    +getDosage() : String
+    +setDosage(String dosage) : void
+    +getFrequency() : String
+    +setFrequency(String frequency) : void
+    +getStartDate() : LocalDate
+    +setStartDate(LocalDate startDate) : void
+    +getEndDate() : LocalDate
+    +setEndDate(LocalDate endDate) : void
+    +getPrescribingDoctor() : String
+    +setPrescribingDoctor(String prescribingDoctor) : void
+    +getNotes() : String
+    +setNotes(String notes) : void
+    +getActive() : Boolean
+    +setActive(Boolean active) : void
+  }
+
+  class "CreatePlanPeriodRequestDTO" as com_carebridge_dtos_CreatePlanPeriodRequestDTO <<dto>> {
+    -LocalDate startDate
+    -LocalDate endDate
+  }
+
+  class "CreateResidentRequestDTO" as com_carebridge_dtos_CreateResidentRequestDTO <<dto>> {
+    -String firstName
+    -String lastName
+    -String cprNr
+    -String userId
+    -String guardianId
+    --
+    +CreateResidentRequestDTO()
+    +CreateResidentRequestDTO(String firstName, String lastName, String cprNr, String userId, String guardianId)
+    +getFirstName() : String
+    +setFirstName(String firstName) : void
+    +getLastName() : String
+    +setLastName(String lastName) : void
+    +getCprNr() : String
+    +setCprNr(String cprNr) : void
+    +getUserId() : String
+    +setUserId(String userId) : void
+    +getGuardianId() : String
+    +setGuardianId(String guardianId) : void
+  }
+
+  class "CreateSavingsGoalRequestDTO" as com_carebridge_dtos_CreateSavingsGoalRequestDTO <<dto>> {
+    -Long budgetId
+    -String goalName
+    -double targetAmount
+    -double monthlySavingAmount
+    -double currentBalance
+  }
+
+  class "CreateShiftRequestDTO" as com_carebridge_dtos_CreateShiftRequestDTO <<dto>> {
+    -LocalDateTime startShift
+    -LocalDateTime endShift
+    -ShiftType shiftType
+    -Long planPeriodId
+    -Long locationId
+    --
+    +getStartShift() : LocalDateTime
+    +setStartShift(LocalDateTime startShift) : void
+    +getEndShift() : LocalDateTime
+    +setEndShift(LocalDateTime endShift) : void
+    +getShiftType() : ShiftType
+    +setShiftType(ShiftType shiftType) : void
+    +getPlanPeriodId() : Long
+    +setPlanPeriodId(Long planPeriodId) : void
+    +getLocationId() : Long
+    +setLocationId(Long locationId) : void
+  }
+
+  class "CreateStaffJournalEntryRequestDTO" as com_carebridge_dtos_CreateStaffJournalEntryRequestDTO <<dto>> {
+    -String title
+    -String content
+  }
+
+  class "CreateTemplateRequestDTO" as com_carebridge_dtos_CreateTemplateRequestDTO <<dto>> {
+    -String title
+    -CreateFieldRequestDTO[] Fields
+  }
+
+  class "DosageResponseDTO" as com_carebridge_dtos_DosageResponseDTO <<dto>> {
+    -Long id
+    -String medicineName
+    -String dosage
+    -String frequency
+    -LocalDate startDate
+    -LocalDate endDate
+    -String note
+    -Long residentId
+    -LocalDateTime updatedAt
+    -Long updatedByUserId
+    --
+    +DosageResponseDTO()
+    +DosageResponseDTO(Long id, String medicineName, String dosage, String frequency, LocalDate startDate, LocalDate endDate, String note, Long residentId, LocalDateTime updatedAt, Long updatedByUserId)
+    +getId() : Long
+    +getMedicineName() : String
+    +getDosage() : String
+    +getFrequency() : String
+    +getStartDate() : LocalDate
+    +getEndDate() : LocalDate
+    +getNote() : String
+    +getResidentId() : Long
+    +getUpdatedAt() : LocalDateTime
+    +getUpdatedByUserId() : Long
+  }
+
+  class "EditJournalEntryRequestDTO" as com_carebridge_dtos_EditJournalEntryRequestDTO <<dto>> {
+    -String title
+    -String riskAssessment
+    -String entryType
+    -CreateJournalEntryAnswerRequestDTO[] answers
+  }
+
+  class "EditShiftRequestDTO" as com_carebridge_dtos_EditShiftRequestDTO <<dto>> {
+    -LocalDateTime startShift
+    -LocalDateTime endShift
+    -ShiftType shiftType
+    -ShiftStatus status
+    -Long locationId
+    -Long assignedUserId
+    --
+    +EditShiftRequestDTO()
+    +getStartShift() : LocalDateTime
+    +setStartShift(LocalDateTime startShift) : void
+    +getEndShift() : LocalDateTime
+    +setEndShift(LocalDateTime endShift) : void
+    +getShiftType() : ShiftType
+    +setShiftType(ShiftType shiftType) : void
+    +getStatus() : ShiftStatus
+    +setStatus(ShiftStatus status) : void
+    +getLocationId() : Long
+    +setLocationId(Long locationId) : void
+    +getAssignedUserId() : Long
+    +setAssignedUserId(Long assignedUserId) : void
+  }
+
+  class "EventDTO" as com_carebridge_dtos_EventDTO <<dto>> {
+    -Long id
+    -String title
+    -String description
+    -Instant startAt
+    -boolean showOnBoard
+    -Long createdById
+    -Long eventTypeId
+    -LocalDate eventDate
+    -LocalTime eventTime
+    -boolean seenByCurrentUser
+    -List<Long> seenByUserIds
+    -Long residentId
+    -Boolean isPrivate
+    -String accessLevel
+    -List<Long> usersWithAccessIds
+    -Integer riskLevel
+    -String riskColor
+    -String riskDescription
+  }
+
+  class "EventTypeDTO" as com_carebridge_dtos_EventTypeDTO <<dto>> {
+    -Long id
+    -String name
+    -String colorHex
+  }
+
+  class "FieldResponseDTO" as com_carebridge_dtos_FieldResponseDTO <<dto>> {
+    -Long id
+    -String title
+    -FieldType fieldType
+    --
+    +FieldResponseDTO(Field field)
+  }
+
+  class "GuardianDTO" as com_carebridge_dtos_GuardianDTO <<dto>> {
+    -Long id
+    -String name
+    -String displayPhone
+    -String displayEmail
+    -String displayName
+    --
+    +GuardianDTO(Long id, String name, String displayPhone, String displayEmail, String displayName)
+    +getId() : Long
+    +getName() : String
+    +getDisplayPhone() : String
+    +getDisplayEmail() : String
+    +getDisplayName() : String
+  }
+
+  class "HandbookResponse" as com_carebridge_dtos_HandbookResponse <<dto>> {
+    -Long id
+    -String title
+    -List<HandbookTabResponse> handbookTabs
+    --
+    +HandbookResponse(Long id, String title, List<HandbookTabResponse> handbookTabs)
+    +getId() : Long
+    +getTitle() : String
+    +getHandbookTabs() : List<HandbookTabResponse>
+  }
+
+  class "HandbookTabResponse" as com_carebridge_dtos_HandbookTabResponse <<dto>> {
+    -Long id
+    -String title
+    -String content
+    -int orderIndex
+    --
+    +HandbookTabResponse(Long id, String title, String content, int orderIndex)
+    +getId() : Long
+    +getTitle() : String
+    +getContent() : String
+    +getOrderIndex() : int
+  }
+
+  class "JournalEntryAnswerResponseDTO" as com_carebridge_dtos_JournalEntryAnswerResponseDTO <<dto>> {
+    -Long id
+    -String answer
+    -FieldResponseDTO field
+    --
+    +JournalEntryAnswerResponseDTO(JournalEntryAnswer journalEntryAnswer)
+  }
+
+  class "JournalEntryDetailedResponseDTO" as com_carebridge_dtos_JournalEntryDetailedResponseDTO <<dto>> {
+    -Long id
+    -Long journalId
+    -Long authorUserId
+    -String title
+    -EntryType entryType
+    -RiskAssessment riskAssessment
+    -LocalDateTime createdAt
+    -LocalDateTime updatedAt
+    -LocalDateTime editCloseTime
+    -JournalEntryAnswerResponseDTO[] journalEntryAnswerResponseDTO
+    --
+    +JournalEntryDetailedResponseDTO(Long id, Long journalId, Long authorUserId, String title, EntryType entryType, RiskAssessment riskAssessment, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime editCloseTime, JournalEntryAnswerResponseDTO[] journalEntryAnswerResponseDTO)
+  }
+
+  class "JournalEntryResponseDTO" as com_carebridge_dtos_JournalEntryResponseDTO <<dto>> {
+    -Long id
+    -Long journalId
+    -Long authorUserId
+    -String title
+    -EntryType entryType
+    -RiskAssessment riskAssessment
+    -LocalDateTime createdAt
+    -LocalDateTime updatedAt
+    -LocalDateTime editCloseTime
+    --
+    +JournalEntryResponseDTO(Long id, Long journalId, Long authorUserId, String title, EntryType entryType, RiskAssessment riskAssessment, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime editCloseTime)
+  }
+
+  class "JwtUserDTO" as com_carebridge_dtos_JwtUserDTO <<dto>> {
+    -String username
+    -String password
+    -Set<String> roles
+  }
+
+  class "LinkResidentsRequest" as com_carebridge_dtos_LinkResidentsRequest <<dto>> {
+    -List<Long> residentIds
+  }
+
+  class "LocationResponseDTO" as com_carebridge_dtos_LocationResponseDTO <<dto>> {
+    -long id
+    -String locationName
+    -String Address
+    -CityResponseDTO city
+    --
+    +LocationResponseDTO(Location location)
+  }
+
+  class "MedicationChartResponseDTO" as com_carebridge_dtos_MedicationChartResponseDTO <<dto>> {
+    -Long id
+    -Long residentId
+    -List<MedicationResponseDTO> medications
+    --
+    +MedicationChartResponseDTO()
+    +MedicationChartResponseDTO(Long id, Long residentId, List<MedicationResponseDTO> medications)
+    +getId() : Long
+    +getResidentId() : Long
+    +getMedications() : List<MedicationResponseDTO>
+  }
+
+  class "MedicationResponseDTO" as com_carebridge_dtos_MedicationResponseDTO <<dto>> {
+    -Long id
+    -Long chartId
+    -Long version
+    -String name
+    -String dosage
+    -String frequency
+    -LocalDate startDate
+    -LocalDate endDate
+    -String prescribingDoctor
+    -String notes
+    -boolean active
+    --
+    +MedicationResponseDTO()
+    +MedicationResponseDTO(Long id, Long chartId, Long version, String name, String dosage, String frequency, LocalDate startDate, LocalDate endDate, String prescribingDoctor, String notes, boolean active)
+    +getId() : Long
+    +getChartId() : Long
+    +getVersion() : Long
+    +getName() : String
+    +getDosage() : String
+    +getFrequency() : String
+    +getStartDate() : LocalDate
+    +getEndDate() : LocalDate
+    +getPrescribingDoctor() : String
+    +getNotes() : String
+    +isActive() : boolean
+  }
+
+  class "MessageDTO" as com_carebridge_dtos_MessageDTO <<dto>> {
+    -Long id
+    -Long userId
+    -Long chatRoomId
+    -String message
+    -Timestamp timestamp
+  }
+
+  class "PageResponseDTO<T>" as com_carebridge_dtos_PageResponseDTO <<dto>> {
+    -List<T> items
+    -long total
+    -int page
+    -int pageSize
+    --
+    +PageResponseDTO()
+    +PageResponseDTO(List<T> items, long total, int page, int pageSize)
+    +getItems() : List<T>
+    +setItems(List<T> items) : void
+    +getTotal() : long
+    +setTotal(long total) : void
+    +getPage() : int
+    +setPage(int page) : void
+    +getPageSize() : int
+    +setPageSize(int pageSize) : void
+  }
+
+  class "PagedChatRoomsDTO" as com_carebridge_dtos_PagedChatRoomsDTO <<dto>> {
+    -List<ChatRoomDTO> chatRooms
+    -long totalCount
+  }
+
+  class "PlanPeriodResponseDTO" as com_carebridge_dtos_PlanPeriodResponseDTO <<dto>> {
+    -Long id
+    -LocalDate startDate
+    -LocalDate endDate
+    -PlanStatus status
+    -Long createdBy
+    -Instant createdAt
+  }
+
+  class "RegisterUserDTO" as com_carebridge_dtos_RegisterUserDTO <<dto>> {
+    -String name
+    -String email
+    -String password
+    -String displayName
+    -String displayEmail
+    -String displayPhone
+    -String internalEmail
+    -String internalPhone
+    -Role role
+    --
+    +RegisterUserDTO()
+    +getName() : String
+    +setName(String name) : void
+    +getEmail() : String
+    +setEmail(String email) : void
+    +getPassword() : String
+    +setPassword(String password) : void
+    +getDisplayName() : String
+    +setDisplayName(String displayName) : void
+    +getDisplayEmail() : String
+    +setDisplayEmail(String displayEmail) : void
+    +getDisplayPhone() : String
+    +setDisplayPhone(String displayPhone) : void
+    +getInternalEmail() : String
+    +setInternalEmail(String internalEmail) : void
+    +getInternalPhone() : String
+    +setInternalPhone(String internalPhone) : void
+    +getRole() : Role
+    +setRole(Role role) : void
+  }
+
+  class "ResidentDetailsResponseDTO" as com_carebridge_dtos_ResidentDetailsResponseDTO <<dto>> {
+    -Long id
+    -String firstName
+    -String lastName
+    -String cprNr
+    -Integer age
+    -String gender
+    -boolean isActive
+    -Long journalId
+    -Long medicationChartId
+    -Long userId
+    -String userDisplayName
+    -String displayPhone
+    -String displayEmail
+    -Instant createdAt
+    -Instant updatedAt
+    -List<GuardianDTO> guardians
+    --
+    +ResidentDetailsResponseDTO()
+    +ResidentDetailsResponseDTO(Long id, String firstName, String lastName, String cprNr, Integer age, String gender, boolean isActive, Long journalId, Long medicationChartId, Long userId, String userDisplayName, String displayPhone, String displayEmail, Instant createdAt, Instant updatedAt, List<GuardianDTO> guardians)
+    +getId() : Long
+    +getFirstName() : String
+    +getLastName() : String
+    +getCprNr() : String
+    +getAge() : Integer
+    +getGender() : String
+    +isActive() : boolean
+    +getJournalId() : Long
+    +getMedicationChartId() : Long
+    +getUserId() : Long
+    +getUserDisplayName() : String
+    +getDisplayPhone() : String
+    +getDisplayEmail() : String
+    +getCreatedAt() : Instant
+    +getUpdatedAt() : Instant
+    +getGuardians() : List<GuardianDTO>
+    +setGuardians(List<GuardianDTO> guardians) : void
+  }
+
+  class "ResidentResponseDTO" as com_carebridge_dtos_ResidentResponseDTO <<dto>> {
+    -Long id
+    -String firstName
+    -String lastName
+    -Long journalId
+    -Long medicationChartId
+    -String cprNr
+    -Integer age
+    -String gender
+    -boolean isActive
+    --
+    +ResidentResponseDTO()
+    +ResidentResponseDTO(Long id, String firstName, String lastName, Long journalId, Long medicationChartId)
+    +ResidentResponseDTO(Long id, String firstName, String lastName, String cprNr, Integer age, String gender, Long journalId, Long medicationChartId, boolean isActive)
+    +ResidentResponseDTO(Long id, String firstName, String lastName, Long journalId)
+    +ResidentResponseDTO(Long id, String firstName, String lastName, Long journalId, String cprNr, boolean isActive)
+    +getId() : Long
+    +getFirstName() : String
+    +getLastName() : String
+    +getJournalId() : Long
+    +getMedicationChartId() : Long
+    +getCprNr() : String
+    +getAge() : Integer
+    +getGender() : String
+    +isActive() : boolean
+  }
+
+  class "SavingsGoalResponseDTO" as com_carebridge_dtos_SavingsGoalResponseDTO <<dto>> {
+    -Long id
+    -Long budgetId
+    -String goalName
+    -double targetAmount
+    -double monthlySavingAmount
+    -double currentBalance
+    -double progressPercentage
+    --
+    +SavingsGoalResponseDTO()
+    +SavingsGoalResponseDTO(Long id, Long budgetId, String goalName, double targetAmount, double monthlySavingAmount, double currentBalance)
+    +getId() : Long
+    +getBudgetId() : Long
+    +getGoalName() : String
+    +getTargetAmount() : double
+    +getMonthlySavingAmount() : double
+    +getCurrentBalance() : double
+    +getProgressPercentage() : double
+  }
+
+  class "ShiftAssignmentDTO" as com_carebridge_dtos_ShiftAssignmentDTO <<dto>> {
+    -Long id
+    -Long shiftId
+    -Long userId
+    -ShiftType shiftType
+    -Instant assignedAt
+    -Long assignedBy
+  }
+
+  class "StaffJournalContractDTO" as com_carebridge_dtos_StaffJournalContractDTO <<dto>> {
+    -Long id
+    -String filename
+    -LocalDateTime uploadedAt
+  }
+
+  class "StaffJournalEntryResponseDTO" as com_carebridge_dtos_StaffJournalEntryResponseDTO <<dto>> {
+    -Long id
+    -String title
+    -String content
+    -Long authorId
+    -String authorName
+    -LocalDateTime createdAt
+    -LocalDateTime updatedAt
+  }
+
+  class "StaffJournalResponseDTO" as com_carebridge_dtos_StaffJournalResponseDTO <<dto>> {
+    -Long id
+    -Long userId
+    -List<StaffJournalContractDTO> contracts
+    -List<StaffJournalEntryResponseDTO> entries
+  }
+
+  class "SubstituteLocationDTO" as com_carebridge_dtos_SubstituteLocationDTO <<dto>> {
+    -Long id
+    -String locationName
+    -String address
+  }
+
+  class "SubstituteResponseDTO" as com_carebridge_dtos_SubstituteResponseDTO <<dto>> {
+    -Long id
+    -String name
+    -String email
+    -String displayEmail
+    -String displayPhone
+    -String internalEmail
+    -String internalPhone
+    -List<SubstituteLocationDTO> locations
+  }
+
+  class "TemplateDetailedResponseDTO" as com_carebridge_dtos_TemplateDetailedResponseDTO <<dto>> {
+    -Long id
+    -String title
+    -FieldResponseDTO[] fields
+    --
+    +TemplateDetailedResponseDTO(Template template)
+  }
+
+  class "TemplateResponseDTO" as com_carebridge_dtos_TemplateResponseDTO <<dto>> {
+    -Long id
+    -String title
+    --
+    +TemplateResponseDTO(Template template)
+  }
+
+  class "TotpCodeRequest" as com_carebridge_dtos_TotpCodeRequest <<dto>> {
+    -String code
+    --
+    +TotpCodeRequest()
+    +getCode() : String
+    +setCode(String code) : void
+  }
+
+  class "UpdateDosageRequestDTO" as com_carebridge_dtos_UpdateDosageRequestDTO <<dto>> {
+    -String medicineName
+    -String dosage
+    -String frequency
+    -LocalDate startDate
+    -LocalDate endDate
+    -String note
+    --
+    +UpdateDosageRequestDTO()
+    +getMedicineName() : String
+    +setMedicineName(String medicineName) : void
+    +getDosage() : String
+    +setDosage(String dosage) : void
+    +getFrequency() : String
+    +setFrequency(String frequency) : void
+    +getStartDate() : LocalDate
+    +setStartDate(LocalDate startDate) : void
+    +getEndDate() : LocalDate
+    +setEndDate(LocalDate endDate) : void
+    +getNote() : String
+    +setNote(String note) : void
+  }
+
+  class "UpdateSavingsGoalRequestDTO" as com_carebridge_dtos_UpdateSavingsGoalRequestDTO <<dto>> {
+    -String goalName
+    -Double targetAmount
+    -Double monthlySavingAmount
+    -Double currentBalance
+  }
+
+  class "UpdateStaffJournalEntryRequestDTO" as com_carebridge_dtos_UpdateStaffJournalEntryRequestDTO <<dto>> {
+    -String title
+    -String content
+  }
+
+  class "UserDTO" as com_carebridge_dtos_UserDTO <<dto>> {
+    -Long id
+    -String name
+    -String email
+    -Role role
+    -String displayName
+    -String displayEmail
+    -String displayPhone
+    -String internalEmail
+    -String internalPhone
+    -boolean isEmployed
+  }
+
+  class "UserWithLocationDTO" as com_carebridge_dtos_UserWithLocationDTO <<dto>> {
+    -Long id
+    -String name
+    -String email
+    -Role role
+    -String displayName
+    -String displayEmail
+    -String displayPhone
+    -String internalEmail
+    -String internalPhone
+    -boolean isEmployed
+    -LocationResponseDTO[] locations
+    --
+    +UserWithLocationDTO(User user)
+  }
+
+}
+
+package "com.carebridge.dtos.security" {
+  interface "ITokenSecurity" as com_carebridge_dtos_security_ITokenSecurity <<dto>> {
+    +getUserWithRolesFromToken(String token) : JwtUserDTO
+    +tokenIsValid(String token, String secret) : boolean
+    +tokenNotExpired(String token) : boolean
+    +timeToExpire(String token) : int
+    +createToken(JwtUserDTO user, String issuer, String expireMillis, String secret) : String
+    +createTempToken(String email, String preAuthType, String issuer, String secret) : String
+    +validateTempToken(String token, String expectedPreAuthType, String secret) : String
+  }
+
+  class "TokenCreationException" as com_carebridge_dtos_security_TokenCreationException <<dto>> {
+    +TokenCreationException(String message, Throwable cause)
+  }
+
+  class "TokenSecurity" as com_carebridge_dtos_security_TokenSecurity <<dto>> {
+    -{static}{readOnly} long TEMP_TOKEN_EXPIRY_MILLIS
+    --
+    +getUserWithRolesFromToken(String token) : JwtUserDTO
+    +tokenIsValid(String token, String secret) : boolean
+    +tokenNotExpired(String token) : boolean
+    +timeToExpire(String token) : int
+    +createToken(JwtUserDTO user, String issuer, String expireMillis, String secret) : String
+    +createTempToken(String email, String preAuthType, String issuer, String secret) : String
+    +validateTempToken(String token, String expectedPreAuthType, String secret) : String
+  }
+
+  class "TokenVerificationException" as com_carebridge_dtos_security_TokenVerificationException <<dto>> {
+    +TokenVerificationException(String message, Throwable cause)
+  }
+
+}
+
+package "com.carebridge.entities" {
+  class "AuditLog" as com_carebridge_entities_AuditLog <<entity>> {
+    -{static}{readOnly} long serialVersionUID
+    -Long id
+    -Instant timestamp
+    -Long doctorId
+    -Long medicationId
+    -Long chartId
+    -String action
+    -String description
+    --
+    +AuditLog()
+    +AuditLog(Long doctorId, Long medicationId, Long chartId, String action, String description)
+    protected onCreate() : void
+    +getId() : Long
+    +getTimestamp() : Instant
+    +getDoctorId() : Long
+    +getMedicationId() : Long
+    +getChartId() : Long
+    +getAction() : String
+    +getDescription() : String
+  }
+
+  class "Budget" as com_carebridge_entities_Budget <<entity>> {
+    -Long id
+    -BigDecimal income
+    -BigDecimal fixedExpenses
+    -BigDecimal variableExpenses
+    -BigDecimal pocketMoneyAmount
+    -BigDecimal savingsAmount
+    -String notes
+    -Resident resident
+    --
+    +Budget()
+  }
+
+  class "ChatRoom" as com_carebridge_entities_ChatRoom <<entity>> {
+    -Long id
+    -List<ChatRoomUser> chatRoomUser
+    -boolean isActive
+    --
+    +getId() : Long
+    +getChatRoomUser() : List<ChatRoomUser>
+    +setChatRoomUser(List<ChatRoomUser> chatRoomUsers) : void
+    +isActive() : boolean
+    +setIsActive(boolean isActive) : void
+  }
+
+  class "ChatRoomUser" as com_carebridge_entities_ChatRoomUser <<entity>> {
+    -Long id
+    -User user
+    -ChatRoom chatRoom
+    --
+    +getId() : Long
+    +getUser() : User
+    +setUser(User user) : void
+    +getChatRoom() : ChatRoom
+    +setChatRoom(ChatRoom chatRoom) : void
+  }
+
+  class "City" as com_carebridge_entities_City <<entity>> {
+    -long id
+    -String cityname
+    -int postalcode
+    -Set<Location> locations
+    --
+    +City(String cityname, int postalcode)
+    +AddLocation(Location location) : void
+    +equals(Object o) : boolean
+    +hashCode() : int
+  }
+
+  class "Dosage" as com_carebridge_entities_Dosage <<entity>> {
+    -Long id
+    -String medicineName
+    -String dosage
+    -String frequency
+    -LocalDate startDate
+    -LocalDate endDate
+    -String note
+    -LocalDateTime updatedAt
+    -Long updatedByUserId
+    -Resident resident
+    --
+    +Dosage()
+    +Dosage(String medicineName, String dosage, String frequency, LocalDate startDate, LocalDate endDate, String note, Resident resident)
+    +getId() : Long
+    +setId(Long id) : void
+    +getMedicineName() : String
+    +setMedicineName(String medicineName) : void
+    +getDosage() : String
+    +setDosage(String dosage) : void
+    +getFrequency() : String
+    +setFrequency(String frequency) : void
+    +getStartDate() : LocalDate
+    +setStartDate(LocalDate startDate) : void
+    +getEndDate() : LocalDate
+    +setEndDate(LocalDate endDate) : void
+    +getNote() : String
+    +setNote(String note) : void
+    +getResident() : Resident
+    +setResident(Resident resident) : void
+    +getUpdatedAt() : LocalDateTime
+    +setUpdatedAt(LocalDateTime updatedAt) : void
+    +getUpdatedByUserId() : Long
+    +setUpdatedByUserId(Long updatedByUserId) : void
+  }
+
+  class "Event" as com_carebridge_entities_Event <<entity>> {
+    -Long id
+    -String title
+    -String description
+    -Instant startAt
+    -boolean showOnBoard
+    -User createdBy
+    -EventType eventType
+    -Instant created_at
+    -Instant updated_at
+    -LocalDate eventDate
+    -LocalTime eventTime
+    -Set<User> seenByUsers
+    -Set<User> usersWithAccess
+    -Long residentId
+    -Integer riskLevel
+    -String riskColor
+    -String riskDescription
+    -EventAccessLevel accessLevel
+    --
+    +Event()
+    +Event(String title, String description, Instant startAt, boolean showOnBoard, User createdBy, EventType eventType)
+    +prePersist() : void
+    +preUpdate() : void
+    -syncDateTimeFromStartAt() : void
+    +getId() : Long
+    +getTitle() : String
+    +setTitle(String title) : void
+    +getDescription() : String
+    +setDescription(String description) : void
+    +getStartAt() : Instant
+    +setStartAt(Instant startAt) : void
+    +isShowOnBoard() : boolean
+    +setShowOnBoard(boolean showOnBoard) : void
+    +getCreatedBy() : User
+    +setCreatedBy(User createdBy) : void
+    +getEventType() : EventType
+    +setEventType(EventType eventType) : void
+    +getCreated_at() : Instant
+    +getUpdated_at() : Instant
+    +getEventDate() : LocalDate
+    +getEventTime() : LocalTime
+    +setEventDate(LocalDate eventDate) : void
+    +setEventTime(LocalTime eventTime) : void
+    +getSeenByUsers() : Set<User>
+    +setSeenByUsers(Set<User> seenByUsers) : void
+    +getUsersWithAccess() : Set<User>
+    +setUsersWithAccess(Set<User> users) : void
+    +getAccessLevel() : EventAccessLevel
+    +setAccessLevel(EventAccessLevel accessLevel) : void
+    +getRiskDescription() : String
+    +setRiskDescription(String riskDescription) : void
+    +getRiskColor() : String
+    +setRiskColor(String riskColor) : void
+    +getRiskLevel() : Integer
+    +setRiskLevel(Integer riskLevel) : void
+    +getResidentId() : Long
+    +setResidentId(Long residentId) : void
+    +equals(Object o) : boolean
+    +hashCode() : int
+  }
+
+  class "EventType" as com_carebridge_entities_EventType <<entity>> {
+    -Long id
+    -String name
+    -String colorHex
+    --
+    +EventType()
+    +EventType(String name, String colorHex)
+    +equals(Object o) : boolean
+    +hashCode() : int
+    +getId() : Long
+    +getName() : String
+    +setName(String name) : void
+    +getColorHex() : String
+    +setColorHex(String colorHex) : void
+  }
+
+  class "Field" as com_carebridge_entities_Field <<entity>> {
+    -Long id
+    -Template template
+    -String title
+    -FieldType fieldType
+    --
+    +setTemplate(Template template) : void
+    +equals(Object o) : boolean
+    +hashCode() : int
+  }
+
+  class "Handbook" as com_carebridge_entities_Handbook <<entity>> {
+    -Long id
+    -String title
+    -LocalDateTime createdAt
+    -List<HandbookTab> handbookTabs
+    --
+    +Handbook()
+    +Handbook(String title)
+    +addHandbookTab(HandbookTab handbookTab) : void
+    +removeHandbookTab(HandbookTab handbookTab) : void
+    +getId() : Long
+    +getTitle() : String
+    +setTitle(String title) : void
+    +getCreatedAt() : LocalDateTime
+    +getHandbookTabs() : List<HandbookTab>
+    +setHandbookTabs(List<HandbookTab> handbookTabs) : void
+  }
+
+  class "HandbookTab" as com_carebridge_entities_HandbookTab <<entity>> {
+    -Long id
+    -Handbook handbook
+    -String title
+    -String content
+    -int orderIndex
+    --
+    +HandbookTab(String title, int orderIndex)
+  }
+
+  class "Journal" as com_carebridge_entities_Journal <<entity>> {
+    -Long id
+    -List<JournalEntry> entries
+    -Resident resident
+    --
+    +addEntry(JournalEntry entry) : void
+    +getId() : Long
+    +getEntries() : List<JournalEntry>
+    +setEntries(List<JournalEntry> entries) : void
+    +setId(Long id) : void
+    +getResident() : Resident
+    +setResident(Resident resident) : void
+  }
+
+  class "JournalEntry" as com_carebridge_entities_JournalEntry <<entity>> {
+    -Long id
+    -User author
+    -Template template
+    -List<JournalEntryAnswer> journalEntryAnswers
+    -String title
+    -RiskAssessment riskAssessment
+    -EntryType entryType
+    -LocalDateTime createdAt
+    -LocalDateTime updatedAt
+    -LocalDateTime editCloseTime
+    -Journal journal
+    --
+    +JournalEntry()
+    +JournalEntry(Journal journal, User author, String title, RiskAssessment riskAssessment, EntryType entryType, Template template)
+  }
+
+  class "JournalEntryAnswer" as com_carebridge_entities_JournalEntryAnswer <<entity>> {
+    -Long id
+    -JournalEntry journalEntry
+    -String answer
+    -Field field
+  }
+
+  class "Location" as com_carebridge_entities_Location <<entity>> {
+    -long id
+    -String locationName
+    -String address
+    -Set<User> users
+    -City city
+    --
+    +Location(String locationName, String address)
+    +setCity(City city) : void
+    +addUser(User user) : void
+    +removeUser(User user) : void
+    +toString() : String
+    +equals(Object o) : boolean
+    +hashCode() : int
+  }
+
+  class "Medication" as com_carebridge_entities_Medication <<entity>> {
+    -{static}{readOnly} long serialVersionUID
+    -Long id
+    -Long version
+    -String name
+    -String dosage
+    -String frequency
+    -LocalDate startDate
+    -LocalDate endDate
+    -String prescribingDoctor
+    -String notes
+    -boolean active
+    -MedicationChart medicationChart
+    --
+    +Medication()
+    +Medication(Long id, String name, String dosage, String frequency, LocalDate startDate, LocalDate endDate, String prescribingDoctor, String notes, boolean active)
+    +Medication(String name, String dosage, String frequency, LocalDate startDate, LocalDate endDate, String prescribingDoctor, String notes, boolean active)
+    +getId() : Long
+    +getVersion() : Long
+    +getName() : String
+    +setName(String name) : void
+    +getDosage() : String
+    +setDosage(String dosage) : void
+    +getFrequency() : String
+    +setFrequency(String frequency) : void
+    +getStartDate() : LocalDate
+    +setStartDate(LocalDate startDate) : void
+    +getEndDate() : LocalDate
+    +setEndDate(LocalDate endDate) : void
+    +getPrescribingDoctor() : String
+    +setPrescribingDoctor(String prescribingDoctor) : void
+    +getNotes() : String
+    +setNotes(String notes) : void
+    +isActive() : boolean
+    +setActive(boolean active) : void
+    +getMedicationChart() : MedicationChart
+    +setMedicationChart(MedicationChart medicationChart) : void
+    +equals(Object o) : boolean
+    +hashCode() : int
+    +toString() : String
+  }
+
+  class "MedicationChart" as com_carebridge_entities_MedicationChart <<entity>> {
+    -Long id
+    -List<Medication> medications
+    -Resident resident
+    --
+    +MedicationChart()
+    +addMedication(Medication medication) : void
+    +removeMedication(Medication medication) : void
+    +getId() : Long
+    +setId(Long id) : void
+    +getMedications() : List<Medication>
+    +setMedications(List<Medication> medications) : void
+    +getResident() : Resident
+    +setResident(Resident resident) : void
+  }
+
+  class "Message" as com_carebridge_entities_Message <<entity>> {
+    -long id
+    -User user
+    -Timestamp timestamp
+    -String message
+    -ChatRoom chatRoom
+    --
+    +setMessage(String message) : void
+    protected onCreate() : void
+    +getId() : long
+    +getUser() : User
+    +getTimestamp() : Timestamp
+    +getMessage() : String
+    +getChatRoom() : ChatRoom
+  }
+
+  class "PlanPeriod" as com_carebridge_entities_PlanPeriod <<entity>> {
+    -Long id
+    -LocalDate startDate
+    -LocalDate endDate
+    -PlanStatus status
+    -Long createdBy
+    -Instant createdAt
+    --
+    -prePersist() : void
+  }
+
+  class "Resident" as com_carebridge_entities_Resident <<entity>> {
+    -Long id
+    -String firstName
+    -String lastName
+    -String cprNr
+    -Integer age
+    -String gender
+    -boolean isActive
+    -Journal journal
+    -MedicationChart medicationChart
+    -User user
+    -Set<User> users
+    -List<Dosage> dosages
+    -Budget budget
+    --
+    +Resident()
+    +Resident(String firstName, String lastName, String cprNr, Journal journal, User guardian)
+    +getId() : Long
+    +setId(Long id) : void
+    +getCprNr() : String
+    +setCprNr(String cprNr) : void
+    +getFirstName() : String
+    +setFirstName(String firstName) : void
+    +getLastName() : String
+    +setLastName(String lastName) : void
+    +getJournal() : Journal
+    +setJournal(Journal journal) : void
+    +getUsers() : Set<User>
+    +setUsers(Set<User> users) : void
+    +addUser(User user) : void
+    +removeUser(User user) : void
+    +isActive() : boolean
+    +setActive(boolean active) : void
+    +getDosages() : List<Dosage>
+    +setDosages(List<Dosage> dosages) : void
+    +getMedicationChart() : MedicationChart
+    +setMedicationChart(MedicationChart medicationChart) : void
+    +setUser(User user) : void
+  }
+
+  class "SavingsGoal" as com_carebridge_entities_SavingsGoal <<entity>> {
+    -Long id
+    -String goalName
+    -double targetAmount
+    -double monthlySavingAmount
+    -double currentBalance
+    -Budget budget
+    --
+    +SavingsGoal()
+    +getId() : Long
+    +setId(Long id) : void
+    +getGoalName() : String
+    +setGoalName(String goalName) : void
+    +getTargetAmount() : double
+    +setTargetAmount(double targetAmount) : void
+    +getMonthlySavingAmount() : double
+    +setMonthlySavingAmount(double monthlySavingAmount) : void
+    +getCurrentBalance() : double
+    +setCurrentBalance(double currentBalance) : void
+    +getBudget() : Budget
+    +setBudget(Budget budget) : void
+  }
+
+  class "Shift" as com_carebridge_entities_Shift <<entity>> {
+    -Long id
+    -LocalDateTime startShift
+    -LocalDateTime endShift
+    -String shiftType
+    -String location
+    -ShiftStatus status
+    -Long planPeriodId
+    -Long assignedUserId
+    -Long createdBy
+    -LocalDateTime createdAt
+    --
+    -prePersist() : void
+  }
+
+  class "ShiftAssignment" as com_carebridge_entities_ShiftAssignment <<entity>> {
+    -Long id
+    -Long shiftId
+    -Long userId
+    -Instant assignedAt
+    -Long assignedBy
+    --
+    package--prePersist() : void
+  }
+
+  class "StaffJournal" as com_carebridge_entities_StaffJournal <<entity>> {
+    -Long id
+    -User user
+    -List<StaffJournalEntry> entries
+    -List<StaffJournalContract> contracts
+  }
+
+  class "StaffJournalContract" as com_carebridge_entities_StaffJournalContract <<entity>> {
+    -Long id
+    -StaffJournal staffJournal
+    -String filename
+    -String path
+    -LocalDateTime uploadedAt
+    --
+    +prePersist() : void
+  }
+
+  class "StaffJournalEntry" as com_carebridge_entities_StaffJournalEntry <<entity>> {
+    -Long id
+    -StaffJournal staffJournal
+    -String title
+    -String content
+    -User author
+    -LocalDateTime createdAt
+    -LocalDateTime updatedAt
+    --
+    +prePersist() : void
+    +preUpdate() : void
+  }
+
+  class "Template" as com_carebridge_entities_Template <<entity>> {
+    -Long id
+    -List<Field> fields
+    -List<JournalEntry> journalEntries
+    -String title
+    -boolean isUsable
+    --
+    +addField(Field f) : void
+    +equals(Object o) : boolean
+    +hashCode() : int
+  }
+
+  class "User" as com_carebridge_entities_User <<entity>> {
+    -Long id
+    -String name
+    -String email
+    -String passwordHash
+    -Role role
+    -Instant created_at
+    -Instant updated_at
+    -String totpSecret
+    -boolean totpEnabled
+    -Instant totpGracePeriodEnd
+    -String displayName
+    -String displayEmail
+    -String displayPhone
+    -String internalEmail
+    -String internalPhone
+    -Resident residentProfile
+    -Set<Event> accessibleEvents
+    -List<Resident> residents
+    -Set<Location> locations
+    -boolean isEmployed
+    --
+    +User()
+    +User(String name, String email, String rawPassword, Role role)
+    +setPassword(String rawPassword) : void
+    +verifyPassword(String pw) : boolean
+    +addRole(Role role) : void
+    +removeRole(String roleName) : void
+    +addLocation(Location location) : void
+    +removeLocation(Location location) : void
+    +prePersist() : void
+    +preUpdate() : void
+    +equals(Object o) : boolean
+    +hashCode() : int
+    +getId() : Long
+    +getName() : String
+    +setName(String name) : void
+    +getEmail() : String
+    +setEmail(String email) : void
+    +getPasswordHash() : String
+    +getRole() : Role
+    +setRole(Role role) : void
+    +getCreated_at() : Instant
+    +getUpdated_at() : Instant
+    +getDisplayName() : String
+    +setDisplayName(String displayName) : void
+    +getDisplayEmail() : String
+    +setDisplayEmail(String displayEmail) : void
+    +getDisplayPhone() : String
+    +setDisplayPhone(String displayPhone) : void
+    +getInternalEmail() : String
+    +setInternalEmail(String internalEmail) : void
+    +getTotpSecret() : String
+    +setTotpSecret(String totpSecret) : void
+    +isTotpEnabled() : boolean
+    +setTotpEnabled(boolean totpEnabled) : void
+    +getTotpGracePeriodEnd() : Instant
+    +setTotpGracePeriodEnd(Instant totpGracePeriodEnd) : void
+    +getInternalPhone() : String
+    +setInternalPhone(String internalPhone) : void
+    +isEmployed() : boolean
+    +setIsEmployed(boolean isEmployed) : void
+    +getAccessibleEvents() : Set<Event>
+    +setAccessibleEvents(Set<Event> events) : void
+    +getResidents() : List<Resident>
+    +setResidents(List<Resident> residents) : void
+    +addResident(Resident resident) : void
+    +getResidentProfile() : Resident
+    +setResidentProfile(Resident residentProfile) : void
+  }
+
+}
+
+package "com.carebridge.entities.enums" {
+  enum "PlanStatus" as com_carebridge_entities_enums_PlanStatus <<entity>> {
+    DRAFT
+    PUBLISHED
+  }
+
+  enum "Role" as com_carebridge_entities_enums_Role <<entity>> {
+    ANYONE
+    USER
+    ADMIN
+    CAREWORKER
+    GUARDIAN
+    PLANNER
+    SUBSTITUTE
+  }
+
+}
+
+package "com.carebridge.entities.security" {
+  interface "ISecurityUser" as com_carebridge_entities_security_ISecurityUser <<entity>> {
+    +verifyPassword(String pw) : boolean
+    +addRole(Role role) : void
+    +removeRole(String role) : void
+  }
+
+}
+
+' Source-discoverable relationships between included classes.
+com_carebridge_config_ApplicationConfig --> com_carebridge_controllers_security_AccessController : accessController
+com_carebridge_config_Populator ..> com_carebridge_entities_EventType : uses
+com_carebridge_config_Populator ..> com_carebridge_entities_Template : uses
+com_carebridge_config_Populator ..> com_carebridge_entities_User : uses
+com_carebridge_controllers_impl_AuditLogController --> com_carebridge_dao_impl_AuditLogDAO : auditLogDAO
+com_carebridge_controllers_impl_AuditLogController ..> com_carebridge_dtos_AuditLogResponseDTO : uses
+com_carebridge_controllers_impl_AuditLogController ..> com_carebridge_entities_AuditLog : uses
+com_carebridge_controllers_impl_ChatRoomController --> com_carebridge_dao_impl_ChatRoomDAO : chatRoomDAO
+com_carebridge_controllers_impl_ChatRoomController --> com_carebridge_dao_impl_UserDAO : userDAO
+com_carebridge_controllers_impl_ChatRoomController ..> com_carebridge_entities_ChatRoom : uses
+com_carebridge_controllers_impl_ChatRoomController ..|> com_carebridge_controllers_IController
+com_carebridge_controllers_impl_ChatRoomUserController --> com_carebridge_dao_impl_ChatRoomDAO : chatRoomDAO
+com_carebridge_controllers_impl_ChatRoomUserController --> com_carebridge_dao_impl_ChatRoomUserDAO : chatRoomUserDAO
+com_carebridge_controllers_impl_ChatRoomUserController --> com_carebridge_dao_impl_UserDAO : userDAO
+com_carebridge_controllers_impl_ChatRoomUserController ..> com_carebridge_entities_ChatRoom : uses
+com_carebridge_controllers_impl_ChatRoomUserController ..> com_carebridge_entities_ChatRoomUser : uses
+com_carebridge_controllers_impl_ChatRoomUserController ..> com_carebridge_entities_User : uses
+com_carebridge_controllers_impl_ChatRoomUserController ..|> com_carebridge_controllers_IController
+com_carebridge_controllers_impl_DosageController --> com_carebridge_dao_impl_DosageDAO : dosageDAO
+com_carebridge_controllers_impl_DosageController --> com_carebridge_dao_impl_ResidentDAO : residentDAO
+com_carebridge_controllers_impl_EventController --> com_carebridge_dao_impl_EventDAO : eventDAO
+com_carebridge_controllers_impl_EventController --> com_carebridge_dao_impl_EventTypeDAO : eventTypeDAO
+com_carebridge_controllers_impl_EventController --> com_carebridge_dao_impl_ResidentDAO : residentDAO
+com_carebridge_controllers_impl_EventController --> com_carebridge_dao_impl_UserDAO : userDAO
+com_carebridge_controllers_impl_EventController ..> com_carebridge_entities_Event : uses
+com_carebridge_controllers_impl_EventController ..> com_carebridge_entities_User : uses
+com_carebridge_controllers_impl_EventController ..|> com_carebridge_controllers_IController
+com_carebridge_controllers_impl_EventTypeController --> com_carebridge_dao_impl_EventTypeDAO : eventTypeDAO
+com_carebridge_controllers_impl_EventTypeController ..> com_carebridge_entities_EventType : uses
+com_carebridge_controllers_impl_EventTypeController ..|> com_carebridge_controllers_IController
+com_carebridge_controllers_impl_JournalEntryController --> com_carebridge_dao_impl_JournalDAO : journalDAO
+com_carebridge_controllers_impl_JournalEntryController --> com_carebridge_dao_impl_JournalEntryDAO : journalEntryDAO
+com_carebridge_controllers_impl_JournalEntryController --> com_carebridge_dao_impl_TemplateDAO : templateDAO
+com_carebridge_controllers_impl_JournalEntryController --> com_carebridge_dao_impl_UserDAO : userDAO
+com_carebridge_controllers_impl_JournalEntryController ..> com_carebridge_dtos_JwtUserDTO : uses
+com_carebridge_controllers_impl_JournalEntryController ..> com_carebridge_entities_JournalEntry : uses
+com_carebridge_controllers_impl_JournalEntryController ..|> com_carebridge_controllers_IController
+com_carebridge_controllers_impl_LocationController --> com_carebridge_dao_impl_CityDAO : cityDAO
+com_carebridge_controllers_impl_LocationController --> com_carebridge_dao_impl_LocationDAO : locationDAO
+com_carebridge_controllers_impl_LocationController ..> com_carebridge_entities_Location : uses
+com_carebridge_controllers_impl_LocationController ..|> com_carebridge_controllers_IController
+com_carebridge_controllers_impl_MedicationController --> com_carebridge_dao_impl_AuditLogDAO : auditLogDAO
+com_carebridge_controllers_impl_MedicationController --> com_carebridge_dao_impl_MedicationChartDAO : medicationChartDAO
+com_carebridge_controllers_impl_MedicationController --> com_carebridge_dao_impl_MedicationDAO : medicationDAO
+com_carebridge_controllers_impl_MedicationController --> com_carebridge_dao_impl_UserDAO : userDAO
+com_carebridge_controllers_impl_MedicationController ..> com_carebridge_dtos_MedicationChartResponseDTO : uses
+com_carebridge_controllers_impl_MedicationController ..> com_carebridge_dtos_MedicationResponseDTO : uses
+com_carebridge_controllers_impl_MedicationController ..> com_carebridge_entities_Medication : uses
+com_carebridge_controllers_impl_MedicationController ..> com_carebridge_entities_MedicationChart : uses
+com_carebridge_controllers_impl_MedicationController ..|> com_carebridge_controllers_IController
+com_carebridge_controllers_impl_MessageController --> com_carebridge_dao_impl_ChatRoomDAO : chatRoomDAO
+com_carebridge_controllers_impl_MessageController --> com_carebridge_dao_impl_MessageDAO : messageDAO
+com_carebridge_controllers_impl_MessageController --> com_carebridge_dao_impl_UserDAO : userDAO
+com_carebridge_controllers_impl_MessageController ..> com_carebridge_entities_ChatRoom : uses
+com_carebridge_controllers_impl_MessageController ..> com_carebridge_entities_Message : uses
+com_carebridge_controllers_impl_MessageController ..> com_carebridge_entities_User : uses
+com_carebridge_controllers_impl_MessageController ..|> com_carebridge_controllers_IController
+com_carebridge_controllers_impl_PlanPeriodController --> com_carebridge_dao_impl_PlanPeriodDAO : planPeriodDAO
+com_carebridge_controllers_impl_PlanPeriodController --> com_carebridge_dao_impl_UserDAO : userDAO
+com_carebridge_controllers_impl_PlanPeriodController ..> com_carebridge_dtos_PlanPeriodResponseDTO : uses
+com_carebridge_controllers_impl_PlanPeriodController ..> com_carebridge_entities_PlanPeriod : uses
+com_carebridge_controllers_impl_ResidentController --> com_carebridge_dao_impl_ResidentDAO : residentDAO
+com_carebridge_controllers_impl_ResidentController --> com_carebridge_dao_impl_UserDAO : userDAO
+com_carebridge_controllers_impl_ResidentController ..> com_carebridge_dtos_ResidentResponseDTO : uses
+com_carebridge_controllers_impl_ResidentController ..> com_carebridge_entities_Resident : uses
+com_carebridge_controllers_impl_ResidentController ..> com_carebridge_entities_User : uses
+com_carebridge_controllers_impl_ResidentController ..|> com_carebridge_controllers_IController
+com_carebridge_controllers_impl_SavingsGoalController --> com_carebridge_dao_impl_SavingsGoalDAO : savingsGoalDAO
+com_carebridge_controllers_impl_SavingsGoalController ..> com_carebridge_entities_SavingsGoal : uses
+com_carebridge_controllers_impl_SavingsGoalController ..|> com_carebridge_controllers_IController
+com_carebridge_controllers_impl_ShiftAssignmentController --> com_carebridge_dao_impl_ShiftDAO : shiftDAO
+com_carebridge_controllers_impl_ShiftController --> com_carebridge_dao_impl_PlanPeriodDAO : planPeriodDAO
+com_carebridge_controllers_impl_ShiftController --> com_carebridge_dao_impl_ShiftDAO : shiftDAO
+com_carebridge_controllers_impl_ShiftController --> com_carebridge_dao_impl_UserDAO : userDAO
+com_carebridge_controllers_impl_ShiftController ..> com_carebridge_dtos_CreateShiftRequestDTO : uses
+com_carebridge_controllers_impl_ShiftController ..> com_carebridge_dtos_JwtUserDTO : uses
+com_carebridge_controllers_impl_ShiftController ..> com_carebridge_entities_Shift : uses
+com_carebridge_controllers_impl_StaffJournalController --> com_carebridge_dao_impl_StaffJournalContractDAO : contractDAO
+com_carebridge_controllers_impl_StaffJournalController --> com_carebridge_dao_impl_StaffJournalDAO : staffJournalDAO
+com_carebridge_controllers_impl_StaffJournalController --> com_carebridge_dao_impl_StaffJournalEntryDAO : entryDAO
+com_carebridge_controllers_impl_StaffJournalController --> com_carebridge_dao_impl_UserDAO : userDAO
+com_carebridge_controllers_impl_StaffJournalController ..> com_carebridge_dtos_StaffJournalContractDTO : uses
+com_carebridge_controllers_impl_StaffJournalController ..> com_carebridge_dtos_StaffJournalEntryResponseDTO : uses
+com_carebridge_controllers_impl_StaffJournalController ..> com_carebridge_dtos_StaffJournalResponseDTO : uses
+com_carebridge_controllers_impl_StaffJournalController ..> com_carebridge_entities_StaffJournal : uses
+com_carebridge_controllers_impl_StaffJournalController ..> com_carebridge_entities_StaffJournalContract : uses
+com_carebridge_controllers_impl_StaffJournalController ..> com_carebridge_entities_StaffJournalEntry : uses
+com_carebridge_controllers_impl_TemplateController --> com_carebridge_dao_impl_TemplateDAO : templateDAO
+com_carebridge_controllers_impl_TemplateController ..> com_carebridge_entities_Template : uses
+com_carebridge_controllers_impl_TemplateController ..|> com_carebridge_controllers_IController
+com_carebridge_controllers_impl_UserController --> com_carebridge_dao_impl_ResidentDAO : residentDAO
+com_carebridge_controllers_impl_UserController --> com_carebridge_dao_impl_UserDAO : userDAO
+com_carebridge_controllers_impl_UserController ..> com_carebridge_entities_User : uses
+com_carebridge_controllers_impl_UserController ..|> com_carebridge_controllers_IController
+com_carebridge_controllers_security_AccessController --> com_carebridge_controllers_security_SecurityController : securityController
+com_carebridge_controllers_security_AccessController ..|> com_carebridge_controllers_security_IAccessController
+com_carebridge_controllers_security_ISecurityController ..> com_carebridge_dtos_JwtUserDTO : uses
+com_carebridge_controllers_security_SecurityController --> com_carebridge_dao_security_ISecurityDAO : securityDAO
+com_carebridge_controllers_security_SecurityController --> com_carebridge_dtos_security_ITokenSecurity : tokenSecurity
+com_carebridge_controllers_security_SecurityController ..> com_carebridge_dtos_JwtUserDTO : uses
+com_carebridge_controllers_security_SecurityController ..> com_carebridge_entities_User : uses
+com_carebridge_controllers_security_SecurityController ..|> com_carebridge_controllers_security_ISecurityController
+com_carebridge_dao_impl_AuditLogDAO ..> com_carebridge_entities_AuditLog : uses
+com_carebridge_dao_impl_BudgetDAO ..> com_carebridge_entities_Budget : uses
+com_carebridge_dao_impl_BudgetDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_ChatRoomDAO ..> com_carebridge_entities_ChatRoom : uses
+com_carebridge_dao_impl_ChatRoomDAO ..> com_carebridge_entities_ChatRoomUser : uses
+com_carebridge_dao_impl_ChatRoomDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_ChatRoomUserDAO ..> com_carebridge_entities_ChatRoomUser : uses
+com_carebridge_dao_impl_ChatRoomUserDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_CityDAO ..> com_carebridge_entities_City : uses
+com_carebridge_dao_impl_CityDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_DosageDAO ..> com_carebridge_entities_Dosage : uses
+com_carebridge_dao_impl_EventDAO ..> com_carebridge_entities_Event : uses
+com_carebridge_dao_impl_EventDAO ..> com_carebridge_entities_User : uses
+com_carebridge_dao_impl_EventDAO ..> com_carebridge_entities_enums_Role : uses
+com_carebridge_dao_impl_EventDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_EventTypeDAO ..> com_carebridge_entities_EventType : uses
+com_carebridge_dao_impl_EventTypeDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_HandbookDAO ..> com_carebridge_entities_Handbook : uses
+com_carebridge_dao_impl_HandbookDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_HandbookTabDAO ..> com_carebridge_entities_HandbookTab : uses
+com_carebridge_dao_impl_JournalDAO ..> com_carebridge_entities_Journal : uses
+com_carebridge_dao_impl_JournalDAO ..> com_carebridge_entities_JournalEntry : uses
+com_carebridge_dao_impl_JournalDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_JournalEntryDAO ..> com_carebridge_entities_JournalEntry : uses
+com_carebridge_dao_impl_JournalEntryDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_LocationDAO ..> com_carebridge_entities_Location : uses
+com_carebridge_dao_impl_LocationDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_MedicationChartDAO ..> com_carebridge_entities_Medication : uses
+com_carebridge_dao_impl_MedicationChartDAO ..> com_carebridge_entities_MedicationChart : uses
+com_carebridge_dao_impl_MedicationDAO ..> com_carebridge_entities_Medication : uses
+com_carebridge_dao_impl_MedicationDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_MessageDAO ..> com_carebridge_entities_Message : uses
+com_carebridge_dao_impl_MessageDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_PlanPeriodDAO ..> com_carebridge_entities_PlanPeriod : uses
+com_carebridge_dao_impl_PlanPeriodDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_ResidentDAO ..> com_carebridge_entities_Resident : uses
+com_carebridge_dao_impl_ResidentDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_SavingsGoalDAO ..> com_carebridge_entities_SavingsGoal : uses
+com_carebridge_dao_impl_SavingsGoalDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_ShiftAssignmentDAO ..> com_carebridge_entities_ShiftAssignment : uses
+com_carebridge_dao_impl_ShiftAssignmentDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_ShiftDAO ..> com_carebridge_entities_Shift : uses
+com_carebridge_dao_impl_ShiftDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_StaffJournalContractDAO ..> com_carebridge_entities_StaffJournalContract : uses
+com_carebridge_dao_impl_StaffJournalDAO ..> com_carebridge_entities_StaffJournal : uses
+com_carebridge_dao_impl_StaffJournalEntryDAO ..> com_carebridge_entities_StaffJournalEntry : uses
+com_carebridge_dao_impl_TemplateDAO ..> com_carebridge_entities_Template : uses
+com_carebridge_dao_impl_TemplateDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_impl_UserDAO ..> com_carebridge_entities_Location : uses
+com_carebridge_dao_impl_UserDAO ..> com_carebridge_entities_Resident : uses
+com_carebridge_dao_impl_UserDAO ..> com_carebridge_entities_User : uses
+com_carebridge_dao_impl_UserDAO ..> com_carebridge_entities_enums_Role : uses
+com_carebridge_dao_impl_UserDAO ..|> com_carebridge_dao_IDAO
+com_carebridge_dao_security_ISecurityDAO ..> com_carebridge_entities_User : uses
+com_carebridge_dao_security_ISecurityDAO ..> com_carebridge_entities_enums_Role : uses
+com_carebridge_dao_security_SecurityDAO ..> com_carebridge_entities_User : uses
+com_carebridge_dao_security_SecurityDAO ..> com_carebridge_entities_enums_Role : uses
+com_carebridge_dao_security_SecurityDAO ..|> com_carebridge_dao_security_ISecurityDAO
+com_carebridge_dtos_ChangeRoleRequestDTO --> com_carebridge_entities_enums_Role : role
+com_carebridge_dtos_ChangeRoleRequestDTO ..> com_carebridge_entities_enums_Role : uses
+com_carebridge_dtos_ChatRoomDTO --> com_carebridge_dtos_ChatRoomUserDTO : members
+com_carebridge_dtos_CityResponseDTO ..> com_carebridge_entities_City : uses
+com_carebridge_dtos_CreateJournalEntryRequestDTO --> com_carebridge_dtos_CreateJournalEntryAnswerRequestDTO : answers
+com_carebridge_dtos_CreateLocationRequestDTO --> com_carebridge_dtos_CreateCityRequestDTO : city
+com_carebridge_dtos_CreateTemplateRequestDTO --> com_carebridge_dtos_CreateFieldRequestDTO : Fields
+com_carebridge_dtos_EditJournalEntryRequestDTO --> com_carebridge_dtos_CreateJournalEntryAnswerRequestDTO : answers
+com_carebridge_dtos_FieldResponseDTO ..> com_carebridge_entities_Field : uses
+com_carebridge_dtos_HandbookResponse --> com_carebridge_dtos_HandbookTabResponse : handbookTabs
+com_carebridge_dtos_HandbookResponse ..> com_carebridge_dtos_HandbookTabResponse : uses
+com_carebridge_dtos_JournalEntryAnswerResponseDTO --> com_carebridge_dtos_FieldResponseDTO : field
+com_carebridge_dtos_JournalEntryAnswerResponseDTO ..> com_carebridge_entities_JournalEntryAnswer : uses
+com_carebridge_dtos_JournalEntryDetailedResponseDTO --> com_carebridge_dtos_JournalEntryAnswerResponseDTO : journalEntryAnswerResponseDTO
+com_carebridge_dtos_JournalEntryDetailedResponseDTO ..> com_carebridge_dtos_JournalEntryAnswerResponseDTO : uses
+com_carebridge_dtos_LocationResponseDTO --> com_carebridge_dtos_CityResponseDTO : city
+com_carebridge_dtos_LocationResponseDTO ..> com_carebridge_entities_Location : uses
+com_carebridge_dtos_MedicationChartResponseDTO --> com_carebridge_dtos_MedicationResponseDTO : medications
+com_carebridge_dtos_MedicationChartResponseDTO ..> com_carebridge_dtos_MedicationResponseDTO : uses
+com_carebridge_dtos_PagedChatRoomsDTO --> com_carebridge_dtos_ChatRoomDTO : chatRooms
+com_carebridge_dtos_PlanPeriodResponseDTO --> com_carebridge_entities_enums_PlanStatus : status
+com_carebridge_dtos_RegisterUserDTO --> com_carebridge_entities_enums_Role : role
+com_carebridge_dtos_RegisterUserDTO ..> com_carebridge_entities_enums_Role : uses
+com_carebridge_dtos_ResidentDetailsResponseDTO --> com_carebridge_dtos_GuardianDTO : guardians
+com_carebridge_dtos_ResidentDetailsResponseDTO ..> com_carebridge_dtos_GuardianDTO : uses
+com_carebridge_dtos_StaffJournalResponseDTO --> com_carebridge_dtos_StaffJournalContractDTO : contracts
+com_carebridge_dtos_StaffJournalResponseDTO --> com_carebridge_dtos_StaffJournalEntryResponseDTO : entries
+com_carebridge_dtos_SubstituteResponseDTO --> com_carebridge_dtos_SubstituteLocationDTO : locations
+com_carebridge_dtos_TemplateDetailedResponseDTO --> com_carebridge_dtos_FieldResponseDTO : fields
+com_carebridge_dtos_TemplateDetailedResponseDTO ..> com_carebridge_entities_Template : uses
+com_carebridge_dtos_TemplateResponseDTO ..> com_carebridge_entities_Template : uses
+com_carebridge_dtos_UserDTO --> com_carebridge_entities_enums_Role : role
+com_carebridge_dtos_UserWithLocationDTO --> com_carebridge_dtos_LocationResponseDTO : locations
+com_carebridge_dtos_UserWithLocationDTO --> com_carebridge_entities_enums_Role : role
+com_carebridge_dtos_UserWithLocationDTO ..> com_carebridge_entities_User : uses
+com_carebridge_dtos_security_ITokenSecurity ..> com_carebridge_dtos_JwtUserDTO : uses
+com_carebridge_dtos_security_TokenSecurity ..> com_carebridge_dtos_JwtUserDTO : uses
+com_carebridge_dtos_security_TokenSecurity ..|> com_carebridge_dtos_security_ITokenSecurity
+com_carebridge_entities_Budget --> com_carebridge_entities_Resident : resident
+com_carebridge_entities_ChatRoom --> com_carebridge_entities_ChatRoomUser : chatRoomUser
+com_carebridge_entities_ChatRoom ..> com_carebridge_entities_ChatRoomUser : uses
+com_carebridge_entities_ChatRoomUser --> com_carebridge_entities_ChatRoom : chatRoom
+com_carebridge_entities_ChatRoomUser --> com_carebridge_entities_User : user
+com_carebridge_entities_ChatRoomUser ..> com_carebridge_entities_ChatRoom : uses
+com_carebridge_entities_ChatRoomUser ..> com_carebridge_entities_User : uses
+com_carebridge_entities_City --> com_carebridge_entities_Location : locations
+com_carebridge_entities_City ..> com_carebridge_entities_Location : uses
+com_carebridge_entities_Dosage --> com_carebridge_entities_Resident : resident
+com_carebridge_entities_Dosage ..> com_carebridge_entities_Resident : uses
+com_carebridge_entities_Event --> com_carebridge_entities_EventType : eventType
+com_carebridge_entities_Event --> com_carebridge_entities_User : createdBy
+com_carebridge_entities_Event --> com_carebridge_entities_User : seenByUsers
+com_carebridge_entities_Event --> com_carebridge_entities_User : usersWithAccess
+com_carebridge_entities_Event ..> com_carebridge_entities_EventType : uses
+com_carebridge_entities_Event ..> com_carebridge_entities_User : uses
+com_carebridge_entities_Field --> com_carebridge_entities_Template : template
+com_carebridge_entities_Field ..> com_carebridge_entities_Template : uses
+com_carebridge_entities_Handbook --> com_carebridge_entities_HandbookTab : handbookTabs
+com_carebridge_entities_Handbook ..> com_carebridge_entities_HandbookTab : uses
+com_carebridge_entities_HandbookTab --> com_carebridge_entities_Handbook : handbook
+com_carebridge_entities_Journal --> com_carebridge_entities_JournalEntry : entries
+com_carebridge_entities_Journal --> com_carebridge_entities_Resident : resident
+com_carebridge_entities_Journal ..> com_carebridge_entities_JournalEntry : uses
+com_carebridge_entities_Journal ..> com_carebridge_entities_Resident : uses
+com_carebridge_entities_JournalEntry --> com_carebridge_entities_Journal : journal
+com_carebridge_entities_JournalEntry --> com_carebridge_entities_JournalEntryAnswer : journalEntryAnswers
+com_carebridge_entities_JournalEntry --> com_carebridge_entities_Template : template
+com_carebridge_entities_JournalEntry --> com_carebridge_entities_User : author
+com_carebridge_entities_JournalEntry ..> com_carebridge_entities_Journal : uses
+com_carebridge_entities_JournalEntry ..> com_carebridge_entities_Template : uses
+com_carebridge_entities_JournalEntry ..> com_carebridge_entities_User : uses
+com_carebridge_entities_JournalEntryAnswer --> com_carebridge_entities_Field : field
+com_carebridge_entities_JournalEntryAnswer --> com_carebridge_entities_JournalEntry : journalEntry
+com_carebridge_entities_Location --> com_carebridge_entities_City : city
+com_carebridge_entities_Location --> com_carebridge_entities_User : users
+com_carebridge_entities_Location ..> com_carebridge_entities_City : uses
+com_carebridge_entities_Location ..> com_carebridge_entities_User : uses
+com_carebridge_entities_Medication --> com_carebridge_entities_MedicationChart : medicationChart
+com_carebridge_entities_Medication ..> com_carebridge_entities_MedicationChart : uses
+com_carebridge_entities_MedicationChart --> com_carebridge_entities_Medication : medications
+com_carebridge_entities_MedicationChart --> com_carebridge_entities_Resident : resident
+com_carebridge_entities_MedicationChart ..> com_carebridge_entities_Medication : uses
+com_carebridge_entities_MedicationChart ..> com_carebridge_entities_Resident : uses
+com_carebridge_entities_Message --> com_carebridge_entities_ChatRoom : chatRoom
+com_carebridge_entities_Message --> com_carebridge_entities_User : user
+com_carebridge_entities_Message ..> com_carebridge_entities_ChatRoom : uses
+com_carebridge_entities_Message ..> com_carebridge_entities_User : uses
+com_carebridge_entities_PlanPeriod --> com_carebridge_entities_enums_PlanStatus : status
+com_carebridge_entities_Resident --> com_carebridge_entities_Budget : budget
+com_carebridge_entities_Resident --> com_carebridge_entities_Dosage : dosages
+com_carebridge_entities_Resident --> com_carebridge_entities_Journal : journal
+com_carebridge_entities_Resident --> com_carebridge_entities_MedicationChart : medicationChart
+com_carebridge_entities_Resident --> com_carebridge_entities_User : user
+com_carebridge_entities_Resident --> com_carebridge_entities_User : users
+com_carebridge_entities_Resident ..> com_carebridge_entities_Dosage : uses
+com_carebridge_entities_Resident ..> com_carebridge_entities_Journal : uses
+com_carebridge_entities_Resident ..> com_carebridge_entities_MedicationChart : uses
+com_carebridge_entities_Resident ..> com_carebridge_entities_User : uses
+com_carebridge_entities_SavingsGoal --> com_carebridge_entities_Budget : budget
+com_carebridge_entities_SavingsGoal ..> com_carebridge_entities_Budget : uses
+com_carebridge_entities_StaffJournal --> com_carebridge_entities_StaffJournalContract : contracts
+com_carebridge_entities_StaffJournal --> com_carebridge_entities_StaffJournalEntry : entries
+com_carebridge_entities_StaffJournal --> com_carebridge_entities_User : user
+com_carebridge_entities_StaffJournalContract --> com_carebridge_entities_StaffJournal : staffJournal
+com_carebridge_entities_StaffJournalEntry --> com_carebridge_entities_StaffJournal : staffJournal
+com_carebridge_entities_StaffJournalEntry --> com_carebridge_entities_User : author
+com_carebridge_entities_Template --> com_carebridge_entities_Field : fields
+com_carebridge_entities_Template --> com_carebridge_entities_JournalEntry : journalEntries
+com_carebridge_entities_Template ..> com_carebridge_entities_Field : uses
+com_carebridge_entities_User --> com_carebridge_entities_Event : accessibleEvents
+com_carebridge_entities_User --> com_carebridge_entities_Location : locations
+com_carebridge_entities_User --> com_carebridge_entities_Resident : residentProfile
+com_carebridge_entities_User --> com_carebridge_entities_Resident : residents
+com_carebridge_entities_User --> com_carebridge_entities_enums_Role : role
+com_carebridge_entities_User ..> com_carebridge_entities_Event : uses
+com_carebridge_entities_User ..> com_carebridge_entities_Location : uses
+com_carebridge_entities_User ..> com_carebridge_entities_Resident : uses
+com_carebridge_entities_User ..> com_carebridge_entities_enums_Role : uses
+com_carebridge_entities_User ..|> com_carebridge_entities_security_ISecurityUser
+com_carebridge_entities_security_ISecurityUser ..> com_carebridge_entities_enums_Role : uses
+
+note bottom
+Generated from source-declared members in the requested packages.
+Excluded package types may still appear in member signatures, but are not rendered as class boxes.
+end note
+
+@enduml
